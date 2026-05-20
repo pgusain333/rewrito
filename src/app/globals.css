@@ -389,6 +389,43 @@ html {
   color: var(--ink);
 }
 
+.typing-reveal {
+  display: inline-block;
+  overflow: hidden;
+  max-width: 100%;
+  white-space: nowrap;
+  vertical-align: bottom;
+  animation: typing-reveal 4.2s steps(34, end) infinite;
+}
+
+.animate-typing-dot {
+  animation: typing-dot 1.25s ease-in-out infinite;
+}
+
+@keyframes typing-reveal {
+  0%,
+  12% {
+    width: 0%;
+  }
+  48%,
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes typing-dot {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  40% {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
