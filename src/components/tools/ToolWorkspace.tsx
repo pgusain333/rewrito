@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   TOOLS,
   TONES,
@@ -48,6 +48,7 @@ function countWords(s: string): number {
 }
 
 export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: Props) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [tool, setTool] = useState<ToolType>(initialTool);
   const [tone, setTone] = useState<Tone>("professional");
   const [refinement, setRefinement] = useState<Refinement>("medium");
@@ -63,6 +64,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
   const [scores, setScores] = useState<ScorePair | null>(null);
   const [loading, setLoading] = useState(false);
   const [creatingTestlet, setCreatingTestlet] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [testletError, setTestletError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -87,9 +89,9 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
   const outputWords = useMemo(() => countWords(output), [output]);
   const usageText = user
     ? remaining > 0
-      ? "Signed in"
+      ? `${remaining} uses left`
       : "Limit reached"
-    : "Free workspace";
+    : `${remaining} uses left`;
 
   function resetResult() {
     setOutput("");
@@ -269,6 +271,49 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
     resetResult();
   }
 
+  async function handleStudyFileUpload(file: File | null) {
+    if (!file) return;
+    setError(null);
+    resetResult();
+
+    const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+    const isText =
+      file.type.startsWith("text/") ||
+      [".txt", ".md", ".csv"].some((ext) => file.name.toLowerCase().endsWith(ext));
+
+    try {
+      if (isPdf) {
+        setUploadingPdf(true);
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/extract-pdf", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data?.error ?? "Could not read this PDF.");
+          return;
+        }
+        setInput(data.text);
+        return;
+      }
+
+      if (isText) {
+        const text = await file.text();
+        setInput(text.trim());
+        return;
+      }
+
+      setError("Upload a PDF or text file.");
+    } catch {
+      setError("Could not read this file. Please try again.");
+    } finally {
+      setUploadingPdf(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   const toolMeta = TOOLS[tool];
   const ToolIcon =
     tool === "humanizer"
@@ -329,15 +374,29 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
             </label>
             <div className="flex items-center gap-2">
               {isStudy && (
-                <button
-                  type="button"
-                  disabled
-                  title="PDF upload placeholder"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-subtle"
-                >
-                  <UploadIcon size={13} />
-                  Upload PDF
-                </button>
+                <>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.txt,.md,.csv,application/pdf,text/*"
+                    className="sr-only"
+                    onChange={(e) => handleStudyFileUpload(e.target.files?.[0] ?? null)}
+                  />
+                  <button
+                    type="button"
+                    disabled={uploadingPdf}
+                    onClick={() => fileInputRef.current?.click()}
+                    title="Upload PDF or text file"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted transition-colors hover:border-ink-subtle hover:text-ink disabled:opacity-60"
+                  >
+                    {uploadingPdf ? (
+                      <span className="h-3 w-3 animate-spin rounded-full border-2 border-ink-subtle/30 border-t-brand" />
+                    ) : (
+                      <UploadIcon size={13} />
+                    )}
+                    {uploadingPdf ? "Reading PDF" : "Upload PDF"}
+                  </button>
+                </>
               )}
               <button
                 onClick={handleSample}
@@ -549,6 +608,14 @@ function placeholderFor(tool: ToolType): string {
   }
 }
 
+function cleanStudyMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/__(.*?)__/g, "$1")
+    .replace(/\s+\n/g, "\n")
+    .trim();
+}
+
 function StudyControls({
   studyMode,
   setStudyMode,
@@ -704,7 +771,7 @@ function parseStudySections(output: string) {
   const heading = /^(?:#{1,3}\s*)?(?:\d+\.\s*)?(Simple Explanation|Key Concept|Step-by-Step Breakdown|Example|Common Mistake|Practice Question)\s*:?\s*$/i;
 
   for (const line of output.split(/\r?\n/)) {
-    const match = line.trim().match(heading);
+    const match = cleanStudyMarkdown(line.trim()).match(heading);
     if (match) {
       const nextIndex = STUDY_SECTION_TITLES.findIndex(
         (title) => title.toLowerCase() === match[1].toLowerCase()
@@ -717,12 +784,12 @@ function parseStudySections(output: string) {
 
   const cleaned = sections.map((section) => ({
     ...section,
-    content: section.content.trim(),
+    content: cleanStudyMarkdown(section.content),
   }));
 
   return cleaned.some((section) => section.content)
     ? cleaned
-    : [{ title: "Simple Explanation", content: output.trim() }];
+    : [{ title: "Simple Explanation", content: cleanStudyMarkdown(output) }];
 }
 
 function StudyOutput({
@@ -841,8 +908,7 @@ type QuizQuestion = {
 };
 
 function cleanStudyLine(line: string): string {
-  return line
-    .replace(/\*\*/g, "")
+  return cleanStudyMarkdown(line)
     .replace(/^#+\s*/, "")
     .replace(/^[-*]\s+/, "")
     .trim();

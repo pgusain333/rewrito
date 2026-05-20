@@ -108,7 +108,7 @@ export function LoginModal({
 
         <div className="mb-5 pr-10 text-center">
           <div className="mx-auto mb-4 flex justify-center">
-            <Logo size={34} />
+            <Logo size={42} />
           </div>
           <h2 id="login-headline" className="text-xl font-semibold text-ink">
             {headline}

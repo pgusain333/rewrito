@@ -47,7 +47,7 @@ export function Navbar() {
         className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8"
       >
         <Link href="/" aria-label="rewrito home" className="-ml-1 rounded-lg p-1">
-          <Logo size={22} />
+          <Logo size={28} />
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">

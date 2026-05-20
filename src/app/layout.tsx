@@ -13,16 +13,20 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rewrito.ai";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  applicationName: "rewrito",
   title: {
     default: "rewrito - AI-powered professional communication",
     template: "%s - rewrito",
   },
   description:
-    "Humanize AI text, rewrite LinkedIn posts, and improve professional emails with rewrito. A simple AI writing toolkit built for clear communication.",
+    "Humanize AI text, rewrite LinkedIn posts, improve professional emails, and study concepts clearly with rewrito.",
   keywords: [
     "AI humanizer",
     "LinkedIn post rewriter",
     "email rewriter",
+    "AI study assistant",
+    "flashcard generator",
+    "quiz generator",
     "AI writing tool",
     "professional communication",
     "rewrito",
@@ -34,20 +38,69 @@ export const metadata: Metadata = {
     url: siteUrl,
     title: "rewrito - AI-powered professional communication",
     description:
-      "Rough text in. Refined communication out. Humanize AI text, polish LinkedIn posts, and rewrite emails.",
+      "Rough text in. Refined communication out. Humanize AI text, polish LinkedIn posts, rewrite emails, and study clearly.",
     siteName: "rewrito",
     locale: "en_US",
+    images: [{ url: "/rewrito-logo.png", width: 1200, height: 320, alt: "rewrito" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "rewrito - AI-powered professional communication",
     description:
-      "Humanize AI text, rewrite LinkedIn posts, and improve professional emails.",
+      "Humanize AI text, rewrite LinkedIn posts, improve professional emails, and study concepts clearly.",
+    images: ["/rewrito-logo.png"],
   },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "rewrito",
+      url: siteUrl,
+      logo: `${siteUrl}/rewrito-logo.png`,
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "hello@rewrito.ai",
+        contactType: "customer support",
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      name: "rewrito",
+      url: siteUrl,
+      publisher: { "@id": `${siteUrl}/#organization` },
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "rewrito",
+      url: siteUrl,
+      applicationCategory: "WritingApplication",
+      operatingSystem: "Web",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -59,6 +112,10 @@ export default function RootLayout({
     <html lang="en" className={poppins.variable}>
       <body className="min-h-screen bg-bg text-ink antialiased">
         {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </body>
     </html>
   );

@@ -199,10 +199,13 @@ function ToolScreenMockup({
     <div className="relative h-36 [perspective:900px]" aria-hidden>
       <div className="absolute inset-x-2 top-3 rounded-2xl border border-line bg-white p-3 shadow-card transition-transform duration-300 [transform:rotateX(8deg)_rotateY(-12deg)] group-hover:[transform:rotateX(4deg)_rotateY(-6deg)_translateY(-3px)]">
         <div className="mb-3 flex items-center justify-between">
-          <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ${accent}`}>
-            <Icon size={16} />
+          <span className="flex min-w-0 items-center gap-2">
+            <span className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${accent}`}>
+              <Icon size={16} />
+            </span>
+            <span className="truncate text-[11px] font-semibold text-ink">{tool}</span>
           </span>
-          <span className="h-2 w-16 rounded-full bg-line" />
+          <span className="h-2 w-10 shrink-0 rounded-full bg-line" />
         </div>
         <div className="space-y-2">
           {rows.map((row, index) => (

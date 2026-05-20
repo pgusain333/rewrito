@@ -178,7 +178,7 @@ Strict rules:
 }
 
 export function buildUserPrompt(input: string): string {
-  return `Rewrite the following text according to the rules above. Return only the rewritten version.\n\n---\n${input}\n---`;
+  return `Rewrite the following text according to the rules above. Return only the rewritten version.\n\nText begins:\n${input}\nText ends.`;
 }
 
 export function buildStudySystemPrompt({
@@ -231,6 +231,7 @@ Strict teaching rules:
 - Avoid unnecessary complexity.
 - Keep the response organized and beginner friendly.
 - Use formulas only when useful, and explain each symbol.
+- Do not wrap words in markdown bold markers.
 - Do not include a section named "Final Takeaway".
 
 Return the response with exactly these markdown headings, in this order:
@@ -280,10 +281,9 @@ export function buildStudyUserPrompt({
 Study mode: ${studyMode}
 Education level: ${educationLevel}${planDetails}
 
-Material:
----
+Material begins:
 ${input}
----`;
+Material ends.`;
 }
 
 // ---------------------------------------------------------------------------

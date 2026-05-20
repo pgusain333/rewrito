@@ -7,6 +7,7 @@ type Props = {
 };
 
 export function Logo({ size = 28, className = "" }: Props) {
+  const width = Math.round(size * 3.75);
   return (
     <span
       className={`inline-flex select-none items-center ${className}`}
@@ -15,10 +16,10 @@ export function Logo({ size = 28, className = "" }: Props) {
       <img
         src="/rewrito-logo.png"
         alt="rewrito"
-        width={Math.round(size * 4.45)}
+        width={width}
         height={size}
         className="h-auto max-w-full object-contain"
-        style={{ width: Math.round(size * 4.45), height: size }}
+        style={{ width, height: size }}
       />
     </span>
   );
