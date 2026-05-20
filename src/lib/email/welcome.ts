@@ -1,3 +1,6 @@
+import type { User } from "@supabase/supabase-js";
+import { createSupabaseServiceClient } from "@/lib/supabase/server";
+
 const RESEND_EMAILS_ENDPOINT = "https://api.resend.com/emails";
 
 const subject = "Welcome to rewrito - your writing and study workspace";
@@ -154,4 +157,49 @@ export async function sendWelcomeEmail({
   }
 
   return { skipped: false, id: payload?.id as string | undefined };
+}
+
+export async function sendWelcomeEmailForUser(user: User) {
+  if (!user.email) {
+    return { sent: false, reason: "Authenticated user has no email address" };
+  }
+
+  const service = createSupabaseServiceClient();
+  const { data: profile, error: profileError } = await service
+    .from("profiles")
+    .select("welcome_email_sent_at")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    throw new Error(`Could not read welcome email status: ${profileError.message}`);
+  }
+
+  if (profile?.welcome_email_sent_at) {
+    return { sent: false, reason: "Welcome email already sent" };
+  }
+
+  const result = await sendWelcomeEmail({
+    to: user.email,
+    idempotencyKey: `welcome-user/${user.id}`,
+  });
+
+  if (result.skipped) {
+    return { sent: false, reason: result.reason };
+  }
+
+  const { error: updateError } = await service.from("profiles").upsert(
+    {
+      id: user.id,
+      email: user.email,
+      welcome_email_sent_at: new Date().toISOString(),
+    },
+    { onConflict: "id" }
+  );
+
+  if (updateError) {
+    throw new Error(`Could not mark welcome email as sent: ${updateError.message}`);
+  }
+
+  return { sent: true, id: result.id };
 }

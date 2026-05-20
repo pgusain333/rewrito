@@ -14,15 +14,21 @@ type Props = {
   subline?: string;
 };
 
+type AuthMode = "login" | "signup";
+type Status = "idle" | "sending" | "sent" | "success" | "error";
+
 export function LoginModal({
   open,
   onClose,
   headline = "Welcome to rewrito",
   subline = "Sign in to keep rewriting.",
 }: Props) {
+  const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
+  const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -36,9 +42,26 @@ export function LoginModal({
     }
   }, [open]);
 
-  async function handleGoogle() {
-    setError(null);
+  function resetFeedback() {
     setStatus("idle");
+    setError(null);
+    setNotice(null);
+  }
+
+  async function sendWelcomeEmail() {
+    try {
+      const response = await fetch("/api/welcome-email", { method: "POST" });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        console.warn("Welcome email could not be sent", payload);
+      }
+    } catch (err) {
+      console.warn("Welcome email request failed", err);
+    }
+  }
+
+  async function handleGoogle() {
+    resetFeedback();
     setGoogleLoading(true);
     try {
       const supabase = createSupabaseBrowserClient();
@@ -66,13 +89,86 @@ export function LoginModal({
     }
   }
 
-  async function handleEmail(e: React.FormEvent) {
+  async function handlePasswordAuth(e: React.FormEvent) {
     e.preventDefault();
-      const normalizedEmail = email.trim();
-      const normalizedName = name.trim();
-      if (!normalizedEmail) return;
+    const normalizedEmail = email.trim();
+    const normalizedName = name.trim();
+    if (!normalizedEmail || !password) return;
+
+    resetFeedback();
     setStatus("sending");
-    setError(null);
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const emailRedirectTo =
+        typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined;
+
+      if (mode === "signup") {
+        if (normalizedName && typeof window !== "undefined") {
+          window.localStorage.setItem(LS_KEYS.pendingName, normalizedName);
+        }
+
+        const { data, error } = await supabase.auth.signUp({
+          email: normalizedEmail,
+          password,
+          options: {
+            emailRedirectTo,
+            data: normalizedName ? { full_name: normalizedName, name: normalizedName } : undefined,
+          },
+        });
+
+        if (error) {
+          setError(error.message);
+          setStatus("error");
+          return;
+        }
+
+        if (data.session) {
+          await sendWelcomeEmail();
+          setStatus("success");
+          setNotice("Your account is ready. You are signed in.");
+          onClose();
+          return;
+        }
+
+        setStatus("sent");
+        setNotice(`We sent a confirmation link to ${normalizedEmail}. Confirm your email once, then log in with your password.`);
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
+
+      if (error) {
+        setError(error.message);
+        setStatus("error");
+        return;
+      }
+
+      await sendWelcomeEmail();
+      setStatus("success");
+      setNotice("You are signed in.");
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign-in could not be completed.");
+      setStatus("error");
+    }
+  }
+
+  async function handleMagicLink() {
+    const normalizedEmail = email.trim();
+    const normalizedName = name.trim();
+    if (!normalizedEmail) {
+      setError("Enter your email first.");
+      setStatus("error");
+      return;
+    }
+
+    resetFeedback();
+    setStatus("sending");
+
     try {
       const supabase = createSupabaseBrowserClient();
       if (normalizedName && typeof window !== "undefined") {
@@ -92,8 +188,8 @@ export function LoginModal({
         setError(error.message);
         setStatus("error");
       } else {
-        setEmail(normalizedEmail);
         setStatus("sent");
+        setNotice(`We sent a sign-in link to ${normalizedEmail}.`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Magic link could not be sent.");
@@ -123,6 +219,33 @@ export function LoginModal({
           <p className="mt-1.5 text-sm text-ink-muted">{subline}</p>
         </div>
 
+        <div className="mb-4 grid grid-cols-2 rounded-xl border border-line bg-bg-section p-1">
+          <button
+            type="button"
+            onClick={() => {
+              setMode("login");
+              resetFeedback();
+            }}
+            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+              mode === "login" ? "bg-white text-ink shadow-soft" : "text-ink-muted hover:text-ink"
+            }`}
+          >
+            Log in
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMode("signup");
+              resetFeedback();
+            }}
+            className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${
+              mode === "signup" ? "bg-white text-ink shadow-soft" : "text-ink-muted hover:text-ink"
+            }`}
+          >
+            Create account
+          </button>
+        </div>
+
         <button
           type="button"
           onClick={handleGoogle}
@@ -144,15 +267,14 @@ export function LoginModal({
           <div className="h-px flex-1 bg-line" />
         </div>
 
-        {status === "sent" ? (
-          <div className="rounded-xl bg-bg-section p-4 text-center text-sm text-ink">
-            <p className="font-medium">Check your inbox.</p>
-            <p className="mt-1 text-ink-muted">
-              We sent a magic sign-in link to <span className="font-medium text-ink">{email}</span>.
-            </p>
+        {notice && (
+          <div className="mb-3 rounded-xl bg-bg-section p-4 text-center text-sm leading-relaxed text-ink">
+            {notice}
           </div>
-        ) : (
-          <form onSubmit={handleEmail} className="space-y-3">
+        )}
+
+        <form onSubmit={handlePasswordAuth} className="space-y-3">
+          {mode === "signup" && (
             <label className="block">
               <span className="field-label">Name</span>
               <input
@@ -164,23 +286,51 @@ export function LoginModal({
                 className="input-base"
               />
             </label>
-            <label className="block">
-              <span className="field-label">Email</span>
-              <input
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
-                className="input-base"
-              />
-            </label>
-            <button type="submit" disabled={status === "sending"} className="btn-primary w-full">
-              {status === "sending" ? "Sending link..." : "Continue with email"}
-            </button>
-          </form>
-        )}
+          )}
+          <label className="block">
+            <span className="field-label">Email</span>
+            <input
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@company.com"
+              className="input-base"
+            />
+          </label>
+          <label className="block">
+            <span className="field-label">Password</span>
+            <input
+              type="password"
+              required
+              minLength={6}
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={mode === "signup" ? "Create a password" : "Your password"}
+              className="input-base"
+            />
+          </label>
+          <button type="submit" disabled={status === "sending"} className="btn-primary w-full">
+            {status === "sending"
+              ? mode === "signup"
+                ? "Creating account..."
+                : "Signing in..."
+              : mode === "signup"
+                ? "Create account"
+                : "Log in"}
+          </button>
+        </form>
+
+        <button
+          type="button"
+          onClick={handleMagicLink}
+          disabled={status === "sending"}
+          className="mt-3 block w-full text-center text-sm font-medium text-brand hover:text-ink"
+        >
+          Send me a magic link instead
+        </button>
 
         {error && (
           <div className="mt-3 rounded-xl border border-error/30 bg-error/5 px-3.5 py-2.5 text-sm leading-relaxed text-error">

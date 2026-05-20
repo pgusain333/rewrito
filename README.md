@@ -6,7 +6,7 @@ AI-powered professional communication: humanize AI text, rewrite LinkedIn posts,
 
 - AI Humanizer, LinkedIn Post Rewriter, and Professional Email Rewriter
 - Anonymous trials with server-side usage enforcement
-- Supabase Auth with Google OAuth and email magic links
+- Supabase Auth with Google OAuth, email/password login, email confirmation, and optional magic links
 - Resend welcome emails after first successful sign-in
 - Dashboard with rewrite history
 - AI quality scoring plus AI-generated confidence scoring
@@ -33,8 +33,9 @@ Run `supabase/schema.sql` in your Supabase SQL editor before testing auth, usage
    - Optional local redirect: `http://localhost:3000/auth/callback`
 4. In Supabase Auth Providers, enable Google and add the Google OAuth client ID and secret.
 5. In Google Cloud Console, add Supabase's Google callback URL as an authorized redirect URI. Supabase shows the exact URL in Auth Providers > Google.
-6. To send magic links from `hello@rewrito.ai`, configure Supabase Auth SMTP with your mail provider and set the sender/from address to `hello@rewrito.ai`. Verify SPF, DKIM, and DMARC for `rewrito.ai`.
-7. To send welcome emails from Resend, add `RESEND_API_KEY`, `RESEND_FROM`, and optionally `REWRITO_REVIEW_URL` in Vercel. The auth callback sends one welcome email and stores `welcome_email_sent_at` in `profiles`.
+6. In Supabase Auth Email settings, keep email confirmations enabled so first-time password sign-ups confirm their email once before logging in with password.
+7. To send auth emails from `hello@rewrito.ai`, configure Supabase Auth SMTP with your mail provider and set the sender/from address to `hello@rewrito.ai`. Verify SPF, DKIM, and DMARC for `rewrito.ai`.
+8. To send welcome emails from Resend, add `RESEND_API_KEY`, `RESEND_FROM`, and optionally `REWRITO_REVIEW_URL` in Vercel. The auth callback and password-login welcome endpoint send one welcome email and store `welcome_email_sent_at` in `profiles`.
 
 ## Scripts
 
