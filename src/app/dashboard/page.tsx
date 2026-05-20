@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { Logo } from "@/components/ui/Logo";
 import { createSupabaseServerClient, createSupabaseServiceClient } from "@/lib/supabase/server";
 import {
   EDUCATION_LEVELS,
@@ -11,7 +12,17 @@ import {
   type StudyMode,
   type ToolType,
 } from "@/lib/prompts";
-import { ArrowRightIcon } from "@/components/ui/icons";
+import { USER_LIMIT } from "@/lib/usage/limits";
+import {
+  ArrowRightIcon,
+  LinkedinIcon,
+  MailIcon,
+  ShieldCheckIcon,
+  SparkleIcon,
+  StudyIcon,
+  UserIcon,
+  WandIcon,
+} from "@/components/ui/icons";
 import { HistoryCopyButton } from "@/components/tools/HistoryCopyButton";
 
 export const dynamic = "force-dynamic";
@@ -85,13 +96,16 @@ export default async function DashboardPage() {
   const avgAfter = scored.length
     ? Math.round(scored.reduce((sum, row) => sum + row.scores!.after.overall, 0) / scored.length)
     : null;
+  const displayName = getDisplayName(user);
 
   return (
     <>
       <Navbar />
       <main className="bg-bg-soft min-h-[60vh]">
-        <div className="mx-auto max-w-5xl px-5 py-10 sm:px-8 sm:py-14">
-          <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-10 sm:px-8 sm:py-14 lg:flex-row lg:items-start">
+          <DashboardSidebar email={user.email ?? ""} name={displayName} used={used} />
+          <div className="min-w-0 flex-1">
+            <div className="mb-6 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
                 Welcome back
@@ -260,9 +274,97 @@ export default async function DashboardPage() {
               </ul>
             )}
           </section>
+          </div>
         </div>
       </main>
       <Footer />
     </>
+  );
+}
+
+function getDisplayName(user: { email?: string | null; user_metadata?: Record<string, unknown> }) {
+  const rawName =
+    user.user_metadata?.full_name ?? user.user_metadata?.name ?? user.user_metadata?.display_name;
+  if (typeof rawName === "string" && rawName.trim()) return rawName.trim().split(/\s+/)[0];
+  if (user.email) return user.email.split("@")[0];
+  return "there";
+}
+
+function DashboardSidebar({
+  email,
+  name,
+  used,
+}: {
+  email: string;
+  name: string;
+  used: number;
+}) {
+  const remaining = Math.max(0, USER_LIMIT - used);
+  const progress = Math.min(100, Math.round((used / USER_LIMIT) * 100));
+  const navItems = [
+    { href: "/try", label: "New session", Icon: WandIcon, active: true },
+    { href: "/ai-humanizer", label: "AI Humanizer", Icon: SparkleIcon },
+    { href: "/ai-detector", label: "AI Detector", Icon: ShieldCheckIcon },
+    { href: "/linkedin-rewriter", label: "LinkedIn Rewriter", Icon: LinkedinIcon },
+    { href: "/email-rewriter", label: "Email Rewriter", Icon: MailIcon },
+    { href: "/study-assistant", label: "Rewrito Study", Icon: StudyIcon, badge: "New" },
+    { href: "/dashboard", label: "Dashboard", Icon: UserIcon },
+  ];
+
+  return (
+    <aside className="w-full shrink-0 lg:sticky lg:top-24 lg:w-72">
+      <div className="card overflow-hidden p-4">
+        <div className="mb-5 flex items-center justify-between">
+          <Logo size={38} />
+        </div>
+        <div className="rounded-2xl bg-bg-section p-4">
+          <p className="text-sm font-semibold text-ink">Hi, {name}</p>
+          <p className="mt-1 truncate text-xs text-ink-muted">{email}</p>
+        </div>
+        <nav aria-label="Dashboard tools" className="mt-5 space-y-1.5">
+          {navItems.map(({ href, label, Icon, active, badge }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
+                active
+                  ? "bg-brand-softPurple text-brand"
+                  : "text-ink-muted hover:bg-bg-section hover:text-ink"
+              }`}
+            >
+              <Icon size={17} />
+              <span className="min-w-0 flex-1 truncate">{label}</span>
+              {badge && (
+                <span className="rounded-full bg-brand-softPurple px-2 py-0.5 text-[10px] font-bold text-brand">
+                  {badge}
+                </span>
+              )}
+            </Link>
+          ))}
+        </nav>
+        <div className="mt-5 rounded-2xl border border-line bg-bg-soft p-4">
+          <div className="flex items-center justify-between text-xs font-semibold text-ink-muted">
+            <span>Sessions remaining</span>
+            <span>{remaining}</span>
+          </div>
+          <div className="mt-2 text-2xl font-semibold tracking-tight text-ink">
+            {used} / {USER_LIMIT}
+          </div>
+          <div className="mt-3 h-2 rounded-full bg-line">
+            <div
+              className="h-full rounded-full bg-brand-gradient"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <Link
+            href="/pricing"
+            className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-brand"
+          >
+            Upgrade for more
+            <ArrowRightIcon size={12} />
+          </Link>
+        </div>
+      </div>
+    </aside>
   );
 }

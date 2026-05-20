@@ -61,10 +61,10 @@ export function Navbar() {
     <header className="sticky top-0 z-30 border-b border-line/70 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <nav
         aria-label="Primary"
-        className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8"
+        className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-5 sm:px-8"
       >
         <Link href="/" aria-label="rewrito home" className="-ml-1 rounded-lg p-1">
-          <Logo size={34} />
+          <Logo size={44} />
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
