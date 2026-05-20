@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
+import { Logo } from "@/components/ui/Logo";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type Props = {
@@ -106,20 +107,8 @@ export function LoginModal({
         </button>
 
         <div className="mb-5 pr-10 text-center">
-          <div className="mx-auto mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-softPurple text-brand">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M12 2 L15 9 L22 10 L17 15 L18 22 L12 18 L6 22 L7 15 L2 10 L9 9 Z" />
-            </svg>
+          <div className="mx-auto mb-4 flex justify-center">
+            <Logo size={34} />
           </div>
           <h2 id="login-headline" className="text-xl font-semibold text-ink">
             {headline}

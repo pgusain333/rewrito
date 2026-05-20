@@ -27,6 +27,7 @@ export default function HomePage() {
         <Hero />
         <ToolCards />
         <LiveTool />
+        <WhyUs />
         <BeforeAfter />
         <HowItWorks />
         <UsageLimits />
@@ -74,9 +75,7 @@ function Hero() {
               See tools
             </Link>
           </div>
-          <p className="mt-4 text-xs text-ink-subtle">
-            3 free trials. No sign-up needed.
-          </p>
+          <p className="mt-4 text-xs text-ink-subtle">Start free. No card needed.</p>
           <HeroSignal />
         </div>
       </div>
@@ -157,12 +156,13 @@ function ToolCards() {
                 href={t.href}
                 className="card group block p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card"
               >
-                <span
-                  className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${t.accent}`}
-                >
-                  <t.icon size={22} />
-                </span>
-                <h3 className="mb-2 text-lg font-semibold text-ink">{t.name}</h3>
+                <ToolScreenMockup tool={t.name} accent={t.accent} Icon={t.icon} />
+                <div className="mb-2 mt-5 flex items-center gap-2">
+                  <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ${t.accent}`}>
+                    <t.icon size={17} />
+                  </span>
+                  <h3 className="text-lg font-semibold text-ink">{t.name}</h3>
+                </div>
                 <p className="text-sm leading-relaxed text-ink-muted">{t.desc}</p>
                 <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-brand">
                   Open tool
@@ -174,6 +174,50 @@ function ToolCards() {
         </div>
       </div>
     </section>
+  );
+}
+
+function ToolScreenMockup({
+  tool,
+  accent,
+  Icon,
+}: {
+  tool: string;
+  accent: string;
+  Icon: (props: { size?: number; className?: string }) => React.ReactNode;
+}) {
+  const rows =
+    tool === "Rewrito Study"
+      ? ["Concept map", "Practice set", "Flashcards"]
+      : tool === "LinkedIn Post Rewriter"
+      ? ["Hook", "Post body", "CTA"]
+      : tool === "Professional Email Rewriter"
+      ? ["Subject", "Polished body", "Sign-off"]
+      : ["AI draft", "Human voice", "Quality score"];
+
+  return (
+    <div className="relative h-36 [perspective:900px]" aria-hidden>
+      <div className="absolute inset-x-2 top-3 rounded-2xl border border-line bg-white p-3 shadow-card transition-transform duration-300 [transform:rotateX(8deg)_rotateY(-12deg)] group-hover:[transform:rotateX(4deg)_rotateY(-6deg)_translateY(-3px)]">
+        <div className="mb-3 flex items-center justify-between">
+          <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ${accent}`}>
+            <Icon size={16} />
+          </span>
+          <span className="h-2 w-16 rounded-full bg-line" />
+        </div>
+        <div className="space-y-2">
+          {rows.map((row, index) => (
+            <div key={row} className="flex items-center gap-2 rounded-lg bg-bg-soft px-2.5 py-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+              <span className="text-[10px] font-medium text-ink-muted">{row}</span>
+              <span
+                className="ml-auto h-1.5 rounded-full bg-brand-softBlue"
+                style={{ width: `${34 + index * 12}%` }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -192,6 +236,67 @@ function LiveTool() {
           </p>
         </div>
         <ToolWorkspace />
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Why trust rewrito ---------- */
+
+function WhyUs() {
+  const reasons = [
+    {
+      title: "Structured by purpose",
+      body: "Each workspace is tuned for a real job: humanizing, posting, emailing, or studying.",
+    },
+    {
+      title: "Keeps meaning intact",
+      body: "The prompts prioritize preserving facts, names, dates, numbers, and intent.",
+    },
+    {
+      title: "Built for review",
+      body: "Scores, copy controls, saved sessions, quiz testlets, and flashcards keep work easy to check.",
+    },
+  ];
+
+  return (
+    <section className="relative overflow-hidden bg-bg-section/60">
+      <div aria-hidden className="hero-abstract opacity-60">
+        <div className="grid-overlay" />
+        <div className="blob-mid" />
+      </div>
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+        <div className="grid gap-10 lg:grid-cols-[0.85fr_1fr] lg:items-center">
+          <div>
+            <span className="chip mb-5">Why people trust rewrito</span>
+            <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+              Why choose rewrito?
+            </h2>
+            <p className="mt-3 text-base leading-relaxed text-ink-muted">
+              rewrito is designed around focused workflows, not a blank chatbot box. The result is
+              easier to scan, easier to trust, and easier to act on.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {reasons.map((reason, index) => (
+              <Reveal key={reason.title} delay={index * 110}>
+                <div className="card relative h-full overflow-hidden p-5">
+                  <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-softPurple text-sm font-semibold text-brand">
+                    {index + 1}
+                  </span>
+                  <h3 className="text-base font-semibold text-ink">{reason.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-muted">{reason.body}</p>
+                  <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-bg-section">
+                    <div
+                      className="h-full rounded-full bg-brand-gradient"
+                      style={{ width: `${64 + index * 12}%` }}
+                    />
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -297,11 +402,11 @@ function UsageLimits() {
           <div className="card p-7">
             <span className="chip">Free, no sign-up</span>
             <h3 className="mt-4 text-2xl font-semibold tracking-tight text-ink">
-              3 free trials
+              Start without friction
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              Try every tool without creating an account. We'll remember your usage
-              on this device.
+              Try the toolkit without creating an account. We'll remember your usage
+              on this device and ask you to log in when it is time to continue.
             </p>
           </div>
           <div className="card relative overflow-hidden p-7">
@@ -326,7 +431,7 @@ function UsageLimits() {
 const FAQS = [
   {
     q: "Is rewrito free to try?",
-    a: "Yes. You get 3 free trials without signing up. Sign in with Google or email to continue using the toolkit.",
+    a: "Yes. You can start without signing up. Sign in with Google or email when you want to continue using the toolkit.",
   },
   {
     q: "Will my writing sound like me?",
@@ -401,7 +506,7 @@ function FinalCTA() {
             Ready to refine your writing and study smarter?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-base text-ink-muted">
-            Three free trials. No card. No friction.
+            Start free. No card. No friction.
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-2 sm:flex-row">
             <Link href="/try" className="btn-primary">

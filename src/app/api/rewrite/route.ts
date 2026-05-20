@@ -20,6 +20,7 @@ import {
   type StudyMode,
   type EducationLevel,
   type StudyPlanDetails,
+  type QuizQuestionCount,
 } from "@/lib/prompts";
 import { ANON_LIMIT, USER_LIMIT } from "@/lib/usage/limits";
 
@@ -36,6 +37,7 @@ type Body = {
   studyMode?: StudyMode;
   educationLevel?: EducationLevel;
   studyPlan?: StudyPlanDetails;
+  quizQuestionCount?: QuizQuestionCount;
   anonymousId?: string | null;
 };
 
@@ -72,6 +74,7 @@ export async function POST(req: Request) {
     studyMode = "explain",
     educationLevel = "college",
     studyPlan,
+    quizQuestionCount = 5,
   } = body;
 
   // ---- Validation ----
@@ -104,6 +107,12 @@ export async function POST(req: Request) {
   } = await supabase.auth.getUser();
 
   const svc = createSupabaseServiceClient();
+  const rawPlan = user?.app_metadata?.plan ?? user?.user_metadata?.plan;
+  const isPaidUser = rawPlan === "pro";
+  const normalizedQuizQuestionCount: QuizQuestionCount =
+    tool === "study" && studyMode === "quiz" && isPaidUser && quizQuestionCount === 20
+      ? 20
+      : 5;
 
   let used = 0;
   let limit = ANON_LIMIT;
@@ -146,7 +155,7 @@ export async function POST(req: Request) {
       .maybeSingle();
     if (row) {
       used = row.request_count ?? 0;
-      limit = row.max_requests ?? ANON_LIMIT;
+      limit = Math.max(row.max_requests ?? ANON_LIMIT, ANON_LIMIT);
       usageRowId = row.id;
     } else {
       const { data: inserted } = await svc
@@ -167,7 +176,7 @@ export async function POST(req: Request) {
       {
         error: user
           ? "You've reached your rewrite limit."
-          : "You have used your 3 free trials. Log in to keep rewriting.",
+          : "Log in to continue working.",
         used,
         limit,
         remaining: 0,
@@ -186,7 +195,12 @@ export async function POST(req: Request) {
         ? [
             {
               role: "system" as const,
-              content: buildStudySystemPrompt({ studyMode, tone, educationLevel }),
+              content: buildStudySystemPrompt({
+                studyMode,
+                tone,
+                educationLevel,
+                quizQuestionCount: normalizedQuizQuestionCount,
+              }),
             },
             {
               role: "user" as const,
@@ -206,7 +220,7 @@ export async function POST(req: Request) {
     output = await generateCompletion({
       messages,
       temperature: tool === "study" ? 0.55 : 0.7,
-      maxTokens: tool === "study" ? 2200 : 1500,
+      maxTokens: tool === "study" ? (normalizedQuizQuestionCount === 20 ? 4200 : 2200) : 1500,
     });
   } catch (err) {
     console.error("AI error:", err);

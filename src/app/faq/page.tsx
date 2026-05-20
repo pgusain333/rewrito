@@ -7,7 +7,7 @@ import { ArrowRightIcon } from "@/components/ui/icons";
 export const metadata: Metadata = {
   title: "FAQ - rewrito",
   description:
-    "Answers to common questions about rewrito, free trials, saved history, AI rewriting, Rewrito Study, privacy, and mobile support.",
+    "Answers to common questions about rewrito, free access, saved history, AI rewriting, Rewrito Study, privacy, and mobile support.",
   alternates: { canonical: "/faq" },
   openGraph: {
     title: "FAQ - rewrito",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 const faqs = [
   {
     q: "Is rewrito free to try?",
-    a: "Yes. You get 3 free trials without signing up. Sign in with Google or email to continue using the toolkit.",
+    a: "Yes. You can start without signing up. Sign in with Google or email when you want to continue using the toolkit.",
   },
   {
     q: "Will my writing sound like me?",
@@ -77,7 +77,7 @@ export default function FAQPage() {
               Common questions about rewrito.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
-              Quick answers about trials, saved rewrites, AI scoring, privacy, writing tools, and Rewrito Study.
+              Quick answers about free access, saved rewrites, AI scoring, privacy, writing tools, and Rewrito Study.
             </p>
           </div>
         </section>

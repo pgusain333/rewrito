@@ -13,6 +13,7 @@ import {
   type Refinement,
   type StudyMode,
   type EducationLevel,
+  type QuizQuestionCount,
 } from "@/lib/prompts";
 import { SAMPLES } from "@/lib/prompts/samples";
 import { useAuthAndUsage } from "@/lib/usage/useAuthAndUsage";
@@ -58,9 +59,12 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
   const [prepLevel, setPrepLevel] = useState("");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
+  const [extraTestlets, setExtraTestlets] = useState<string[]>([]);
   const [scores, setScores] = useState<ScorePair | null>(null);
   const [loading, setLoading] = useState(false);
+  const [creatingTestlet, setCreatingTestlet] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [testletError, setTestletError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const [showLogin, setShowLogin] = useState(false);
@@ -77,19 +81,22 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
   } = useAuthAndUsage();
 
   const isStudy = tool === "study";
+  const isPaidUser = user?.plan === "pro";
   const wordCount = useMemo(() => countWords(input), [input]);
   const charCount = input.length;
   const outputWords = useMemo(() => countWords(output), [output]);
   const usageText = user
     ? remaining > 0
       ? "Signed in"
-      : "Rewrite limit reached"
-    : `${remaining} of ${limit} free trials left`;
+      : "Limit reached"
+    : "Free workspace";
 
   function resetResult() {
     setOutput("");
+    setExtraTestlets([]);
     setScores(null);
     setError(null);
+    setTestletError(null);
   }
 
   function handleToolChange(nextTool: ToolType) {
@@ -118,7 +125,9 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
 
     setLoading(true);
     setOutput("");
+    setExtraTestlets([]);
     setScores(null);
+    setTestletError(null);
     try {
       const res = await fetch("/api/rewrite", {
         method: "POST",
@@ -137,6 +146,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
             hoursPerDay,
             prepLevel,
           },
+          quizQuestionCount: 5,
         }),
       });
       const data = await res.json();
@@ -162,6 +172,72 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleCreateTestlet(questionCount: QuizQuestionCount) {
+    setTestletError(null);
+    if (!input.trim()) {
+      setTestletError("Paste study material first.");
+      return;
+    }
+    if (!isPaidUser && extraTestlets.length >= 1) {
+      setShowUpgrade(true);
+      return;
+    }
+    if (!user && used >= limit) {
+      setShowLogin(true);
+      return;
+    }
+    if (user && used >= limit) {
+      setShowUpgrade(true);
+      return;
+    }
+
+    setCreatingTestlet(true);
+    try {
+      const res = await fetch("/api/rewrite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tool: "study",
+          text: `${input}\n\nCreate a fresh quiz testlet. Do not repeat the same wording or same answer order from earlier questions.`,
+          tone,
+          refinement,
+          anonymousId: anonId,
+          studyMode: "quiz",
+          educationLevel,
+          studyPlan: {
+            subject: studySubject,
+            examDate,
+            hoursPerDay,
+            prepLevel,
+          },
+          quizQuestionCount: questionCount,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (data?.requiresAuth) {
+          setShowLogin(true);
+        } else if (data?.requiresUpgrade) {
+          setShowUpgrade(true);
+        }
+        setTestletError(data?.error ?? "Could not create another testlet.");
+        if (typeof data?.used === "number") setUsageFromServer(data.used);
+        return;
+      }
+
+      setExtraTestlets((prev) => [...prev, data.output]);
+      if (typeof data.used === "number") {
+        setUsageFromServer(data.used);
+      } else if (!user) {
+        incrementAnon();
+      }
+    } catch {
+      setTestletError("Network error. Please try again.");
+    } finally {
+      setCreatingTestlet(false);
     }
   }
 
@@ -412,7 +488,15 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
               <SkeletonLines />
             ) : output ? (
               isStudy ? (
-                <StudyOutput output={output} studyMode={studyMode} />
+                <StudyOutput
+                  output={output}
+                  studyMode={studyMode}
+                  extraTestlets={extraTestlets}
+                  isPaidUser={isPaidUser}
+                  creatingTestlet={creatingTestlet}
+                  testletError={testletError}
+                  onCreateTestlet={handleCreateTestlet}
+                />
               ) : (
                 output
               )
@@ -444,7 +528,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       <LoginModal
         open={showLogin}
         onClose={() => setShowLogin(false)}
-        headline="You've used your 3 free trials"
+        headline="Log in to continue working"
         subline="Log in to keep rewriting."
       />
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
@@ -641,17 +725,47 @@ function parseStudySections(output: string) {
     : [{ title: "Simple Explanation", content: output.trim() }];
 }
 
-function StudyOutput({ output, studyMode }: { output: string; studyMode: StudyMode }) {
+function StudyOutput({
+  output,
+  studyMode,
+  extraTestlets,
+  isPaidUser,
+  creatingTestlet,
+  testletError,
+  onCreateTestlet,
+}: {
+  output: string;
+  studyMode: StudyMode;
+  extraTestlets: string[];
+  isPaidUser: boolean;
+  creatingTestlet: boolean;
+  testletError: string | null;
+  onCreateTestlet: (questionCount: QuizQuestionCount) => void;
+}) {
   const sections = parseStudySections(output);
   const practice = sections.find((section) => section.title === "Practice Question")?.content ?? "";
   const supportingSections = sections.filter((section) => section.title !== "Practice Question");
 
   if (studyMode === "quiz") {
-    const questions = parseQuizQuestions(practice || output).slice(0, 5);
+    const testlets = [practice || output, ...extraTestlets];
     return (
       <div className="space-y-4">
         <StudySectionList sections={supportingSections} defaultOpenCount={2} />
-        <QuizTestlet key={output} questions={questions} fallback={practice || output} />
+        <TestletBuilder
+          isPaidUser={isPaidUser}
+          createdCount={extraTestlets.length}
+          creating={creatingTestlet}
+          error={testletError}
+          onCreate={onCreateTestlet}
+        />
+        {testlets.map((testlet, index) => (
+          <QuizTestlet
+            key={`${index}-${testlet}`}
+            title={`Testlet ${index + 1}`}
+            questions={parseQuizQuestions(testlet)}
+            fallback={testlet}
+          />
+        ))}
       </div>
     );
   }
@@ -817,10 +931,90 @@ function parseQuizQuestions(text: string): QuizQuestion[] {
   return questions.filter((question) => question.answerKey);
 }
 
+function TestletBuilder({
+  isPaidUser,
+  createdCount,
+  creating,
+  error,
+  onCreate,
+}: {
+  isPaidUser: boolean;
+  createdCount: number;
+  creating: boolean;
+  error: string | null;
+  onCreate: (questionCount: QuizQuestionCount) => void;
+}) {
+  const freeExtraAvailable = !isPaidUser && createdCount === 0;
+  const questionCount: QuizQuestionCount = isPaidUser ? 20 : 5;
+  const canCreate = isPaidUser || freeExtraAvailable;
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-line bg-white">
+      <div className="border-b border-line bg-bg-soft px-4 py-3">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <div>
+            <h4 className="text-sm font-semibold text-ink">Testlet builder</h4>
+            <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+              Generate a fresh practice set from the same study material with new wording and answer order.
+            </p>
+          </div>
+          <span className="inline-flex w-fit rounded-full bg-brand-softPurple px-3 py-1 text-xs font-semibold text-brand">
+            {isPaidUser ? "Pro mastery" : "Practice booster"}
+          </span>
+        </div>
+      </div>
+      <div className="grid gap-3 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div className="rounded-xl border border-line bg-bg-soft p-3">
+            <div className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+              Next set
+            </div>
+            <div className="mt-1 text-sm font-semibold text-ink">
+              {questionCount} questions
+            </div>
+          </div>
+          <div className="rounded-xl border border-line bg-bg-soft p-3">
+            <div className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+              Style
+            </div>
+            <div className="mt-1 text-sm font-semibold text-ink">MCQ testlet</div>
+          </div>
+        </div>
+        <button
+          type="button"
+          disabled={!canCreate || creating}
+          onClick={() => onCreate(questionCount)}
+          className="btn-primary w-full sm:w-auto"
+        >
+          {creating
+            ? "Creating..."
+            : isPaidUser
+            ? "Create mastery testlet"
+            : freeExtraAvailable
+            ? "Create another testlet"
+            : "Extra testlet used"}
+        </button>
+      </div>
+      {!isPaidUser && !freeExtraAvailable && (
+        <p className="border-t border-line px-4 py-3 text-xs text-ink-muted">
+          Upgrade to create multiple mastery testlets with 20 questions each.
+        </p>
+      )}
+      {error && (
+        <div className="border-t border-error/20 bg-error/5 px-4 py-3 text-xs text-error">
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function QuizTestlet({
+  title,
   questions,
   fallback,
 }: {
+  title: string;
   questions: QuizQuestion[];
   fallback: string;
 }) {
@@ -845,7 +1039,7 @@ function QuizTestlet({
     <div className="rounded-xl border border-line bg-white p-4">
       <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
         <div>
-          <h4 className="text-sm font-semibold text-ink">Quiz Me testlet</h4>
+          <h4 className="text-sm font-semibold text-ink">{title}</h4>
           <p className="mt-1 text-xs text-ink-muted">
             Select one answer for each question, then check your score.
           </p>
@@ -994,7 +1188,7 @@ function FlashcardDeck({
       <div className="mb-4">
         <h4 className="text-sm font-semibold text-ink">Interactive flashcards</h4>
         <p className="mt-1 text-xs text-ink-muted">
-          Click a card to flip between the question and answer.
+          Flip a card to reveal the answer.
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -1005,19 +1199,32 @@ function FlashcardDeck({
               key={`${card.question}-${index}`}
               type="button"
               onClick={() => setFlipped((prev) => ({ ...prev, [index]: !prev[index] }))}
-              className={`min-h-40 rounded-xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-soft ${
-                isFlipped
-                  ? "border-brand bg-brand-softPurple text-brand"
-                  : "border-line bg-bg-soft text-ink"
-              }`}
+              className="min-h-44 text-left [perspective:1200px]"
             >
-              <span className="mb-3 inline-flex rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-ink-muted">
-                {isFlipped ? "Answer" : "Question"} {index + 1}
+              <span
+                className={`relative block min-h-44 rounded-xl transition-transform duration-500 [transform-style:preserve-3d] ${
+                  isFlipped ? "[transform:rotateY(180deg)]" : ""
+                }`}
+              >
+                <span className="absolute inset-0 rounded-xl border border-line bg-bg-soft p-4 text-ink shadow-soft [backface-visibility:hidden]">
+                  <span className="mb-3 inline-flex rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-ink-muted">
+                    Question {index + 1}
+                  </span>
+                  <span className="block text-sm font-semibold leading-relaxed">
+                    {card.question}
+                  </span>
+                  <span className="mt-4 block text-xs text-ink-subtle">Flip for answer</span>
+                </span>
+                <span className="absolute inset-0 rounded-xl border border-brand bg-brand-softPurple p-4 text-brand shadow-soft [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                  <span className="mb-3 inline-flex rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-ink-muted">
+                    Answer {index + 1}
+                  </span>
+                  <span className="block text-sm font-semibold leading-relaxed">
+                    {card.answer}
+                  </span>
+                  <span className="mt-4 block text-xs text-ink-subtle">Flip back</span>
+                </span>
               </span>
-              <span className="block text-sm font-semibold leading-relaxed">
-                {isFlipped ? card.answer : card.question}
-              </span>
-              <span className="mt-4 block text-xs text-ink-subtle">Click to flip</span>
             </button>
           );
         })}

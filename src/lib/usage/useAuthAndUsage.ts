@@ -1,10 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { ANON_LIMIT, USER_LIMIT, LS_KEYS } from "@/lib/usage/limits";
 
-export type SessionUser = { id: string; email: string | null };
+export type SessionUser = {
+  id: string;
+  email: string | null;
+  plan?: "free" | "pro";
+};
 
 function generateAnonId(): string {
   // Lightweight, no extra deps.
@@ -50,11 +55,20 @@ export function useAuthAndUsage() {
       setUserUsed(data?.request_count ?? 0);
     }
 
+    function toSessionUser(u: User): SessionUser {
+      const rawPlan = u.app_metadata?.plan ?? u.user_metadata?.plan;
+      return {
+        id: u.id,
+        email: u.email ?? null,
+        plan: rawPlan === "pro" ? "pro" : "free",
+      };
+    }
+
     supabase.auth.getUser().then(({ data }) => {
       if (!mounted) return;
       const u = data.user;
       if (u) {
-        setUser({ id: u.id, email: u.email ?? null });
+        setUser(toSessionUser(u));
         loadUsage(u.id);
       }
       setLoading(false);
@@ -63,7 +77,7 @@ export function useAuthAndUsage() {
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
       const u = session?.user;
       if (u) {
-        setUser({ id: u.id, email: u.email ?? null });
+        setUser(toSessionUser(u));
         loadUsage(u.id);
       } else {
         setUser(null);

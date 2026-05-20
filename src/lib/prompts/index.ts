@@ -23,6 +23,8 @@ export type StudyPlanDetails = {
   prepLevel?: string;
 };
 
+export type QuizQuestionCount = 5 | 20;
+
 export const TOOLS: Record<
   ToolType,
   { slug: string; name: string; tagline: string; description: string }
@@ -183,10 +185,12 @@ export function buildStudySystemPrompt({
   studyMode,
   tone,
   educationLevel,
+  quizQuestionCount = 5,
 }: {
   studyMode: StudyMode;
   tone: Tone;
   educationLevel: EducationLevel;
+  quizQuestionCount?: QuizQuestionCount;
 }): string {
   const modeInstructions: Record<StudyMode, string> = {
     explain:
@@ -194,7 +198,7 @@ export function buildStudySystemPrompt({
     steps:
       "Break the material or problem into numbered steps. Explain the reasoning, formulas, and why each step matters.",
     quiz:
-      "Create an interactive-style testlet with exactly 5 multiple-choice questions. Each question must have four options labeled A, B, C, and D, one correct answer, and a brief explanation.",
+      `Create an interactive-style testlet with exactly ${quizQuestionCount} multiple-choice questions. Each question must have four options labeled A, B, C, and D, one correct answer, and a brief explanation.`,
     flashcards:
       "Create memory-friendly flashcards using strict Q: and A: pairs. Focus on definitions, formulas, and exam-ready concepts.",
     notes:
@@ -238,7 +242,7 @@ Return the response with exactly these markdown headings, in this order:
 ## Practice Question
 
 Mode-specific formatting:
-- For Quiz Me mode, put exactly 5 MCQs inside "Practice Question" using this strict format for each question:
+- For Quiz Me mode, put exactly ${quizQuestionCount} MCQs inside "Practice Question" using this strict format for each question:
   1. Question text
   A) Option text
   B) Option text

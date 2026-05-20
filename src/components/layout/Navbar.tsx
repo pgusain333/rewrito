@@ -4,11 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { LoginModal } from "@/components/modals/LoginModal";
+import { UseCaseModal } from "@/components/modals/UseCaseModal";
 import { useAuthAndUsage } from "@/lib/usage/useAuthAndUsage";
+import { LS_KEYS } from "@/lib/usage/limits";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showUseCase, setShowUseCase] = useState(false);
   const { user, signOut } = useAuthAndUsage();
 
   useEffect(() => {
@@ -16,6 +19,26 @@ export function Navbar() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("login") === "1") setShowLogin(true);
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setShowUseCase(false);
+      return;
+    }
+    if (typeof window === "undefined") return;
+    const key = `${LS_KEYS.useCasePrefix}.${user.id}`;
+    if (!window.localStorage.getItem(key)) {
+      setShowUseCase(true);
+    }
+  }, [user]);
+
+  function handleUseCaseClose(useCase?: string) {
+    if (user && typeof window !== "undefined") {
+      const key = `${LS_KEYS.useCasePrefix}.${user.id}`;
+      window.localStorage.setItem(key, useCase ?? "Skipped");
+    }
+    setShowUseCase(false);
+  }
 
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -114,6 +137,7 @@ export function Navbar() {
       )}
 
       <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
+      <UseCaseModal open={showUseCase} onClose={handleUseCaseClose} />
     </header>
   );
 }

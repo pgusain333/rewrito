@@ -41,7 +41,7 @@ export default function PricingPage() {
                   <span className="text-sm text-ink-muted">/ forever</span>
                 </div>
                 <ul className="mt-6 space-y-3 text-sm text-ink">
-                  <Feat>3 trials without sign-up</Feat>
+                  <Feat>Start without sign-up</Feat>
                   <Feat>Sign in to keep rewriting</Feat>
                   <Feat>All 4 tools (Humanizer, LinkedIn, Email, Study)</Feat>
                   <Feat>6 tone presets</Feat>
