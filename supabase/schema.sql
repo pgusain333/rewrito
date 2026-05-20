@@ -8,8 +8,12 @@
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text,
+  welcome_email_sent_at timestamptz,
   created_at timestamptz not null default now()
 );
+
+alter table public.profiles
+  add column if not exists welcome_email_sent_at timestamptz;
 
 -- Auto-create a profile row when a new auth user signs up.
 create or replace function public.handle_new_user()
