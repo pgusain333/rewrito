@@ -65,11 +65,11 @@ function Hero() {
             with a simple AI writing toolkit built for clear communication.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="#try" className="btn-primary">
+            <Link href="/try" className="btn-primary">
               Try rewrito free
               <ArrowRightIcon size={16} />
             </Link>
-            <Link href="#tools" className="btn-secondary">
+            <Link href="/tools" className="btn-secondary">
               See tools
             </Link>
           </div>
@@ -392,7 +392,7 @@ function FinalCTA() {
             Three free trials. No card. No friction.
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-2 sm:flex-row">
-            <Link href="#try" className="btn-primary">
+            <Link href="/try" className="btn-primary">
               Start rewriting
               <ArrowRightIcon size={16} />
             </Link>

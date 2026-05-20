@@ -47,7 +47,7 @@ export default function PricingPage() {
                   <Feat>6 tone presets</Feat>
                   <Feat>Copy and download output</Feat>
                 </ul>
-                <Link href="/#try" className="btn-secondary mt-7 w-full">
+                <Link href="/try" className="btn-secondary mt-7 w-full">
                   Start free
                 </Link>
               </div>
@@ -72,7 +72,7 @@ export default function PricingPage() {
                   <Feat>Longer input length</Feat>
                   <Feat>Priority performance</Feat>
                 </ul>
-                <Link href="/#try" className="btn-primary mt-7 w-full">
+                <Link href="/try" className="btn-primary mt-7 w-full">
                   Join the waitlist <ArrowRightIcon size={16} />
                 </Link>
               </div>

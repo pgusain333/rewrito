@@ -28,9 +28,9 @@ export function Navbar() {
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
-          <NavLink href="/#tools">Tools</NavLink>
+          <NavLink href="/tools">Tools</NavLink>
           <NavLink href="/pricing">Pricing</NavLink>
-          <NavLink href="/#faq">FAQ</NavLink>
+          <NavLink href="/faq">FAQ</NavLink>
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
@@ -48,7 +48,7 @@ export function Navbar() {
               <button onClick={() => setShowLogin(true)} className="btn-ghost">
                 Log in
               </button>
-              <Link href="/#try" className="btn-primary !py-2 !px-4">
+              <Link href="/try" className="btn-primary !py-2 !px-4">
                 Try free
               </Link>
             </>
@@ -83,9 +83,9 @@ export function Navbar() {
       {open && (
         <div id="mobile-menu" className="border-t border-line bg-white md:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
-            <MobileLink href="/#tools" onClick={() => setOpen(false)}>Tools</MobileLink>
+            <MobileLink href="/tools" onClick={() => setOpen(false)}>Tools</MobileLink>
             <MobileLink href="/pricing" onClick={() => setOpen(false)}>Pricing</MobileLink>
-            <MobileLink href="/#faq" onClick={() => setOpen(false)}>FAQ</MobileLink>
+            <MobileLink href="/faq" onClick={() => setOpen(false)}>FAQ</MobileLink>
             <div className="mt-3 flex flex-col gap-2">
               {user ? (
                 <>
@@ -101,7 +101,7 @@ export function Navbar() {
                   <button onClick={() => { setShowLogin(true); setOpen(false); }} className="btn-secondary w-full">
                     Log in
                   </button>
-                  <Link href="/#try" onClick={() => setOpen(false)} className="btn-primary w-full">
+                  <Link href="/try" onClick={() => setOpen(false)} className="btn-primary w-full">
                     Try free
                   </Link>
                 </>

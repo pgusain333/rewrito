@@ -19,13 +19,13 @@ export function Footer() {
           </FooterCol>
           <FooterCol title="Product">
             <FooterLink href="/pricing">Pricing</FooterLink>
-            <FooterLink href="/#faq">FAQ</FooterLink>
+            <FooterLink href="/faq">FAQ</FooterLink>
             <FooterLink href="/dashboard">Dashboard</FooterLink>
           </FooterCol>
           <FooterCol title="Company">
             <FooterLink href="mailto:hello@rewrito.ai">Contact</FooterLink>
-            <FooterLink href="/#">Privacy</FooterLink>
-            <FooterLink href="/#">Terms</FooterLink>
+            <FooterLink href="/privacy">Privacy</FooterLink>
+            <FooterLink href="/terms">Terms</FooterLink>
           </FooterCol>
         </div>
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-line pt-6 text-xs text-ink-subtle sm:flex-row sm:items-center">

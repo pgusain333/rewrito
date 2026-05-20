@@ -104,7 +104,7 @@ export function ToolPage({ tool, intro, faq, whatItDoes }: Props) {
                   One toolkit for the writing that matters.
                 </p>
               </div>
-              <Link href="/#tools" className="btn-primary">
+              <Link href="/tools" className="btn-primary">
                 See all tools <ArrowRightIcon size={16} />
               </Link>
             </div>

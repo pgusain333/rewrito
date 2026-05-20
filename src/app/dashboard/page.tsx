@@ -86,7 +86,7 @@ export default async function DashboardPage() {
               </h1>
               <p className="mt-1 text-sm text-ink-muted">{user.email}</p>
             </div>
-            <Link href="/#try" className="btn-primary">
+            <Link href="/try" className="btn-primary">
               New rewrite <ArrowRightIcon size={16} />
             </Link>
           </div>
