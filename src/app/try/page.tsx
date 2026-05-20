@@ -6,12 +6,12 @@ import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 export const metadata: Metadata = {
   title: "Try rewrito Free - AI Writing Tool",
   description:
-    "Try rewrito free. Humanize AI text, rewrite LinkedIn posts, and improve professional emails in one AI writing workspace.",
+    "Try rewrito free. Humanize AI text, rewrite LinkedIn posts, improve professional emails, and study concepts clearly in one workspace.",
   alternates: { canonical: "/try" },
   openGraph: {
     title: "Try rewrito Free - AI Writing Tool",
     description:
-      "Paste a draft, choose a tone, and get clearer professional writing with rewrito.",
+      "Paste a draft or study material, choose a mode, and get clearer output with rewrito.",
     url: "/try",
   },
 };
@@ -28,8 +28,8 @@ export default function TryPage() {
               Rewrite rough text into clear professional communication.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
-              Use the workspace to humanize AI text, polish a LinkedIn draft, or tighten a
-              professional email.
+              Use the workspace to humanize AI text, polish a LinkedIn draft, tighten a
+              professional email, or understand study material clearly.
             </p>
           </div>
         </section>

@@ -3,8 +3,16 @@ import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { createSupabaseServerClient, createSupabaseServiceClient } from "@/lib/supabase/server";
-import { TOOLS, type ToolType } from "@/lib/prompts";
+import {
+  EDUCATION_LEVELS,
+  STUDY_MODES,
+  TOOLS,
+  type EducationLevel,
+  type StudyMode,
+  type ToolType,
+} from "@/lib/prompts";
 import { ArrowRightIcon } from "@/components/ui/icons";
+import { HistoryCopyButton } from "@/components/tools/HistoryCopyButton";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +23,8 @@ type HistoryRow = {
   output_text: string;
   tone: string;
   refinement_level: string;
+  study_mode: StudyMode | null;
+  education_level: EducationLevel | null;
   created_at: string;
   scores: {
     before: {
@@ -53,7 +63,9 @@ export default async function DashboardPage() {
       .maybeSingle(),
     svc
       .from("rewrite_history")
-      .select("id, tool_type, input_text, output_text, tone, refinement_level, created_at, scores")
+      .select(
+        "id, tool_type, input_text, output_text, tone, refinement_level, study_mode, education_level, created_at, scores"
+      )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(10),
@@ -61,17 +73,17 @@ export default async function DashboardPage() {
 
   const used = usage?.request_count ?? 0;
   const rows = (history ?? []) as HistoryRow[];
-
-  // Average score improvement across history.
-  const scored = rows.filter((r) => r.scores);
+  const scored = rows.filter((row) => row.scores);
   const avgImprovement = scored.length
     ? Math.round(
-        scored.reduce((sum, r) => sum + (r.scores!.after.overall - r.scores!.before.overall), 0) /
-          scored.length
+        scored.reduce(
+          (sum, row) => sum + (row.scores!.after.overall - row.scores!.before.overall),
+          0
+        ) / scored.length
       )
     : null;
   const avgAfter = scored.length
-    ? Math.round(scored.reduce((sum, r) => sum + r.scores!.after.overall, 0) / scored.length)
+    ? Math.round(scored.reduce((sum, row) => sum + row.scores!.after.overall, 0) / scored.length)
     : null;
 
   return (
@@ -87,7 +99,7 @@ export default async function DashboardPage() {
               <p className="mt-1 text-sm text-ink-muted">{user.email}</p>
             </div>
             <Link href="/try" className="btn-primary">
-              New rewrite <ArrowRightIcon size={16} />
+              New session <ArrowRightIcon size={16} />
             </Link>
           </div>
 
@@ -95,12 +107,12 @@ export default async function DashboardPage() {
             <div className="card p-6 md:col-span-2">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-medium uppercase tracking-wide text-ink-muted">
-                  Rewrites used
+                  Sessions used
                 </h2>
                 <span className="text-xs text-ink-muted">{used}</span>
               </div>
               <p className="mt-3 text-sm text-ink-muted">
-                Your signed-in rewrites are saved here so you can revisit useful drafts.
+                Your signed-in rewrites and study sessions are saved here so you can revisit useful work.
               </p>
 
               {avgImprovement !== null && (
@@ -155,35 +167,65 @@ export default async function DashboardPage() {
           </div>
 
           <section className="mt-10">
-            <h2 className="mb-4 text-lg font-semibold text-ink">Recent rewrites</h2>
+            <h2 className="mb-4 text-lg font-semibold text-ink">Recent sessions</h2>
             {rows.length === 0 ? (
               <div className="card p-8 text-center text-sm text-ink-muted">
-                Your rewrites will show up here.
+                Your rewrites and study sessions will show up here.
               </div>
             ) : (
               <ul className="space-y-3">
-                {rows.map((r) => {
-                  const delta = r.scores
-                    ? r.scores.after.overall - r.scores.before.overall
+                {rows.map((row) => {
+                  const isStudy = row.tool_type === "study";
+                  const delta = row.scores
+                    ? row.scores.after.overall - row.scores.before.overall
                     : null;
-                  const aiConfidence = r.scores?.after.aiGenerated;
+                  const aiConfidence = row.scores?.after.aiGenerated;
+                  const modeLabel = row.study_mode
+                    ? STUDY_MODES.find((mode) => mode.value === row.study_mode)?.label ?? row.study_mode
+                    : null;
+                  const educationLabel = row.education_level
+                    ? EDUCATION_LEVELS.find((level) => level.value === row.education_level)?.label ??
+                      row.education_level
+                    : null;
+                  const meta = isStudy
+                    ? [modeLabel, educationLabel].filter(Boolean).join(" - ")
+                    : `${row.tone} - ${row.refinement_level}`;
+
                   return (
-                    <li key={r.id} className="card p-5">
+                    <li key={row.id} className="card p-5">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <span className="chip !text-[11px]">{TOOLS[r.tool_type]?.name ?? r.tool_type}</span>
-                          <span className="text-xs text-ink-subtle">·</span>
-                          <span className="text-xs text-ink-muted">{r.tone} · {r.refinement_level}</span>
+                          <span className="chip !text-[11px]">
+                            {TOOLS[row.tool_type]?.name ?? row.tool_type}
+                          </span>
+                          <span className="text-xs text-ink-subtle">-</span>
+                          <span className="text-xs text-ink-muted">{meta}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {r.scores && (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <HistoryCopyButton text={row.output_text} />
+                          {row.scores && (
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-bg-section px-2.5 py-0.5 text-[11px] font-medium text-ink">
-                              <span className="text-ink-subtle">{r.scores.before.overall}</span>
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="text-ink-subtle"><path d="M5 12h14"/><path d="m13 5 7 7-7 7"/></svg>
-                              <span className="text-ink">{r.scores.after.overall}</span>
+                              <span className="text-ink-subtle">{row.scores.before.overall}</span>
+                              <svg
+                                width="10"
+                                height="10"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden
+                                className="text-ink-subtle"
+                              >
+                                <path d="M5 12h14" />
+                                <path d="m13 5 7 7-7 7" />
+                              </svg>
+                              <span className="text-ink">{row.scores.after.overall}</span>
                               {delta !== null && delta !== 0 && (
                                 <span className={delta > 0 ? "text-success" : "text-error"}>
-                                  {delta > 0 ? "+" : ""}{delta}
+                                  {delta > 0 ? "+" : ""}
+                                  {delta}
                                 </span>
                               )}
                             </span>
@@ -194,18 +236,22 @@ export default async function DashboardPage() {
                             </span>
                           )}
                           <span className="text-xs text-ink-subtle">
-                            {new Date(r.created_at).toLocaleString()}
+                            {new Date(row.created_at).toLocaleString()}
                           </span>
                         </div>
                       </div>
                       <div className="mt-3 grid gap-3 sm:grid-cols-2">
                         <div>
-                          <div className="field-label">Input</div>
-                          <p className="line-clamp-3 text-sm text-ink-muted">{r.input_text}</p>
+                          <div className="field-label">
+                            {isStudy ? "Study material" : "Input"}
+                          </div>
+                          <p className="line-clamp-3 text-sm text-ink-muted">{row.input_text}</p>
                         </div>
                         <div>
-                          <div className="field-label">Output</div>
-                          <p className="line-clamp-3 text-sm text-ink">{r.output_text}</p>
+                          <div className="field-label">
+                            {isStudy ? "Study response" : "Output"}
+                          </div>
+                          <p className="line-clamp-3 text-sm text-ink">{row.output_text}</p>
                         </div>
                       </div>
                     </li>

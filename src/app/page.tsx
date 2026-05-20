@@ -9,12 +9,13 @@ import {
   LinkedinIcon,
   MailIcon,
   SparkleIcon,
+  StudyIcon,
 } from "@/components/ui/icons";
 
 export const metadata: Metadata = {
   title: "rewrito - AI-powered professional communication",
   description:
-    "Humanize AI text, rewrite LinkedIn posts, and improve professional emails with rewrito.",
+    "Humanize AI text, rewrite LinkedIn posts, improve professional emails, and study concepts clearly with rewrito.",
   alternates: { canonical: "/" },
 };
 
@@ -61,8 +62,8 @@ function Hero() {
             out.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
-            Humanize AI text, improve LinkedIn posts, and rewrite professional emails
-            with a simple AI writing toolkit built for clear communication.
+            Humanize AI text, improve LinkedIn posts, rewrite professional emails,
+            and turn confusing study material into clear understanding.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/try" className="btn-primary">
@@ -128,6 +129,13 @@ const TOOL_CARDS = [
     desc: "Rewrite drafts into concise, polite, confident emails in seconds.",
     accent: "bg-bg-section text-ink",
   },
+  {
+    icon: StudyIcon,
+    name: "Rewrito Study",
+    href: "/study-assistant",
+    desc: "Explain concepts, organize notes, create quizzes, and build calm study plans.",
+    accent: "bg-success/10 text-success",
+  },
 ];
 
 function ToolCards() {
@@ -136,13 +144,13 @@ function ToolCards() {
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Three tools. One toolkit.
+            Four tools. One toolkit.
           </h2>
           <p className="mt-3 text-base text-ink-muted">
-            Built for people who care how their writing lands.
+            Built for people who care how their writing lands and how clearly they learn.
           </p>
         </div>
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {TOOL_CARDS.map((t, idx) => (
             <Reveal key={t.name} delay={idx * 90}>
               <Link
@@ -180,7 +188,7 @@ function LiveTool() {
             Try it right here.
           </h2>
           <p className="mt-3 text-base text-ink-muted">
-            No sign-up. Paste something, pick a tone, and see the difference.
+            No sign-up. Paste writing or study material, pick a mode, and see the difference.
           </p>
         </div>
         <ToolWorkspace />
@@ -248,9 +256,9 @@ function BeforeAfter() {
 
 function HowItWorks() {
   const steps = [
-    { n: "1", title: "Paste your text", body: "Drop in AI-generated copy, rough notes, or a draft email." },
-    { n: "2", title: "Choose tone", body: "Professional, natural, executive, friendly, persuasive, or academic." },
-    { n: "3", title: "Get refined output", body: "Copy, download, or keep refining. Your meaning stays intact." },
+    { n: "1", title: "Paste your text", body: "Drop in AI copy, rough notes, an email draft, or study material." },
+    { n: "2", title: "Choose the right mode", body: "Pick a tone, refinement level, or Study mode for clear learning." },
+    { n: "3", title: "Get structured output", body: "Copy, download, revise, or save useful sessions in your dashboard." },
   ];
   return (
     <section className="bg-bg">
@@ -329,6 +337,10 @@ const FAQS = [
     a: "Anonymous trials are not saved. For signed-in users, recent rewrites are saved to your dashboard so you can revisit them. You can delete history at any time.",
   },
   {
+    q: "Can Rewrito Study help with exam preparation?",
+    a: "Yes. Rewrito Study can explain concepts simply, break problems into steps, generate quizzes, create flashcards, organize notes, and build study plans.",
+  },
+  {
     q: "Which AI model powers rewrito?",
     a: "We use a small, cost-efficient large language model by default. The architecture supports swapping providers, so we can use the best model for each tool over time.",
   },
@@ -386,7 +398,7 @@ function FinalCTA() {
             }}
           />
           <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Ready to refine your communication?
+            Ready to refine your writing and study smarter?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-base text-ink-muted">
             Three free trials. No card. No friction.

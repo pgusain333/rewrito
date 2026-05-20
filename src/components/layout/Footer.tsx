@@ -16,6 +16,7 @@ export function Footer() {
             <FooterLink href="/ai-humanizer">AI Humanizer</FooterLink>
             <FooterLink href="/linkedin-rewriter">LinkedIn Rewriter</FooterLink>
             <FooterLink href="/email-rewriter">Email Rewriter</FooterLink>
+            <FooterLink href="/study-assistant">Rewrito Study</FooterLink>
           </FooterCol>
           <FooterCol title="Product">
             <FooterLink href="/pricing">Pricing</FooterLink>
@@ -29,7 +30,7 @@ export function Footer() {
           </FooterCol>
         </div>
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-line pt-6 text-xs text-ink-subtle sm:flex-row sm:items-center">
-          <p>© {new Date().getFullYear()} rewrito. All rights reserved.</p>
+          <p>(c) {new Date().getFullYear()} rewrito. All rights reserved.</p>
           <p>Built for clear, calm communication.</p>
         </div>
       </div>

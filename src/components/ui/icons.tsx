@@ -83,6 +83,23 @@ export const MailIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const StudyIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z" />
+    <path d="M4 5.5v16" />
+    <path d="M8 7h8" />
+    <path d="M8 11h6" />
+  </Icon>
+);
+
+export const UploadIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 16V4" />
+    <path d="m7 9 5-5 5 5" />
+    <path d="M5 20h14" />
+  </Icon>
+);
+
 export const LinkedinIcon = (p: IconProps) => (
   <Icon {...p}>
     <rect x="3" y="3" width="18" height="18" rx="3" />

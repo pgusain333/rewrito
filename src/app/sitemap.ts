@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/ai-humanizer",
     "/linkedin-rewriter",
     "/email-rewriter",
+    "/study-assistant",
     "/pricing",
   ];
   return routes.map((path) => ({

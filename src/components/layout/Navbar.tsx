@@ -29,6 +29,7 @@ export function Navbar() {
 
         <div className="hidden items-center gap-1 md:flex">
           <NavLink href="/tools">Tools</NavLink>
+          <NavLink href="/study-assistant">Study</NavLink>
           <NavLink href="/pricing">Pricing</NavLink>
           <NavLink href="/faq">FAQ</NavLink>
         </div>
@@ -84,6 +85,7 @@ export function Navbar() {
         <div id="mobile-menu" className="border-t border-line bg-white md:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
             <MobileLink href="/tools" onClick={() => setOpen(false)}>Tools</MobileLink>
+            <MobileLink href="/study-assistant" onClick={() => setOpen(false)}>Study</MobileLink>
             <MobileLink href="/pricing" onClick={() => setOpen(false)}>Pricing</MobileLink>
             <MobileLink href="/faq" onClick={() => setOpen(false)}>FAQ</MobileLink>
             <div className="mt-3 flex flex-col gap-2">

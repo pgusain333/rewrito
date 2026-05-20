@@ -3,17 +3,17 @@ import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
-import { ArrowRightIcon, LinkedinIcon, MailIcon, SparkleIcon } from "@/components/ui/icons";
+import { ArrowRightIcon, LinkedinIcon, MailIcon, SparkleIcon, StudyIcon } from "@/components/ui/icons";
 
 export const metadata: Metadata = {
   title: "AI Writing Tools - rewrito",
   description:
-    "Explore rewrito's AI Humanizer, LinkedIn Post Rewriter, and Professional Email Rewriter for clear professional communication.",
+    "Explore rewrito's AI Humanizer, LinkedIn Post Rewriter, Professional Email Rewriter, and AI Study Assistant.",
   alternates: { canonical: "/tools" },
   openGraph: {
     title: "AI Writing Tools - rewrito",
     description:
-      "Humanize AI text, polish LinkedIn posts, and rewrite professional emails with rewrito.",
+      "Humanize AI text, polish LinkedIn posts, rewrite professional emails, and study concepts clearly with rewrito.",
     url: "/tools",
   },
 };
@@ -43,6 +43,14 @@ const tools = [
       "Rewrite messy drafts into concise, polite, confident emails that keep your intent and details.",
     points: ["Tightens wording", "Balances tone", "Keeps names, dates, and numbers"],
   },
+  {
+    icon: StudyIcon,
+    name: "Rewrito Study",
+    href: "/study-assistant",
+    description:
+      "Turn confusing study material into clear explanations, step-by-step breakdowns, quizzes, flashcards, notes, and study plans.",
+    points: ["Explains concepts clearly", "Creates quizzes and flashcards", "Organizes study plans"],
+  },
 ];
 
 export default function ToolsPage() {
@@ -51,11 +59,11 @@ export default function ToolsPage() {
     "@type": "CollectionPage",
     name: "rewrito AI Writing Tools",
     description:
-      "AI tools for humanizing AI text, rewriting LinkedIn posts, and improving professional emails.",
+      "AI tools for humanizing AI text, rewriting LinkedIn posts, improving professional emails, and learning concepts clearly.",
     mainEntity: tools.map((tool) => ({
       "@type": "SoftwareApplication",
       name: tool.name,
-      applicationCategory: "WritingApplication",
+      applicationCategory: tool.href === "/study-assistant" ? "EducationalApplication" : "WritingApplication",
       url: tool.href,
     })),
   };
@@ -71,14 +79,14 @@ export default function ToolsPage() {
               Tools for professional writing that sounds clear and human.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
-              Choose a focused rewriter for AI-generated copy, LinkedIn posts, or email drafts.
-              Each tool preserves meaning while improving tone, structure, and readability.
+              Choose a focused workspace for AI-generated copy, LinkedIn posts, email drafts,
+              or study material. Each tool improves clarity while keeping the purpose intact.
             </p>
           </div>
         </section>
 
         <section className="bg-bg-section/60">
-          <div className="mx-auto grid max-w-6xl gap-5 px-5 py-14 sm:px-8 sm:py-20 lg:grid-cols-3">
+          <div className="mx-auto grid max-w-6xl gap-5 px-5 py-14 sm:grid-cols-2 sm:px-8 sm:py-20 xl:grid-cols-4">
             {tools.map((tool) => (
               <article key={tool.name} className="card flex h-full flex-col p-6">
                 <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-softPurple text-brand">
@@ -109,7 +117,7 @@ export default function ToolsPage() {
                 Try the toolkit
               </h2>
               <p className="mt-3 text-base text-ink-muted">
-                Paste a draft, choose a tone, and compare the rewritten version.
+                Paste a draft or study material, choose the right settings, and compare the result.
               </p>
             </div>
             <ToolWorkspace />

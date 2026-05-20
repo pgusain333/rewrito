@@ -7,12 +7,12 @@ import { ArrowRightIcon } from "@/components/ui/icons";
 export const metadata: Metadata = {
   title: "FAQ - rewrito",
   description:
-    "Answers to common questions about rewrito, free trials, saved history, AI rewriting, privacy, and mobile support.",
+    "Answers to common questions about rewrito, free trials, saved history, AI rewriting, Rewrito Study, privacy, and mobile support.",
   alternates: { canonical: "/faq" },
   openGraph: {
     title: "FAQ - rewrito",
     description:
-      "Learn how rewrito works, what is stored, which tools are included, and how to start rewriting.",
+      "Learn how rewrito works, what is stored, which tools are included, and how to start rewriting or studying.",
     url: "/faq",
   },
 };
@@ -32,7 +32,11 @@ const faqs = [
   },
   {
     q: "Which tools are included?",
-    a: "rewrito includes an AI Humanizer, a LinkedIn Post Rewriter, and a Professional Email Rewriter.",
+    a: "rewrito includes an AI Humanizer, a LinkedIn Post Rewriter, a Professional Email Rewriter, and Rewrito Study.",
+  },
+  {
+    q: "What does Rewrito Study do?",
+    a: "Rewrito Study helps students understand concepts, organize notes, generate quizzes, create flashcards, and build study plans for exam preparation.",
   },
   {
     q: "Does rewrito detect AI-generated writing?",
@@ -73,7 +77,7 @@ export default function FAQPage() {
               Common questions about rewrito.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
-              Quick answers about trials, saved rewrites, AI scoring, privacy, and the writing tools.
+              Quick answers about trials, saved rewrites, AI scoring, privacy, writing tools, and Rewrito Study.
             </p>
           </div>
         </section>
@@ -107,7 +111,7 @@ export default function FAQPage() {
               <div>
                 <h2 className="text-xl font-semibold text-ink">Ready to try it?</h2>
                 <p className="mt-1 text-sm text-ink-muted">
-                  Open the writing toolkit and rewrite your first draft.
+                  Open the toolkit and try your first rewrite or study session.
                 </p>
               </div>
               <Link href="/tools" className="btn-primary">

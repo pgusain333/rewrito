@@ -4,15 +4,22 @@ import { generateCompletion } from "@/lib/ai/provider";
 import {
   buildSystemPrompt,
   buildUserPrompt,
+  buildStudySystemPrompt,
+  buildStudyUserPrompt,
   buildScoringSystemPrompt,
   buildScoringUserPrompt,
   TOOLS,
   TONES,
   REFINEMENTS,
+  STUDY_MODES,
+  EDUCATION_LEVELS,
   type ScorePair,
   type ToolType,
   type Tone,
   type Refinement,
+  type StudyMode,
+  type EducationLevel,
+  type StudyPlanDetails,
 } from "@/lib/prompts";
 import { ANON_LIMIT, USER_LIMIT } from "@/lib/usage/limits";
 
@@ -26,6 +33,9 @@ type Body = {
   text: string;
   tone: Tone;
   refinement: Refinement;
+  studyMode?: StudyMode;
+  educationLevel?: EducationLevel;
+  studyPlan?: StudyPlanDetails;
   anonymousId?: string | null;
 };
 
@@ -38,6 +48,12 @@ function isTone(v: unknown): v is Tone {
 function isRefinement(v: unknown): v is Refinement {
   return typeof v === "string" && REFINEMENTS.some((r) => r.value === v);
 }
+function isStudyMode(v: unknown): v is StudyMode {
+  return typeof v === "string" && STUDY_MODES.some((m) => m.value === v);
+}
+function isEducationLevel(v: unknown): v is EducationLevel {
+  return typeof v === "string" && EDUCATION_LEVELS.some((l) => l.value === v);
+}
 
 export async function POST(req: Request) {
   let body: Body;
@@ -47,13 +63,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { tool, text, tone, refinement, anonymousId } = body;
+  const {
+    tool,
+    text,
+    tone,
+    refinement,
+    anonymousId,
+    studyMode = "explain",
+    educationLevel = "college",
+    studyPlan,
+  } = body;
 
   // ---- Validation ----
   if (!isToolType(tool)) return NextResponse.json({ error: "Invalid tool" }, { status: 400 });
   if (!isTone(tone)) return NextResponse.json({ error: "Invalid tone" }, { status: 400 });
   if (!isRefinement(refinement))
     return NextResponse.json({ error: "Invalid refinement level" }, { status: 400 });
+  if (tool === "study" && !isStudyMode(studyMode))
+    return NextResponse.json({ error: "Invalid study mode" }, { status: 400 });
+  if (tool === "study" && !isEducationLevel(educationLevel))
+    return NextResponse.json({ error: "Invalid education level" }, { status: 400 });
 
   if (typeof text !== "string" || text.trim().length < 5) {
     return NextResponse.json(
@@ -152,13 +181,32 @@ export async function POST(req: Request) {
   // ---- Call AI ----
   let output: string;
   try {
+    const messages =
+      tool === "study"
+        ? [
+            {
+              role: "system" as const,
+              content: buildStudySystemPrompt({ studyMode, tone, educationLevel }),
+            },
+            {
+              role: "user" as const,
+              content: buildStudyUserPrompt({
+                input: text,
+                studyMode,
+                educationLevel,
+                details: studyPlan,
+              }),
+            },
+          ]
+        : [
+            { role: "system" as const, content: buildSystemPrompt(tool, tone, refinement) },
+            { role: "user" as const, content: buildUserPrompt(text) },
+          ];
+
     output = await generateCompletion({
-      messages: [
-        { role: "system", content: buildSystemPrompt(tool, tone, refinement) },
-        { role: "user", content: buildUserPrompt(text) },
-      ],
-      temperature: 0.7,
-      maxTokens: 1500,
+      messages,
+      temperature: tool === "study" ? 0.55 : 0.7,
+      maxTokens: tool === "study" ? 2200 : 1500,
     });
   } catch (err) {
     console.error("AI error:", err);
@@ -177,19 +225,21 @@ export async function POST(req: Request) {
 
   // ---- Score the rewrite (best-effort; never blocks the response) ----
   let scores: ScorePair | null = null;
-  try {
-    const raw = await generateCompletion({
-      messages: [
-        { role: "system", content: buildScoringSystemPrompt(tool) },
-        { role: "user", content: buildScoringUserPrompt(text, output) },
-      ],
-      temperature: 0.2,
-      maxTokens: 300,
-    });
-    scores = parseScores(raw);
-  } catch (err) {
-    console.warn("Scoring failed:", err);
-    scores = null;
+  if (tool !== "study") {
+    try {
+      const raw = await generateCompletion({
+        messages: [
+          { role: "system", content: buildScoringSystemPrompt(tool) },
+          { role: "user", content: buildScoringUserPrompt(text, output) },
+        ],
+        temperature: 0.2,
+        maxTokens: 300,
+      });
+      scores = parseScores(raw);
+    } catch (err) {
+      console.warn("Scoring failed:", err);
+      scores = null;
+    }
   }
 
   // ---- Increment usage + log history ----
@@ -210,6 +260,8 @@ export async function POST(req: Request) {
       output_text: output,
       tone,
       refinement_level: refinement,
+      study_mode: tool === "study" ? studyMode : null,
+      education_level: tool === "study" ? educationLevel : null,
       scores,
     });
   }

@@ -1,4 +1,4 @@
-export type ToolType = "humanizer" | "linkedin" | "email";
+export type ToolType = "humanizer" | "linkedin" | "email" | "study";
 export type Tone =
   | "professional"
   | "natural"
@@ -7,6 +7,21 @@ export type Tone =
   | "persuasive"
   | "academic";
 export type Refinement = "light" | "medium" | "strong";
+export type StudyMode =
+  | "explain"
+  | "steps"
+  | "quiz"
+  | "flashcards"
+  | "notes"
+  | "studyplan";
+export type EducationLevel = "school" | "college" | "university" | "professional";
+
+export type StudyPlanDetails = {
+  examDate?: string;
+  hoursPerDay?: string;
+  subject?: string;
+  prepLevel?: string;
+};
 
 export const TOOLS: Record<
   ToolType,
@@ -33,6 +48,13 @@ export const TOOLS: Record<
     description:
       "Rewrite rough email text into a concise, professional message that keeps your intent.",
   },
+  study: {
+    slug: "study-assistant",
+    name: "Rewrito Study",
+    tagline: "Understand concepts clearly. Learn faster.",
+    description:
+      "Turn confusing study material into clear explanations, organized notes, quizzes, flashcards, and study plans.",
+  },
 };
 
 export const TONES: { value: Tone; label: string; hint: string }[] = [
@@ -48,6 +70,30 @@ export const REFINEMENTS: { value: Refinement; label: string; hint: string }[] =
   { value: "light", label: "Light", hint: "Small edits, keep voice" },
   { value: "medium", label: "Medium", hint: "Balanced rewrite" },
   { value: "strong", label: "Strong", hint: "Substantial rewrite" },
+];
+
+export const STUDY_MODES: { value: StudyMode; label: string; hint: string }[] = [
+  { value: "explain", label: "Explain Simply", hint: "Clear beginner-friendly explanation" },
+  { value: "steps", label: "Step-by-Step", hint: "Guided reasoning and formulas" },
+  { value: "quiz", label: "Quiz Me", hint: "MCQs, short answers, answer key" },
+  { value: "flashcards", label: "Flashcards", hint: "Q/A cards for revision" },
+  { value: "notes", label: "Organize Notes", hint: "Headings, bullets, definitions" },
+  { value: "studyplan", label: "Study Plan", hint: "Schedule, revision, practice" },
+];
+
+export const EDUCATION_LEVELS: {
+  value: EducationLevel;
+  label: string;
+  hint: string;
+}[] = [
+  { value: "school", label: "School", hint: "Simple and foundational" },
+  { value: "college", label: "College", hint: "Practical and exam-focused" },
+  { value: "university", label: "University", hint: "Detailed and rigorous" },
+  {
+    value: "professional",
+    label: "Professional Certification",
+    hint: "Concise, applied, certification-ready",
+  },
 ];
 
 function refinementInstruction(level: Refinement): string {
@@ -77,7 +123,7 @@ const SHARED_GUARDRAILS = [
   "Return ONLY the rewritten text. No preamble, no explanations, no quotation marks around the result, no markdown fences.",
   "Do not invent facts, names, numbers, or claims that are not present in the input.",
   "Preserve the user's original meaning and intent.",
-  "Avoid clichés and filler phrases such as 'in today's world', 'delve into', 'navigate the landscape', 'unlock', 'leverage', 'in conclusion'.",
+  "Avoid cliches and filler phrases such as 'in today's world', 'delve into', 'navigate the landscape', 'unlock', 'leverage', 'in conclusion'.",
   "Vary sentence length. Avoid robotic parallel structures.",
 ].join("\n- ");
 
@@ -89,7 +135,7 @@ export function buildSystemPrompt(
   const baseTone = toneInstruction(tone);
   const baseRefine = refinementInstruction(refinement);
 
-  const toolSpecific: Record<ToolType, string> = {
+  const toolSpecific: Record<Exclude<ToolType, "study">, string> = {
     humanizer: `You are an expert editor specializing in making AI-generated writing sound natural and human.
 Goals:
 - Reduce robotic wording and AI patterns (e.g. "It is important to note", "Furthermore").
@@ -112,6 +158,14 @@ Goals:
 - Maintain a standard email structure (greeting, body, sign-off) only if appropriate to the input.`,
   };
 
+  if (tool === "study") {
+    return buildStudySystemPrompt({
+      studyMode: "explain",
+      tone,
+      educationLevel: "college",
+    });
+  }
+
   return `${toolSpecific[tool]}
 
 Tone: ${baseTone}
@@ -123,6 +177,100 @@ Strict rules:
 
 export function buildUserPrompt(input: string): string {
   return `Rewrite the following text according to the rules above. Return only the rewritten version.\n\n---\n${input}\n---`;
+}
+
+export function buildStudySystemPrompt({
+  studyMode,
+  tone,
+  educationLevel,
+}: {
+  studyMode: StudyMode;
+  tone: Tone;
+  educationLevel: EducationLevel;
+}): string {
+  const modeInstructions: Record<StudyMode, string> = {
+    explain:
+      "Explain the material in easy language. Avoid unnecessary jargon. Use analogies only when they make the idea clearer.",
+    steps:
+      "Break the material or problem into numbered steps. Explain the reasoning, formulas, and why each step matters.",
+    quiz:
+      "Create practice material: 5 MCQs, 3 short-answer questions, an answer key placed separately, and brief answer explanations.",
+    flashcards:
+      "Create memory-friendly flashcards using Q: and A: format. Focus on definitions, formulas, and exam-ready concepts.",
+    notes:
+      "Organize messy material into clean study notes with headings, bullet points, definitions, formulas, and important concepts.",
+    studyplan:
+      "Create a realistic study plan with a daily schedule, revision plan, practice plan, weak area focus, and balanced workload.",
+  };
+
+  const level = EDUCATION_LEVELS.find((item) => item.value === educationLevel);
+
+  return `You are Rewrito Study, an excellent tutor and study coach.
+
+Purpose:
+- Help students understand clearly.
+- Teach concepts instead of just giving answers.
+- Support learning, exam preparation, revision, and study organization.
+- Never frame the response as cheating, copying homework, or bypassing learning.
+
+Mode: ${STUDY_MODES.find((item) => item.value === studyMode)?.label ?? "Explain Simply"}
+Mode behavior: ${modeInstructions[studyMode]}
+Education level: ${level?.label ?? "College"} - ${level?.hint ?? "Practical and exam-focused"}
+Tone: ${toneInstruction(tone)}
+
+Strict teaching rules:
+- Behave like a patient, trustworthy tutor.
+- Prioritize understanding over short answers.
+- If the input is a question, explain how to think through it.
+- If information is missing, state the assumption briefly instead of inventing facts.
+- Do not fabricate citations, textbooks, legal authorities, page numbers, or sources.
+- Avoid unnecessary complexity.
+- Keep the response organized and beginner friendly.
+- Use formulas only when useful, and explain each symbol.
+- Do not include a section named "Final Takeaway".
+
+Return the response with exactly these markdown headings, in this order:
+## Simple Explanation
+## Key Concept
+## Step-by-Step Breakdown
+## Example
+## Common Mistake
+## Practice Question
+
+For Quiz Me mode, put the 5 MCQs, 3 short-answer questions, separate answer key, and short explanations inside "Practice Question".
+For Flashcards mode, put the Q:/A: flashcards inside "Practice Question".
+For Study Plan mode, use "Step-by-Step Breakdown" for the daily schedule and "Practice Question" for practice tasks.`;
+}
+
+export function buildStudyUserPrompt({
+  input,
+  studyMode,
+  educationLevel,
+  details,
+}: {
+  input: string;
+  studyMode: StudyMode;
+  educationLevel: EducationLevel;
+  details?: StudyPlanDetails;
+}): string {
+  const planDetails =
+    studyMode === "studyplan"
+      ? `\nStudy plan details:
+- Subject: ${details?.subject?.trim() || "Not specified"}
+- Exam date: ${details?.examDate?.trim() || "Not specified"}
+- Hours available per day: ${details?.hoursPerDay?.trim() || "Not specified"}
+- Current preparation level: ${details?.prepLevel?.trim() || "Not specified"}`
+      : "";
+
+  return `Create a study-focused educational response for this material.
+
+Study mode: ${studyMode}
+Education level: ${educationLevel}${planDetails}
+
+Material:
+---
+${input}
+---`;
 }
 
 // ---------------------------------------------------------------------------
@@ -150,6 +298,8 @@ export function buildScoringSystemPrompt(tool: ToolType): string {
       "Score with a focus on hook quality, scannability, and authenticity for LinkedIn.",
     email:
       "Score with a focus on professional clarity, politeness, and conciseness.",
+    study:
+      "Score with a focus on educational clarity, structure, usefulness, and beginner-friendly explanation.",
   };
 
   return `You are an impartial writing-quality evaluator.
