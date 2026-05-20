@@ -1,0 +1,191 @@
+export type ToolType = "humanizer" | "linkedin" | "email";
+export type Tone =
+  | "professional"
+  | "natural"
+  | "executive"
+  | "friendly"
+  | "persuasive"
+  | "academic";
+export type Refinement = "light" | "medium" | "strong";
+
+export const TOOLS: Record<
+  ToolType,
+  { slug: string; name: string; tagline: string; description: string }
+> = {
+  humanizer: {
+    slug: "ai-humanizer",
+    name: "AI Humanizer",
+    tagline: "Make AI text read like a person wrote it",
+    description:
+      "Rewrite AI-generated text into natural, human, professional writing while preserving the original meaning.",
+  },
+  linkedin: {
+    slug: "linkedin-rewriter",
+    name: "LinkedIn Post Rewriter",
+    tagline: "Turn rough notes into a post worth reading",
+    description:
+      "Polish a rough draft into a clear, professional LinkedIn post - strong hook, real voice, no fake hype.",
+  },
+  email: {
+    slug: "email-rewriter",
+    name: "Professional Email Rewriter",
+    tagline: "Clear, polite, confident emails - fast",
+    description:
+      "Rewrite rough email text into a concise, professional message that keeps your intent.",
+  },
+};
+
+export const TONES: { value: Tone; label: string; hint: string }[] = [
+  { value: "professional", label: "Professional", hint: "Clear, neutral, polished" },
+  { value: "natural", label: "Natural", hint: "Conversational and human" },
+  { value: "executive", label: "Executive", hint: "Direct, decisive, senior" },
+  { value: "friendly", label: "Friendly", hint: "Warm and approachable" },
+  { value: "persuasive", label: "Persuasive", hint: "Confident, action-oriented" },
+  { value: "academic", label: "Academic", hint: "Precise and formal" },
+];
+
+export const REFINEMENTS: { value: Refinement; label: string; hint: string }[] = [
+  { value: "light", label: "Light", hint: "Small edits, keep voice" },
+  { value: "medium", label: "Medium", hint: "Balanced rewrite" },
+  { value: "strong", label: "Strong", hint: "Substantial rewrite" },
+];
+
+function refinementInstruction(level: Refinement): string {
+  switch (level) {
+    case "light":
+      return "Make minimal changes. Preserve the original voice. Fix only awkward phrasing, robotic patterns, and obvious grammar issues.";
+    case "medium":
+      return "Rewrite for clarity and flow. Vary sentence structure. Replace generic phrasing. Keep all original facts and intent.";
+    case "strong":
+      return "Rewrite substantially for clarity, rhythm, and impact while strictly preserving every factual claim and the original intent.";
+  }
+}
+
+function toneInstruction(tone: Tone): string {
+  const map: Record<Tone, string> = {
+    professional: "Use a clear, neutral, professional tone.",
+    natural: "Use a natural, conversational tone - like a thoughtful human wrote it.",
+    executive: "Use a senior, executive tone: direct, confident, decisive.",
+    friendly: "Use a warm, friendly tone without being casual or unprofessional.",
+    persuasive: "Use a persuasive, confident tone with a clear call to action where appropriate.",
+    academic: "Use a precise, formal, academic tone.",
+  };
+  return map[tone];
+}
+
+const SHARED_GUARDRAILS = [
+  "Return ONLY the rewritten text. No preamble, no explanations, no quotation marks around the result, no markdown fences.",
+  "Do not invent facts, names, numbers, or claims that are not present in the input.",
+  "Preserve the user's original meaning and intent.",
+  "Avoid clichés and filler phrases such as 'in today's world', 'delve into', 'navigate the landscape', 'unlock', 'leverage', 'in conclusion'.",
+  "Vary sentence length. Avoid robotic parallel structures.",
+].join("\n- ");
+
+export function buildSystemPrompt(
+  tool: ToolType,
+  tone: Tone,
+  refinement: Refinement
+): string {
+  const baseTone = toneInstruction(tone);
+  const baseRefine = refinementInstruction(refinement);
+
+  const toolSpecific: Record<ToolType, string> = {
+    humanizer: `You are an expert editor specializing in making AI-generated writing sound natural and human.
+Goals:
+- Reduce robotic wording and AI patterns (e.g. "It is important to note", "Furthermore").
+- Improve flow and rhythm with varied sentence structure.
+- Keep the writing professional and grounded.
+- Preserve all facts and meaning exactly.`,
+    linkedin: `You are a senior content editor for LinkedIn posts.
+Goals:
+- Open with a real, grounded hook (no clickbait, no "Here's what nobody tells you").
+- Use short paragraphs (1-3 lines) and plenty of white space.
+- Keep it human. No motivational fluff, no fake humility, no emoji spam.
+- Preserve the author's specific points and examples.
+- End with a quiet, genuine thought or question - not a generic CTA.`,
+    email: `You are an executive communication editor.
+Goals:
+- Keep it concise. Remove filler and hedging.
+- Keep it polite and confident.
+- Preserve the original request, intent, and all key details (names, dates, numbers).
+- If a subject line is not provided, do not invent one unless the user asked.
+- Maintain a standard email structure (greeting, body, sign-off) only if appropriate to the input.`,
+  };
+
+  return `${toolSpecific[tool]}
+
+Tone: ${baseTone}
+Refinement level: ${baseRefine}
+
+Strict rules:
+- ${SHARED_GUARDRAILS}`;
+}
+
+export function buildUserPrompt(input: string): string {
+  return `Rewrite the following text according to the rules above. Return only the rewritten version.\n\n---\n${input}\n---`;
+}
+
+// ---------------------------------------------------------------------------
+// Scoring
+// ---------------------------------------------------------------------------
+
+export type ScoreBreakdown = {
+  clarity: number;
+  naturalness: number;
+  conciseness: number;
+  aiGenerated: number;
+  overall: number;
+};
+
+export type ScorePair = {
+  before: ScoreBreakdown;
+  after: ScoreBreakdown;
+};
+
+export function buildScoringSystemPrompt(tool: ToolType): string {
+  const lens: Record<ToolType, string> = {
+    humanizer:
+      "Score with a focus on how human and natural the writing feels (no AI tells).",
+    linkedin:
+      "Score with a focus on hook quality, scannability, and authenticity for LinkedIn.",
+    email:
+      "Score with a focus on professional clarity, politeness, and conciseness.",
+  };
+
+  return `You are an impartial writing-quality evaluator.
+
+Given an ORIGINAL piece of text and a REWRITTEN version, score each one on three dimensions from 0 to 100:
+- clarity: how easy it is to understand
+- naturalness: how human and unforced the writing reads
+- conciseness: how efficient the wording is (no filler, no padding)
+
+Also score "aiGenerated" from 0 to 100:
+- 0 means very likely human-written
+- 100 means very likely AI-generated
+
+Also produce an "overall" score from 0 to 100 that reflects the writing's overall quality on a professional bar.
+
+${lens[tool]}
+
+Be honest. Do not give every text 80+. Mediocre or robotic writing should score in the 40-65 range. Excellent writing scores 85+.
+
+Return ONLY a single JSON object, no prose, no markdown fences, in this exact shape:
+{
+  "before": { "clarity": <int>, "naturalness": <int>, "conciseness": <int>, "aiGenerated": <int>, "overall": <int> },
+  "after":  { "clarity": <int>, "naturalness": <int>, "conciseness": <int>, "aiGenerated": <int>, "overall": <int> }
+}`;
+}
+
+export function buildScoringUserPrompt(original: string, rewritten: string): string {
+  return `ORIGINAL:
+"""
+${original}
+"""
+
+REWRITTEN:
+"""
+${rewritten}
+"""
+
+Return the JSON object only.`;
+}

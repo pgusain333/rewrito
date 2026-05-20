@@ -1,0 +1,260 @@
+import { NextResponse } from "next/server";
+import { createSupabaseServerClient, createSupabaseServiceClient } from "@/lib/supabase/server";
+import { generateCompletion } from "@/lib/ai/provider";
+import {
+  buildSystemPrompt,
+  buildUserPrompt,
+  buildScoringSystemPrompt,
+  buildScoringUserPrompt,
+  TOOLS,
+  TONES,
+  REFINEMENTS,
+  type ScorePair,
+  type ToolType,
+  type Tone,
+  type Refinement,
+} from "@/lib/prompts";
+import { ANON_LIMIT, USER_LIMIT } from "@/lib/usage/limits";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+const MAX_INPUT_CHARS = 8000;
+
+type Body = {
+  tool: ToolType;
+  text: string;
+  tone: Tone;
+  refinement: Refinement;
+  anonymousId?: string | null;
+};
+
+function isToolType(v: unknown): v is ToolType {
+  return typeof v === "string" && v in TOOLS;
+}
+function isTone(v: unknown): v is Tone {
+  return typeof v === "string" && TONES.some((t) => t.value === v);
+}
+function isRefinement(v: unknown): v is Refinement {
+  return typeof v === "string" && REFINEMENTS.some((r) => r.value === v);
+}
+
+export async function POST(req: Request) {
+  let body: Body;
+  try {
+    body = (await req.json()) as Body;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  const { tool, text, tone, refinement, anonymousId } = body;
+
+  // ---- Validation ----
+  if (!isToolType(tool)) return NextResponse.json({ error: "Invalid tool" }, { status: 400 });
+  if (!isTone(tone)) return NextResponse.json({ error: "Invalid tone" }, { status: 400 });
+  if (!isRefinement(refinement))
+    return NextResponse.json({ error: "Invalid refinement level" }, { status: 400 });
+
+  if (typeof text !== "string" || text.trim().length < 5) {
+    return NextResponse.json(
+      { error: "Please paste at least a few words to rewrite." },
+      { status: 400 }
+    );
+  }
+  if (text.length > MAX_INPUT_CHARS) {
+    return NextResponse.json(
+      { error: `Input is too long. Limit is ${MAX_INPUT_CHARS} characters.` },
+      { status: 413 }
+    );
+  }
+
+  // ---- Identify user ----
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const svc = createSupabaseServiceClient();
+
+  let used = 0;
+  let limit = ANON_LIMIT;
+  let usageRowId: string | null = null;
+
+  if (user) {
+    limit = USER_LIMIT;
+    const { data: row } = await svc
+      .from("usage_limits")
+      .select("id, request_count, max_requests")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (row) {
+      used = row.request_count ?? 0;
+      limit = row.max_requests ?? USER_LIMIT;
+      usageRowId = row.id;
+    } else {
+      const { data: inserted } = await svc
+        .from("usage_limits")
+        .insert({ user_id: user.id, request_count: 0, max_requests: USER_LIMIT })
+        .select("id")
+        .single();
+      usageRowId = inserted?.id ?? null;
+    }
+  } else {
+    // Anonymous: track in DB by anonymous_id when provided.
+    const anonId = (anonymousId ?? "").trim();
+    if (!anonId) {
+      return NextResponse.json(
+        { error: "Missing anonymous identifier." },
+        { status: 400 }
+      );
+    }
+    const { data: row } = await svc
+      .from("usage_limits")
+      .select("id, request_count, max_requests")
+      .is("user_id", null)
+      .eq("anonymous_id", anonId)
+      .maybeSingle();
+    if (row) {
+      used = row.request_count ?? 0;
+      limit = row.max_requests ?? ANON_LIMIT;
+      usageRowId = row.id;
+    } else {
+      const { data: inserted } = await svc
+        .from("usage_limits")
+        .insert({
+          anonymous_id: anonId,
+          request_count: 0,
+          max_requests: ANON_LIMIT,
+        })
+        .select("id")
+        .single();
+      usageRowId = inserted?.id ?? null;
+    }
+  }
+
+  if (used >= limit) {
+    return NextResponse.json(
+      {
+        error: user
+          ? "You've reached your rewrite limit."
+          : "You have used your 3 free trials. Log in to keep rewriting.",
+        used,
+        limit,
+        remaining: 0,
+        requiresAuth: !user,
+        requiresUpgrade: !!user,
+      },
+      { status: 429 }
+    );
+  }
+
+  // ---- Call AI ----
+  let output: string;
+  try {
+    output = await generateCompletion({
+      messages: [
+        { role: "system", content: buildSystemPrompt(tool, tone, refinement) },
+        { role: "user", content: buildUserPrompt(text) },
+      ],
+      temperature: 0.7,
+      maxTokens: 1500,
+    });
+  } catch (err) {
+    console.error("AI error:", err);
+    return NextResponse.json(
+      { error: "Something went wrong on our side. Please try again." },
+      { status: 502 }
+    );
+  }
+
+  if (!output) {
+    return NextResponse.json(
+      { error: "The model returned an empty response. Please try again." },
+      { status: 502 }
+    );
+  }
+
+  // ---- Score the rewrite (best-effort; never blocks the response) ----
+  let scores: ScorePair | null = null;
+  try {
+    const raw = await generateCompletion({
+      messages: [
+        { role: "system", content: buildScoringSystemPrompt(tool) },
+        { role: "user", content: buildScoringUserPrompt(text, output) },
+      ],
+      temperature: 0.2,
+      maxTokens: 300,
+    });
+    scores = parseScores(raw);
+  } catch (err) {
+    console.warn("Scoring failed:", err);
+    scores = null;
+  }
+
+  // ---- Increment usage + log history ----
+  const newCount = used + 1;
+  if (usageRowId) {
+    await svc
+      .from("usage_limits")
+      .update({ request_count: newCount, updated_at: new Date().toISOString() })
+      .eq("id", usageRowId);
+  }
+
+  if (user) {
+    // Only log history for authenticated users (privacy by default).
+    await svc.from("rewrite_history").insert({
+      user_id: user.id,
+      tool_type: tool,
+      input_text: text,
+      output_text: output,
+      tone,
+      refinement_level: refinement,
+      scores,
+    });
+  }
+
+  return NextResponse.json({
+    output,
+    scores,
+    used: newCount,
+    limit,
+    remaining: Math.max(0, limit - newCount),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function parseScores(raw: string): ScorePair | null {
+  if (!raw) return null;
+  // Strip code fences / preamble defensively.
+  const cleaned = raw
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim();
+  // Grab the first {...} block if the model added stray prose.
+  const match = cleaned.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+
+  try {
+    const obj = JSON.parse(match[0]);
+    const norm = (v: unknown): number => {
+      const n = Number(v);
+      if (!Number.isFinite(n)) return 0;
+      return Math.max(0, Math.min(100, Math.round(n)));
+    };
+    const shape = (b: any) => ({
+      clarity: norm(b?.clarity),
+      naturalness: norm(b?.naturalness),
+      conciseness: norm(b?.conciseness),
+      aiGenerated: norm(b?.aiGenerated ?? b?.ai_generated ?? b?.aiLikelihood),
+      overall: norm(b?.overall),
+    });
+    if (!obj?.before || !obj?.after) return null;
+    return { before: shape(obj.before), after: shape(obj.after) };
+  } catch {
+    return null;
+  }
+}

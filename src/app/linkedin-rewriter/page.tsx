@@ -1,0 +1,53 @@
+import type { Metadata } from "next";
+import { ToolPage } from "@/components/tools/ToolPage";
+
+export const metadata: Metadata = {
+  title: "LinkedIn Post Rewriter - polish your post in seconds",
+  description:
+    "Free LinkedIn Post Rewriter. Turn rough notes into a clear, professional LinkedIn post with a real hook - no fake hype, no motivational fluff.",
+  alternates: { canonical: "/linkedin-rewriter" },
+  openGraph: {
+    title: "LinkedIn Post Rewriter - polish your post in seconds",
+    description:
+      "Turn rough notes into a clear LinkedIn post. Real hook, real voice, no clickbait.",
+    url: "/linkedin-rewriter",
+  },
+};
+
+export default function Page() {
+  return (
+    <ToolPage
+      tool="linkedin"
+      intro={{
+        h1: "LinkedIn Post Rewriter - turn rough notes into a post worth reading.",
+        lead: "Paste your draft and get a clear, professional LinkedIn post with a real hook, short paragraphs, and zero motivational fluff.",
+      }}
+      whatItDoes={[
+        "Builds a grounded hook - no 'Here's what nobody tells you'.",
+        "Breaks ideas into short, readable paragraphs.",
+        "Preserves your specific points and examples.",
+        "Removes fake hype, emoji spam, and humblebrags.",
+        "Ends with a genuine thought, not a forced CTA.",
+        "Tone presets for professional, natural, or executive voice.",
+      ]}
+      faq={[
+        {
+          q: "Will my post sound generic?",
+          a: "No - that's the whole point. rewrito strips the generic LinkedIn voice. It keeps your specific examples and angles and rewrites the structure around them.",
+        },
+        {
+          q: "Can it write a post from scratch?",
+          a: "rewrito is a rewriter, not a generator. Give it a rough draft, bullet points, or a voice memo transcript and it'll shape it into a post.",
+        },
+        {
+          q: "How long can my draft be?",
+          a: "Up to 8,000 characters per rewrite. Most LinkedIn posts perform best around 1,200-1,800 characters.",
+        },
+        {
+          q: "Does it add emojis or hashtags?",
+          a: "Only if your draft already has them. The default output is clean - no surprise emojis, no auto-generated hashtag soup.",
+        },
+      ]}
+    />
+  );
+}
