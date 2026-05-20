@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 type Props = {
   open: boolean;
@@ -23,14 +24,14 @@ export function Modal({ open, onClose, children, labelledBy }: Props) {
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby={labelledBy}
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink/30 px-3 py-4 backdrop-blur-sm animate-fade-in sm:px-4 sm:py-6"
+      className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-ink/30 px-3 py-4 backdrop-blur-sm animate-fade-in sm:px-4 sm:py-6"
       onClick={onClose}
     >
       <div
@@ -39,6 +40,7 @@ export function Modal({ open, onClose, children, labelledBy }: Props) {
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
