@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
@@ -28,6 +29,7 @@ export default function HomePage() {
         <Hero />
         <ToolCards />
         <SuitableFor />
+        <WriteEverywhere />
         <LiveTool />
         <WhyUs />
         <BeforeAfter />
@@ -60,8 +62,8 @@ function Hero() {
           </span>
           <h1 className="text-balance text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-5xl md:text-6xl">
             Rough text in.{" "}
-            <span className="bg-brand-gradient bg-clip-text text-transparent">
-              Refined communication
+            <span className="block bg-brand-gradient bg-clip-text text-transparent sm:inline">
+              Refined <span className="block sm:inline">communication</span>
             </span>{" "}
             out.
           </h1>
@@ -94,7 +96,7 @@ function HeroSignal() {
         <span className="signal-track">
           <span />
         </span>
-        <span className="signal-chip signal-bright">Human voice</span>
+        <span className="signal-chip signal-bright hidden sm:inline-flex">Human voice</span>
       </div>
       <div className="signal-bars">
         <span />
@@ -166,7 +168,7 @@ function ToolCards() {
                 href={t.href}
                 className="card group flex h-full flex-col overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card"
               >
-                <ToolChatMockup tool={t.name} accent={t.accent} Icon={t.icon} />
+                <ToolChatMockup tool={t.name} accent={t.accent} Icon={t.icon} delay={idx * 1.05} />
                 <div className="mb-2 mt-5">
                   <h3 className="text-base font-semibold leading-snug text-ink">{t.name}</h3>
                 </div>
@@ -188,17 +190,20 @@ function ToolChatMockup({
   tool,
   accent,
   Icon,
+  delay = 0,
 }: {
   tool: string;
   accent: string;
-  Icon: (props: { size?: number; className?: string }) => React.ReactNode;
+  Icon: (props: { size?: number; className?: string }) => ReactNode;
+  delay?: number;
 }) {
   const copy = toolMockupCopy(tool);
   const isLinkedIn = tool === "LinkedIn Post Rewriter";
 
   return (
-    <div className="relative h-56 [perspective:1000px]" aria-hidden>
-      <div className="h-full rounded-2xl border border-line bg-white p-3 shadow-card transition-transform duration-300 [transform:rotateX(6deg)_rotateY(-8deg)] group-hover:[transform:rotateX(3deg)_rotateY(-4deg)_translateY(-3px)]">
+    <div className="relative h-60 overflow-hidden [perspective:1000px]" aria-hidden>
+      <div className="h-full rounded-2xl border border-line bg-white p-3 shadow-card transition-transform duration-300 [transform:rotateX(4deg)_rotateY(-5deg)] group-hover:[transform:rotateX(2deg)_rotateY(-2deg)_translateY(-3px)]">
+        <span className="mock-cursor" style={{ animationDelay: `${delay}s` }} />
         <div className="mb-3 flex items-center justify-between gap-2">
           <span className="flex min-w-0 items-center gap-2">
             {isLinkedIn ? (
@@ -214,7 +219,9 @@ function ToolChatMockup({
         </div>
         <div className="space-y-2">
           <div className="ml-auto max-w-[86%] rounded-2xl rounded-tr-md bg-brand-softPurple px-3 py-2 text-[11px] font-medium leading-relaxed text-brand">
-            <span className="typing-reveal">{copy.prompt}</span>
+            <span className="typing-reveal" style={{ animationDelay: `${delay + 0.4}s` }}>
+              {copy.prompt}
+            </span>
           </div>
           <div className="flex items-center gap-1.5 rounded-full bg-bg-soft px-3 py-2 text-ink-subtle">
             <span className="h-1.5 w-1.5 rounded-full bg-brand animate-typing-dot" />
@@ -298,18 +305,26 @@ function SuitableFor() {
     {
       title: "Students",
       body: "Understand concepts, create flashcards, prepare quizzes, and organize revision.",
+      image:
+        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80",
     },
     {
       title: "Professionals",
       body: "Rewrite emails, sharpen reports, and keep workplace communication clear.",
+      image:
+        "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80",
     },
     {
       title: "Academics",
       body: "Clarify dense notes, study legal or finance material, and review AI-written drafts.",
+      image:
+        "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=900&q=80",
     },
     {
       title: "Creators",
       body: "Turn rough ideas into readable posts without losing your own voice.",
+      image:
+        "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80",
     },
   ];
 
@@ -325,10 +340,17 @@ function SuitableFor() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {audiences.map((audience, index) => (
             <Reveal key={audience.title} delay={index * 80}>
-              <div className="card h-full p-6">
-                <AudienceMockup index={index} />
-                <h3 className="mt-5 text-base font-semibold text-ink">{audience.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{audience.body}</p>
+              <div className="card h-full overflow-hidden">
+                <img
+                  src={audience.image}
+                  alt=""
+                  className="h-36 w-full object-cover"
+                  loading="lazy"
+                />
+                <div className="p-5">
+                  <h3 className="text-base font-semibold text-ink">{audience.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-muted">{audience.body}</p>
+                </div>
               </div>
             </Reveal>
           ))}
@@ -338,32 +360,85 @@ function SuitableFor() {
   );
 }
 
-function AudienceMockup({ index }: { index: number }) {
-  const rows =
-    [
-      ["Notes", "Quiz", "Plan"],
-      ["Email", "Report", "Tone"],
-      ["Concept", "Source", "Review"],
-      ["Idea", "Post", "Voice"],
-    ][index] ?? ["Draft", "Rewrite", "Review"];
+function WriteEverywhere() {
+  const apps = [
+    { name: "Gmail", icon: "https://cdn.simpleicons.org/gmail/EA4335" },
+    { name: "LinkedIn", icon: "https://cdn.simpleicons.org/linkedin/0A66C2" },
+    { name: "Slack", icon: "https://cdn.simpleicons.org/slack/611F69" },
+    { name: "WhatsApp", icon: "https://cdn.simpleicons.org/whatsapp/25D366" },
+    { name: "Notion", icon: "https://cdn.simpleicons.org/notion/000000" },
+    { name: "Outlook", icon: "https://cdn.simpleicons.org/microsoftoutlook/0078D4" },
+    { name: "Docs", icon: "https://cdn.simpleicons.org/googledocs/4285F4" },
+    { name: "Word", icon: "https://cdn.simpleicons.org/microsoftword/185ABD" },
+    { name: "Discord", icon: "https://cdn.simpleicons.org/discord/5865F2" },
+    { name: "X", icon: "https://cdn.simpleicons.org/x/000000" },
+  ];
 
   return (
-    <div className="rounded-xl border border-line bg-bg-soft p-3">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="h-2 w-16 rounded-full bg-brand-softPurple" />
-        <span className="h-2 w-8 rounded-full bg-line" />
-      </div>
-      <div className="space-y-2">
-        {rows.map((row, rowIndex) => (
-          <div key={row} className="flex items-center gap-2 rounded-lg bg-white px-2.5 py-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-            <span className="text-[10px] font-semibold text-ink-muted">{row}</span>
-            <span
-              className="ml-auto h-1.5 rounded-full bg-brand-softBlue"
-              style={{ width: `${34 + rowIndex * 10}%` }}
-            />
+    <section className="bg-[#ecffe8]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+        <div>
+          <span className="chip mb-5">Write where work already happens</span>
+          <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+            Use rewrito across the places you already draft.
+          </h2>
+          <p className="mt-3 text-base leading-relaxed text-ink-muted">
+            Emails, posts, study notes, reports, and messages all start in different places.
+            rewrito gives you one clear workspace to refine them before they go out.
+          </p>
+          <div className="mt-8 grid grid-cols-3 gap-3 sm:max-w-md sm:grid-cols-5 sm:gap-4">
+            {apps.map((app) => (
+              <div key={app.name} className="group text-center">
+                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white text-lg font-bold shadow-soft transition-transform duration-300 group-hover:-translate-y-1">
+                  <img src={app.icon} alt={`${app.name} logo`} className="h-7 w-7 object-contain" loading="lazy" />
+                </span>
+                <span className="mt-2 block text-[10px] font-semibold text-ink-muted">{app.name}</span>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+        <LargeChatMockup />
+      </div>
+    </section>
+  );
+}
+
+function LargeChatMockup() {
+  return (
+    <div className="relative mx-auto w-full max-w-xl" aria-hidden>
+      <div className="card relative overflow-hidden p-5 shadow-card">
+        <span className="mock-cursor mock-cursor-large" />
+        <div className="mb-5 flex items-center justify-end gap-2">
+          {["AI draft", "LinkedIn", "DOCX"].map((item, index) => (
+            <span
+              key={item}
+              className={`rounded-xl px-3 py-2 text-xs font-semibold ${
+                index === 1 ? "bg-[#0A66C2] text-white" : "bg-bg-section text-ink-muted"
+              }`}
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+        <div className="space-y-4">
+          <div className="ml-auto max-w-[74%] rounded-2xl rounded-tr-md bg-bg-section px-4 py-3 text-sm font-medium text-ink">
+            Can you make this report summary clearer?
+          </div>
+          <div className="max-w-[86%] rounded-2xl rounded-tl-md bg-white px-4 py-3 text-sm leading-relaxed text-ink-muted shadow-soft">
+            Rewrito can tighten the message, preserve your facts, and show what changed so the next draft is easier to write yourself.
+          </div>
+          <div className="ml-auto max-w-[82%] rounded-2xl rounded-tr-md bg-bg-section px-4 py-3 text-sm font-medium text-ink">
+            Create a concise version for a leadership update.
+          </div>
+        </div>
+        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-line bg-white px-4 py-3 shadow-soft">
+          <span className="text-xl text-brand">+</span>
+          <span className="flex-1 text-sm text-ink-subtle">Type your message...</span>
+          <span className="h-8 w-8 rounded-full bg-bg-section" />
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-brand-gradient text-white">
+            <ArrowRightIcon size={16} className="-rotate-45" />
+          </span>
+        </div>
       </div>
     </div>
   );

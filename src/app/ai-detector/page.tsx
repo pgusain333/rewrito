@@ -142,10 +142,17 @@ export default function AiDetectorPage() {
 }
 
 function DetectorHeroMockup() {
+  const scores = [
+    ["GPTZero-style", 78, 18],
+    ["Originality.ai-style", 82, 24],
+    ["Turnitin-style", 69, 16],
+  ] as const;
+
   return (
     <div className="relative mx-auto w-full max-w-lg [perspective:1100px]" aria-hidden>
-      <div className="rounded-3xl border border-line bg-white p-5 shadow-card [transform:rotateX(6deg)_rotateY(-8deg)]">
-        <div className="mb-5 flex items-center justify-between">
+      <div className="card relative overflow-hidden p-5 shadow-card [transform:rotateX(5deg)_rotateY(-7deg)]">
+        <span className="mock-cursor mock-cursor-large" />
+        <div className="mb-5 flex items-center justify-between gap-3">
           <span className="flex items-center gap-2 text-sm font-semibold text-ink">
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-softPurple text-brand">
               <ShieldCheckIcon size={18} />
@@ -156,27 +163,40 @@ function DetectorHeroMockup() {
             Readiness 91%
           </span>
         </div>
-        <div className="grid gap-3">
-          {[
-            ["GPTZero-style", 78, 18],
-            ["Originality.ai-style", 82, 24],
-            ["Turnitin-style", 69, 16],
-          ].map(([label, before, after]) => (
-            <div key={label} className="rounded-xl border border-line bg-bg-soft p-3">
-              <div className="mb-2 flex justify-between text-xs font-semibold text-ink">
-                <span>{label}</span>
-                <span>{after}% after</span>
-              </div>
-              <div className="grid gap-1.5">
-                <span className="h-1.5 rounded-full bg-error/20">
-                  <span className="block h-full rounded-full bg-error/70" style={{ width: `${before}%` }} />
-                </span>
-                <span className="h-1.5 rounded-full bg-success/10">
-                  <span className="block h-full rounded-full bg-success" style={{ width: `${after}%` }} />
-                </span>
-              </div>
+        <div className="space-y-3">
+          <div className="ml-auto max-w-[78%] rounded-2xl rounded-tr-md bg-brand-softPurple px-4 py-3 text-sm font-medium text-brand">
+            <span className="typing-reveal">Check if this draft sounds AI-written.</span>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-full bg-bg-soft px-3 py-2 text-ink-subtle">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand animate-typing-dot" />
+            <span className="h-1.5 w-1.5 rounded-full bg-brand animate-typing-dot [animation-delay:120ms]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-brand animate-typing-dot [animation-delay:240ms]" />
+            <span className="ml-1 text-[10px] font-medium">rewrito is checking detector signals</span>
+          </div>
+          <div className="rounded-2xl rounded-tl-md border border-line bg-bg-soft p-3">
+            <div className="mb-3 flex items-center gap-1.5 text-xs font-semibold text-ink">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded bg-white text-brand">r</span>
+              rewrito output
             </div>
-          ))}
+            <div className="grid gap-3">
+              {scores.map(([label, before, after]) => (
+                <div key={label}>
+                  <div className="mb-1.5 flex justify-between text-[11px] font-semibold text-ink">
+                    <span>{label}</span>
+                    <span>{after}% after</span>
+                  </div>
+                  <div className="grid gap-1.5">
+                    <span className="h-1.5 rounded-full bg-error/20">
+                      <span className="block h-full rounded-full bg-error/70" style={{ width: `${before}%` }} />
+                    </span>
+                    <span className="h-1.5 rounded-full bg-success/10">
+                      <span className="block h-full rounded-full bg-success" style={{ width: `${after}%` }} />
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

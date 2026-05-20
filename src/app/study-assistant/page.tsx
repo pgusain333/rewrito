@@ -135,34 +135,7 @@ export default function StudyAssistantPage() {
                   </Link>
                 </div>
               </div>
-              <div className="card relative overflow-hidden p-6">
-                <div className="absolute inset-x-0 top-0 h-[3px] bg-brand-gradient" />
-                <div className="mb-5 flex items-center gap-3">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-success/10 text-success">
-                    <StudyIcon size={20} />
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-ink">Premium AI Study Workspace</p>
-                    <p className="text-xs text-ink-muted">Structured, calm, and exam-ready.</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  {["Simple Explanation", "Key Concept", "Step-by-Step Breakdown"].map((label, index) => (
-                    <div key={label} className="rounded-xl border border-line bg-bg-soft p-3">
-                      <div className="flex items-center gap-2 text-sm font-semibold text-ink">
-                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white text-xs text-brand">
-                          {index + 1}
-                        </span>
-                        {label}
-                      </div>
-                      <div className="mt-3 space-y-2">
-                        <span className="block h-2 rounded-full bg-line" />
-                        <span className="block h-2 w-4/5 rounded-full bg-line" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <StudyHeroMockup />
             </div>
           </div>
         </section>
@@ -252,6 +225,59 @@ export default function StudyAssistantPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
     </>
+  );
+}
+
+function StudyHeroMockup() {
+  const sections = [
+    ["Simple Explanation", "Working capital is the money a business has available for day-to-day needs."],
+    ["Key Concept", "Current assets minus current liabilities shows short-term financial flexibility."],
+    ["Practice Question", "If assets are 80,000 and liabilities are 52,000, what is working capital?"],
+  ];
+
+  return (
+    <div className="relative mx-auto w-full max-w-lg [perspective:1100px]" aria-hidden>
+      <div className="card relative overflow-hidden p-5 shadow-card [transform:rotateX(4deg)_rotateY(-6deg)]">
+        <div className="absolute inset-x-0 top-0 h-[3px] bg-brand-gradient" />
+        <span className="mock-cursor mock-cursor-large" />
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <span className="flex min-w-0 items-center gap-3">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-success/10 text-success">
+              <StudyIcon size={20} />
+            </span>
+            <span>
+              <span className="block text-sm font-semibold text-ink">Premium AI Study Workspace</span>
+              <span className="block text-xs text-ink-muted">Structured, calm, and exam-ready.</span>
+            </span>
+          </span>
+          <span className="rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-success">
+            Tutor mode
+          </span>
+        </div>
+        <div className="space-y-3">
+          <div className="ml-auto max-w-[78%] rounded-2xl rounded-tr-md bg-brand-softPurple px-4 py-3 text-sm font-medium text-brand">
+            <span className="typing-reveal">Explain working capital simply.</span>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-full bg-bg-soft px-3 py-2 text-ink-subtle">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand animate-typing-dot" />
+            <span className="h-1.5 w-1.5 rounded-full bg-brand animate-typing-dot [animation-delay:120ms]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-brand animate-typing-dot [animation-delay:240ms]" />
+            <span className="ml-1 text-[10px] font-medium">rewrito is building a study guide</span>
+          </div>
+          {sections.map(([title, body], index) => (
+            <div key={title} className="rounded-2xl border border-line bg-bg-soft p-3">
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-ink">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white text-xs text-brand">
+                  {index + 1}
+                </span>
+                {title}
+              </div>
+              <p className="text-xs leading-relaxed text-ink-muted">{body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 

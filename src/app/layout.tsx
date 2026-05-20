@@ -112,6 +112,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={poppins.variable}>
+      <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-580NF5HJMD" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-580NF5HJMD');
+`,
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-bg text-ink antialiased">
         {children}
         <script
