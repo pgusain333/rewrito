@@ -412,7 +412,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
               <SkeletonLines />
             ) : output ? (
               isStudy ? (
-                <StudyOutput output={output} />
+                <StudyOutput output={output} studyMode={studyMode} />
               ) : (
                 output
               )
@@ -641,8 +641,41 @@ function parseStudySections(output: string) {
     : [{ title: "Simple Explanation", content: output.trim() }];
 }
 
-function StudyOutput({ output }: { output: string }) {
+function StudyOutput({ output, studyMode }: { output: string; studyMode: StudyMode }) {
   const sections = parseStudySections(output);
+  const practice = sections.find((section) => section.title === "Practice Question")?.content ?? "";
+  const supportingSections = sections.filter((section) => section.title !== "Practice Question");
+
+  if (studyMode === "quiz") {
+    const questions = parseQuizQuestions(practice || output).slice(0, 5);
+    return (
+      <div className="space-y-4">
+        <StudySectionList sections={supportingSections} defaultOpenCount={2} />
+        <QuizTestlet key={output} questions={questions} fallback={practice || output} />
+      </div>
+    );
+  }
+
+  if (studyMode === "flashcards") {
+    const cards = parseFlashcards(practice || output);
+    return (
+      <div className="space-y-4">
+        <StudySectionList sections={supportingSections} defaultOpenCount={2} />
+        <FlashcardDeck key={output} cards={cards} fallback={practice || output} />
+      </div>
+    );
+  }
+
+  return <StudySectionList sections={sections} defaultOpenCount={3} />;
+}
+
+function StudySectionList({
+  sections,
+  defaultOpenCount,
+}: {
+  sections: { title: string; content: string }[];
+  defaultOpenCount: number;
+}) {
   const accents = [
     "bg-brand-softPurple text-brand",
     "bg-brand-softBlue text-brand-accent",
@@ -657,7 +690,7 @@ function StudyOutput({ output }: { output: string }) {
       {sections.map((section, index) => (
         <details
           key={section.title}
-          open={index < 3}
+          open={index < defaultOpenCount}
           className="group overflow-hidden rounded-xl border border-line bg-white"
         >
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
@@ -682,6 +715,313 @@ function StudyOutput({ output }: { output: string }) {
           </div>
         </details>
       ))}
+    </div>
+  );
+}
+
+type QuizQuestion = {
+  prompt: string;
+  options: { key: string; text: string }[];
+  answerKey: string;
+  explanation: string;
+};
+
+function cleanStudyLine(line: string): string {
+  return line
+    .replace(/\*\*/g, "")
+    .replace(/^#+\s*/, "")
+    .replace(/^[-*]\s+/, "")
+    .trim();
+}
+
+function parseQuizQuestions(text: string): QuizQuestion[] {
+  const lines = text.split(/\r?\n/).map(cleanStudyLine).filter(Boolean);
+  const questions: QuizQuestion[] = [];
+  const answerKeyLines: string[] = [];
+  let current: QuizQuestion | null = null;
+  let inAnswerKey = false;
+
+  function pushCurrent() {
+    if (current?.prompt && current.options.length >= 2) {
+      questions.push(current);
+    }
+    current = null;
+  }
+
+  for (const line of lines) {
+    if (/^answer\s*key\b/i.test(line)) {
+      inAnswerKey = true;
+      pushCurrent();
+      continue;
+    }
+
+    if (inAnswerKey) {
+      answerKeyLines.push(line);
+      continue;
+    }
+
+    const questionMatch = line.match(/^(?:Q(?:uestion)?\s*)?(\d+)[.)]\s+(.+)$/i);
+    const optionMatch = line.match(/^([A-D])[\).:-]\s+(.+)$/i);
+    const answerMatch = line.match(/^(?:correct\s*)?answer\s*[:\-]\s*([A-D])(?:[\).:\s-]*(.*))?$/i);
+    const explanationMatch = line.match(/^explanation\s*[:\-]\s*(.+)$/i);
+
+    if (questionMatch && !/^(answer|explanation)\b/i.test(questionMatch[2])) {
+      pushCurrent();
+      current = {
+        prompt: questionMatch[2].trim(),
+        options: [],
+        answerKey: "",
+        explanation: "",
+      };
+      continue;
+    }
+
+    if (current && optionMatch) {
+      current.options.push({
+        key: optionMatch[1].toUpperCase(),
+        text: optionMatch[2].trim(),
+      });
+      continue;
+    }
+
+    if (current && answerMatch) {
+      current.answerKey = answerMatch[1].toUpperCase();
+      if (answerMatch[2]) current.explanation = answerMatch[2].trim();
+      continue;
+    }
+
+    if (current && explanationMatch) {
+      current.explanation = explanationMatch[1].trim();
+      continue;
+    }
+
+    if (current && current.options.length === 0) {
+      current.prompt = `${current.prompt} ${line}`.trim();
+    } else if (current && current.answerKey && !current.explanation) {
+      current.explanation = line;
+    }
+  }
+
+  pushCurrent();
+
+  for (const line of answerKeyLines) {
+    const keyMatch = line.match(/^(\d+)[.)]\s*([A-D])(?:[\).:\s-]*(.*))?$/i);
+    if (!keyMatch) continue;
+    const index = Number(keyMatch[1]) - 1;
+    const question = questions[index];
+    if (!question) continue;
+    question.answerKey = keyMatch[2].toUpperCase();
+    if (keyMatch[3] && !question.explanation) question.explanation = keyMatch[3].trim();
+  }
+
+  return questions.filter((question) => question.answerKey);
+}
+
+function QuizTestlet({
+  questions,
+  fallback,
+}: {
+  questions: QuizQuestion[];
+  fallback: string;
+}) {
+  const [selected, setSelected] = useState<Record<number, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const answeredCount = Object.keys(selected).length;
+  const score = questions.reduce(
+    (sum, question, index) => sum + (selected[index] === question.answerKey ? 1 : 0),
+    0
+  );
+
+  if (!questions.length) {
+    return (
+      <StudySectionList
+        sections={[{ title: "Practice Question", content: fallback }]}
+        defaultOpenCount={1}
+      />
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-line bg-white p-4">
+      <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+        <div>
+          <h4 className="text-sm font-semibold text-ink">Quiz Me testlet</h4>
+          <p className="mt-1 text-xs text-ink-muted">
+            Select one answer for each question, then check your score.
+          </p>
+        </div>
+        {submitted && (
+          <span className="inline-flex w-fit rounded-full bg-brand-softPurple px-3 py-1 text-xs font-semibold text-brand">
+            Score: {score}/{questions.length}
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-4">
+        {questions.map((question, index) => (
+          <div key={`${question.prompt}-${index}`} className="rounded-xl border border-line bg-bg-soft p-4">
+            <p className="text-sm font-semibold leading-relaxed text-ink">
+              {index + 1}. {question.prompt}
+            </p>
+            <div className="mt-3 grid gap-2">
+              {question.options.map((option) => {
+                const chosen = selected[index] === option.key;
+                const correct = submitted && option.key === question.answerKey;
+                const wrong = submitted && chosen && option.key !== question.answerKey;
+                return (
+                  <button
+                    key={option.key}
+                    type="button"
+                    disabled={submitted}
+                    onClick={() => setSelected((prev) => ({ ...prev, [index]: option.key }))}
+                    className={`flex items-start gap-2 rounded-xl border px-3 py-2 text-left text-sm transition-colors ${
+                      correct
+                        ? "border-success bg-success/10 text-success"
+                        : wrong
+                        ? "border-error bg-error/10 text-error"
+                        : chosen
+                        ? "border-brand bg-brand-softPurple text-brand"
+                        : "border-line bg-white text-ink hover:border-ink-subtle"
+                    }`}
+                  >
+                    <span className="font-semibold">{option.key})</span>
+                    <span>{option.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {submitted && (
+              <div className="mt-3 rounded-xl border border-line bg-white p-3 text-xs leading-relaxed text-ink-muted">
+                <span className="font-semibold text-ink">Answer: {question.answerKey}.</span>{" "}
+                {question.explanation || "Review the key concept above to see why this option fits best."}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <button
+          type="button"
+          disabled={submitted || answeredCount < questions.length}
+          onClick={() => setSubmitted(true)}
+          className="btn-primary w-full sm:w-auto"
+        >
+          {submitted ? "Answers shown" : "Show answers"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSelected({});
+            setSubmitted(false);
+          }}
+          className="btn-secondary w-full sm:w-auto"
+        >
+          Reset quiz
+        </button>
+      </div>
+    </div>
+  );
+}
+
+type Flashcard = {
+  question: string;
+  answer: string;
+};
+
+function parseFlashcards(text: string): Flashcard[] {
+  const lines = text.split(/\r?\n/).map(cleanStudyLine);
+  const cards: Flashcard[] = [];
+  let current: Flashcard | null = null;
+  let side: "question" | "answer" | null = null;
+
+  function pushCurrent() {
+    if (current?.question && current.answer) cards.push(current);
+    current = null;
+    side = null;
+  }
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+
+    const questionMatch = line.match(/^(?:\d+[.)]\s*)?Q(?:uestion)?\s*\d*\s*[:\-]\s*(.+)$/i);
+    const answerMatch = line.match(/^(?:\d+[.)]\s*)?A(?:nswer)?\s*\d*\s*[:\-]\s*(.+)$/i);
+
+    if (questionMatch) {
+      pushCurrent();
+      current = { question: questionMatch[1].trim(), answer: "" };
+      side = "question";
+      continue;
+    }
+
+    if (answerMatch) {
+      if (!current) current = { question: "", answer: "" };
+      current.answer = answerMatch[1].trim();
+      side = "answer";
+      continue;
+    }
+
+    if (current && side) {
+      current[side] = `${current[side]} ${line}`.trim();
+    }
+  }
+
+  pushCurrent();
+  return cards;
+}
+
+function FlashcardDeck({
+  cards,
+  fallback,
+}: {
+  cards: Flashcard[];
+  fallback: string;
+}) {
+  const [flipped, setFlipped] = useState<Record<number, boolean>>({});
+
+  if (!cards.length) {
+    return (
+      <StudySectionList
+        sections={[{ title: "Practice Question", content: fallback }]}
+        defaultOpenCount={1}
+      />
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-line bg-white p-4">
+      <div className="mb-4">
+        <h4 className="text-sm font-semibold text-ink">Interactive flashcards</h4>
+        <p className="mt-1 text-xs text-ink-muted">
+          Click a card to flip between the question and answer.
+        </p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {cards.map((card, index) => {
+          const isFlipped = flipped[index];
+          return (
+            <button
+              key={`${card.question}-${index}`}
+              type="button"
+              onClick={() => setFlipped((prev) => ({ ...prev, [index]: !prev[index] }))}
+              className={`min-h-40 rounded-xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-soft ${
+                isFlipped
+                  ? "border-brand bg-brand-softPurple text-brand"
+                  : "border-line bg-bg-soft text-ink"
+              }`}
+            >
+              <span className="mb-3 inline-flex rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-ink-muted">
+                {isFlipped ? "Answer" : "Question"} {index + 1}
+              </span>
+              <span className="block text-sm font-semibold leading-relaxed">
+                {isFlipped ? card.answer : card.question}
+              </span>
+              <span className="mt-4 block text-xs text-ink-subtle">Click to flip</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

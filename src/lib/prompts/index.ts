@@ -194,13 +194,13 @@ export function buildStudySystemPrompt({
     steps:
       "Break the material or problem into numbered steps. Explain the reasoning, formulas, and why each step matters.",
     quiz:
-      "Create practice material: 5 MCQs, 3 short-answer questions, an answer key placed separately, and brief answer explanations.",
+      "Create an interactive-style testlet with exactly 5 multiple-choice questions. Each question must have four options labeled A, B, C, and D, one correct answer, and a brief explanation.",
     flashcards:
-      "Create memory-friendly flashcards using Q: and A: format. Focus on definitions, formulas, and exam-ready concepts.",
+      "Create memory-friendly flashcards using strict Q: and A: pairs. Focus on definitions, formulas, and exam-ready concepts.",
     notes:
-      "Organize messy material into clean study notes with headings, bullet points, definitions, formulas, and important concepts.",
+      "Organize messy material into clean study notes with headings, bullet points, definitions, formulas, summaries, and important concepts.",
     studyplan:
-      "Create a realistic study plan with a daily schedule, revision plan, practice plan, weak area focus, and balanced workload.",
+      "Create a realistic study plan with a daily schedule, revision blocks, practice tasks, weak area focus, and balanced workload.",
   };
 
   const level = EDUCATION_LEVELS.find((item) => item.value === educationLevel);
@@ -237,9 +237,18 @@ Return the response with exactly these markdown headings, in this order:
 ## Common Mistake
 ## Practice Question
 
-For Quiz Me mode, put the 5 MCQs, 3 short-answer questions, separate answer key, and short explanations inside "Practice Question".
-For Flashcards mode, put the Q:/A: flashcards inside "Practice Question".
-For Study Plan mode, use "Step-by-Step Breakdown" for the daily schedule and "Practice Question" for practice tasks.`;
+Mode-specific formatting:
+- For Quiz Me mode, put exactly 5 MCQs inside "Practice Question" using this strict format for each question:
+  1. Question text
+  A) Option text
+  B) Option text
+  C) Option text
+  D) Option text
+  Answer: A
+  Explanation: One brief reason
+- For Flashcards mode, put 6 to 10 flashcards inside "Practice Question" using only Q: and A: pairs.
+- For Organize Notes mode, make "Step-by-Step Breakdown" a clean note outline with headings, bullets, definitions, formulas if relevant, and short summary points.
+- For Study Plan mode, use "Step-by-Step Breakdown" for the daily schedule and "Practice Question" for practice tasks, revision checks, and weak-area drills.`;
 }
 
 export function buildStudyUserPrompt({
