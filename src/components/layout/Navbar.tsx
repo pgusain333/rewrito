@@ -7,6 +7,13 @@ import { LoginModal } from "@/components/modals/LoginModal";
 import { UseCaseModal } from "@/components/modals/UseCaseModal";
 import { useAuthAndUsage } from "@/lib/usage/useAuthAndUsage";
 import { LS_KEYS } from "@/lib/usage/limits";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+
+function displayName(user: { name: string | null; email: string | null }) {
+  if (user.name) return user.name.split(/\s+/)[0];
+  if (user.email) return user.email.split("@")[0];
+  return "Account";
+}
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -32,6 +39,16 @@ export function Navbar() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (!user || user.name || typeof window === "undefined") return;
+    const pendingName = window.localStorage.getItem(LS_KEYS.pendingName)?.trim();
+    if (!pendingName) return;
+    window.localStorage.removeItem(LS_KEYS.pendingName);
+    createSupabaseBrowserClient().auth.updateUser({
+      data: { full_name: pendingName, name: pendingName },
+    });
+  }, [user]);
+
   function handleUseCaseClose(useCase?: string) {
     if (user && typeof window !== "undefined") {
       const key = `${LS_KEYS.useCasePrefix}.${user.id}`;
@@ -47,11 +64,12 @@ export function Navbar() {
         className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8"
       >
         <Link href="/" aria-label="rewrito home" className="-ml-1 rounded-lg p-1">
-          <Logo size={28} />
+          <Logo size={34} />
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
           <NavLink href="/tools">Tools</NavLink>
+          <NavLink href="/ai-detector">AI Detector</NavLink>
           <NavLink href="/study-assistant">Study</NavLink>
           <NavLink href="/pricing">Pricing</NavLink>
           <NavLink href="/faq">FAQ</NavLink>
@@ -60,6 +78,9 @@ export function Navbar() {
         <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <>
+              <span className="max-w-[140px] truncate rounded-full bg-bg-soft px-3 py-2 text-sm font-semibold text-ink">
+                {displayName(user)}
+              </span>
               <Link href="/dashboard" className="btn-ghost">
                 Dashboard
               </Link>
@@ -108,12 +129,16 @@ export function Navbar() {
         <div id="mobile-menu" className="border-t border-line bg-white md:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
             <MobileLink href="/tools" onClick={() => setOpen(false)}>Tools</MobileLink>
+            <MobileLink href="/ai-detector" onClick={() => setOpen(false)}>AI Detector</MobileLink>
             <MobileLink href="/study-assistant" onClick={() => setOpen(false)}>Study</MobileLink>
             <MobileLink href="/pricing" onClick={() => setOpen(false)}>Pricing</MobileLink>
             <MobileLink href="/faq" onClick={() => setOpen(false)}>FAQ</MobileLink>
             <div className="mt-3 flex flex-col gap-2">
               {user ? (
                 <>
+                  <div className="rounded-xl bg-bg-soft px-3 py-2 text-sm font-semibold text-ink">
+                    {displayName(user)}
+                  </div>
                   <Link href="/dashboard" onClick={() => setOpen(false)} className="btn-secondary w-full">
                     Dashboard
                   </Link>

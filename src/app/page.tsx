@@ -8,6 +8,7 @@ import {
   ArrowRightIcon,
   LinkedinIcon,
   MailIcon,
+  ShieldCheckIcon,
   SparkleIcon,
   StudyIcon,
 } from "@/components/ui/icons";
@@ -15,7 +16,7 @@ import {
 export const metadata: Metadata = {
   title: "rewrito - AI-powered professional communication",
   description:
-    "Humanize AI text, rewrite LinkedIn posts, improve professional emails, and study concepts clearly with rewrito.",
+    "Humanize AI text, check AI detection scores, rewrite LinkedIn posts, improve professional emails, and study concepts clearly with rewrito.",
   alternates: { canonical: "/" },
 };
 
@@ -29,6 +30,7 @@ export default function HomePage() {
         <LiveTool />
         <WhyUs />
         <BeforeAfter />
+        <LearningCoach />
         <HowItWorks />
         <UsageLimits />
         <FAQ />
@@ -64,7 +66,7 @@ function Hero() {
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
             Humanize AI text, improve LinkedIn posts, rewrite professional emails,
-            and turn confusing study material into clear understanding.
+            check AI detector confidence, and turn confusing study material into clear understanding.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/try" className="btn-primary">
@@ -115,6 +117,13 @@ const TOOL_CARDS = [
     accent: "bg-brand-softPurple text-brand",
   },
   {
+    icon: ShieldCheckIcon,
+    name: "AI Detector Score",
+    href: "/ai-detector",
+    desc: "Check detector-style confidence before and after humanizing your draft.",
+    accent: "bg-warning/10 text-warning",
+  },
+  {
     icon: LinkedinIcon,
     name: "LinkedIn Post Rewriter",
     href: "/linkedin-rewriter",
@@ -143,25 +152,22 @@ function ToolCards() {
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Four tools. One toolkit.
+            Five tools. One toolkit.
           </h2>
           <p className="mt-3 text-base text-ink-muted">
             Built for people who care how their writing lands and how clearly they learn.
           </p>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {TOOL_CARDS.map((t, idx) => (
             <Reveal key={t.name} delay={idx * 90}>
               <Link
                 href={t.href}
-                className="card group block p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card"
+                className="card group block p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card"
               >
                 <ToolScreenMockup tool={t.name} accent={t.accent} Icon={t.icon} />
-                <div className="mb-2 mt-5 flex items-center gap-2">
-                  <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ${t.accent}`}>
-                    <t.icon size={17} />
-                  </span>
-                  <h3 className="text-lg font-semibold text-ink">{t.name}</h3>
+                <div className="mb-2 mt-6">
+                  <h3 className="text-base font-semibold text-ink">{t.name}</h3>
                 </div>
                 <p className="text-sm leading-relaxed text-ink-muted">{t.desc}</p>
                 <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-brand">
@@ -191,19 +197,21 @@ function ToolScreenMockup({
       ? ["Concept map", "Practice set", "Flashcards"]
       : tool === "LinkedIn Post Rewriter"
       ? ["Hook", "Post body", "CTA"]
+      : tool === "AI Detector Score"
+      ? ["Detector scan", "Humanized draft", "Risk drop"]
       : tool === "Professional Email Rewriter"
       ? ["Subject", "Polished body", "Sign-off"]
       : ["AI draft", "Human voice", "Quality score"];
 
   return (
-    <div className="relative h-36 [perspective:900px]" aria-hidden>
-      <div className="absolute inset-x-2 top-3 rounded-2xl border border-line bg-white p-3 shadow-card transition-transform duration-300 [transform:rotateX(8deg)_rotateY(-12deg)] group-hover:[transform:rotateX(4deg)_rotateY(-6deg)_translateY(-3px)]">
+    <div className="relative h-44 [perspective:900px]" aria-hidden>
+      <div className="absolute inset-x-2 top-3 z-10 rounded-2xl border border-line bg-white p-3 shadow-card transition-transform duration-300 [transform:rotateX(8deg)_rotateY(-12deg)] group-hover:[transform:rotateX(4deg)_rotateY(-6deg)_translateY(-3px)]">
         <div className="mb-3 flex items-center justify-between">
           <span className="flex min-w-0 items-center gap-2">
             <span className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${accent}`}>
               <Icon size={16} />
             </span>
-            <span className="truncate text-[11px] font-semibold text-ink">{tool}</span>
+            <span className="truncate text-[10px] font-semibold text-ink">{tool}</span>
           </span>
           <span className="h-2 w-10 shrink-0 rounded-full bg-line" />
         </div>
@@ -250,7 +258,7 @@ function WhyUs() {
   const reasons = [
     {
       title: "Structured by purpose",
-      body: "Each workspace is tuned for a real job: humanizing, posting, emailing, or studying.",
+      body: "Each workspace is tuned for a real job: humanizing, detecting, posting, emailing, or studying.",
     },
     {
       title: "Keeps meaning intact",
@@ -284,9 +292,7 @@ function WhyUs() {
             {reasons.map((reason, index) => (
               <Reveal key={reason.title} delay={index * 110}>
                 <div className="card relative h-full overflow-hidden p-5">
-                  <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-softPurple text-sm font-semibold text-brand">
-                    {index + 1}
-                  </span>
+                  <ReasonMiniMockup index={index} />
                   <h3 className="text-base font-semibold text-ink">{reason.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-ink-muted">{reason.body}</p>
                   <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-bg-section">
@@ -302,6 +308,38 @@ function WhyUs() {
         </div>
       </div>
     </section>
+  );
+}
+
+function ReasonMiniMockup({ index }: { index: number }) {
+  const labelSets = [
+    ["Mode", "Purpose", "Output"],
+    ["Facts", "Meaning", "Voice"],
+    ["Score", "Copy", "Review"],
+  ];
+  const labels = labelSets[index] ?? labelSets[0];
+
+  return (
+    <div className="mb-5 rounded-xl border border-line bg-bg-soft p-3">
+      <div className="mb-3 flex items-center justify-between">
+        <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-brand-softPurple text-xs font-semibold text-brand">
+          {index + 1}
+        </span>
+        <span className="h-2 w-12 rounded-full bg-line" />
+      </div>
+      <div className="space-y-2">
+        {labels.map((label, itemIndex) => (
+          <div key={label} className="flex items-center gap-2 rounded-lg bg-white px-2 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+            <span className="text-[10px] font-medium text-ink-muted">{label}</span>
+            <span
+              className="ml-auto h-1.5 rounded-full bg-brand-softBlue"
+              style={{ width: `${32 + itemIndex * 16}%` }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -360,6 +398,43 @@ function BeforeAfter() {
   );
 }
 
+function LearningCoach() {
+  return (
+    <section className="bg-bg">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div>
+            <span className="chip mb-5">Built to teach</span>
+            <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+              Over time, you write better without the tool.
+            </h2>
+            <p className="mt-3 text-base leading-relaxed text-ink-muted">
+              rewrito does more than rewrite. It shows what changed, why the draft improved,
+              and which habits to carry into your next message, post, paper, or study note.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              ["Pattern", "Replace generic AI phrasing with a concrete subject."],
+              ["Rhythm", "Break long sentences and vary sentence shape."],
+              ["Habit", "Keep names, numbers, and examples while cutting filler."],
+            ].map(([title, body], index) => (
+              <Reveal key={title} delay={index * 90}>
+                <div className="card h-full p-5">
+                  <span className="mb-4 inline-flex rounded-full bg-brand-softPurple px-3 py-1 text-xs font-semibold text-brand">
+                    {title}
+                  </span>
+                  <p className="text-sm leading-relaxed text-ink-muted">{body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ---------- How it works ---------- */
 
 function HowItWorks() {
@@ -381,6 +456,7 @@ function HowItWorks() {
           {steps.map((s, idx) => (
             <Reveal key={s.n} delay={idx * 100} as="li">
               <div className="card h-full p-6">
+                <StepMiniMockup index={idx} />
                 <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-softPurple text-sm font-semibold text-brand">
                   {s.n}
                 </span>
@@ -392,6 +468,35 @@ function HowItWorks() {
         </ol>
       </div>
     </section>
+  );
+}
+
+function StepMiniMockup({ index }: { index: number }) {
+  const rowSets = [
+    ["Paste", "Draft", "Context"],
+    ["Tone", "Mode", "Level"],
+    ["Score", "Guide", "Coach"],
+  ];
+  const rows = rowSets[index] ?? rowSets[0];
+
+  return (
+    <div className="mb-5 rounded-xl border border-line bg-bg-soft p-3">
+      <div className="mb-2 flex items-center justify-between">
+        <span className="h-2 w-14 rounded-full bg-brand-softPurple" />
+        <span className="h-2 w-8 rounded-full bg-line" />
+      </div>
+      <div className="space-y-1.5">
+        {rows.map((row, rowIndex) => (
+          <div key={row} className="flex items-center gap-2 rounded-lg bg-white px-2 py-1.5">
+            <span className="text-[10px] font-semibold text-ink-muted">{row}</span>
+            <span
+              className="ml-auto h-1.5 rounded-full bg-brand-softBlue"
+              style={{ width: `${36 + rowIndex * 12}%` }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

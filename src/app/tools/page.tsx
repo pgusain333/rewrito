@@ -3,17 +3,24 @@ import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
-import { ArrowRightIcon, LinkedinIcon, MailIcon, SparkleIcon, StudyIcon } from "@/components/ui/icons";
+import {
+  ArrowRightIcon,
+  LinkedinIcon,
+  MailIcon,
+  ShieldCheckIcon,
+  SparkleIcon,
+  StudyIcon,
+} from "@/components/ui/icons";
 
 export const metadata: Metadata = {
   title: "AI Writing Tools - rewrito",
   description:
-    "Explore rewrito's AI Humanizer, LinkedIn Post Rewriter, Professional Email Rewriter, and AI Study Assistant.",
+    "Explore rewrito's AI Humanizer, AI Detector Score, LinkedIn Post Rewriter, Professional Email Rewriter, and AI Study Assistant.",
   alternates: { canonical: "/tools" },
   openGraph: {
     title: "AI Writing Tools - rewrito",
     description:
-      "Humanize AI text, polish LinkedIn posts, rewrite professional emails, and study concepts clearly with rewrito.",
+      "Humanize AI text, check AI detector confidence, polish LinkedIn posts, rewrite professional emails, and study concepts clearly with rewrito.",
     url: "/tools",
   },
 };
@@ -44,6 +51,14 @@ const tools = [
     points: ["Tightens wording", "Balances tone", "Keeps names, dates, and numbers"],
   },
   {
+    icon: ShieldCheckIcon,
+    name: "AI Detector Score",
+    href: "/ai-detector",
+    description:
+      "Check detector-style AI confidence, compare before and after scores, and learn which writing patterns to improve.",
+    points: ["Shows before and after scores", "Humanizes high-risk drafts", "Teaches better writing habits"],
+  },
+  {
     icon: StudyIcon,
     name: "Rewrito Study",
     href: "/study-assistant",
@@ -59,7 +74,7 @@ export default function ToolsPage() {
     "@type": "CollectionPage",
     name: "rewrito AI Writing Tools",
     description:
-      "AI tools for humanizing AI text, rewriting LinkedIn posts, improving professional emails, and learning concepts clearly.",
+      "AI tools for humanizing AI text, checking AI detector confidence, rewriting LinkedIn posts, improving professional emails, and learning concepts clearly.",
     mainEntity: tools.map((tool) => ({
       "@type": "SoftwareApplication",
       name: tool.name,
@@ -76,17 +91,17 @@ export default function ToolsPage() {
           <div className="mx-auto max-w-6xl px-5 pb-10 pt-14 sm:px-8 sm:pb-14 sm:pt-20">
             <span className="chip mb-5">AI writing toolkit</span>
             <h1 className="max-w-3xl text-balance text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-              Tools for professional writing that sounds clear and human.
+              Tools for writing, studying, and checking AI confidence.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
-              Choose a focused workspace for AI-generated copy, LinkedIn posts, email drafts,
-              or study material. Each tool improves clarity while keeping the purpose intact.
+              Choose a focused workspace for AI-generated copy, detector-style checks,
+              LinkedIn posts, email drafts, or study material. Each tool improves clarity while keeping the purpose intact.
             </p>
           </div>
         </section>
 
         <section className="bg-bg-section/60">
-          <div className="mx-auto grid max-w-6xl gap-5 px-5 py-14 sm:grid-cols-2 sm:px-8 sm:py-20 xl:grid-cols-4">
+          <div className="mx-auto grid max-w-6xl gap-5 px-5 py-14 sm:grid-cols-2 sm:px-8 sm:py-20 lg:grid-cols-3 xl:grid-cols-5">
             {tools.map((tool) => (
               <article key={tool.name} className="card flex h-full flex-col p-6">
                 <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-softPurple text-brand">

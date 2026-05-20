@@ -29,7 +29,7 @@ export function UseCaseModal({ open, onClose }: Props) {
     <Modal open={open} onClose={() => onClose()} labelledBy="use-case-headline">
       <div className="text-center">
         <div className="mx-auto mb-4 flex justify-center">
-          <Logo size={42} />
+          <Logo size={52} />
         </div>
         <h2 id="use-case-headline" className="text-xl font-semibold text-ink">
           How are you going to use rewrito?

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   TOOLS,
   TONES,
@@ -22,6 +22,7 @@ import { UpgradeModal } from "@/components/modals/UpgradeModal";
 import { Listbox } from "@/components/ui/Listbox";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { ScoreCard } from "@/components/tools/ScoreCard";
+import { WritingCoachCard } from "@/components/tools/WritingCoachCard";
 import {
   CheckIcon,
   CopyIcon,
@@ -84,6 +85,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
 
   const isStudy = tool === "study";
   const isPaidUser = user?.plan === "pro";
+  const useWideOutput = isStudy && studyMode === "quiz";
   const wordCount = useMemo(() => countWords(input), [input]);
   const charCount = input.length;
   const outputWords = useMemo(() => countWords(output), [output]);
@@ -366,8 +368,12 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
         </div>
       )}
 
-      <div className="grid gap-0 md:grid-cols-2">
-        <div className="border-b border-line p-5 md:border-b-0 md:border-r md:p-6">
+      <div className={`grid gap-0 ${useWideOutput ? "" : "md:grid-cols-2"}`}>
+        <div
+          className={`border-b border-line p-5 md:p-6 ${
+            useWideOutput ? "" : "md:border-b-0 md:border-r"
+          }`}
+        >
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <label htmlFor="rw-input" className="field-label !mb-0">
               {isStudy ? "Study material" : "Your text"}
@@ -579,8 +585,9 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       </div>
 
       {scores && tool !== "study" && (
-        <div className="border-t border-line bg-bg-soft p-5 sm:p-6 animate-fade-up">
+        <div className="space-y-4 border-t border-line bg-bg-soft p-5 sm:p-6 animate-fade-up">
           <ScoreCard scores={scores} />
+          <WritingCoachCard original={input} rewritten={output} />
         </div>
       )}
 
@@ -812,9 +819,16 @@ function StudyOutput({
   const sections = parseStudySections(output);
   const practice = sections.find((section) => section.title === "Practice Question")?.content ?? "";
   const supportingSections = sections.filter((section) => section.title !== "Practice Question");
+  const quizTestlets = [practice || output, ...extraTestlets];
+  const [activeTestletIndex, setActiveTestletIndex] = useState(0);
+
+  useEffect(() => {
+    setActiveTestletIndex(Math.max(0, quizTestlets.length - 1));
+  }, [output, quizTestlets.length]);
 
   if (studyMode === "quiz") {
-    const testlets = [practice || output, ...extraTestlets];
+    const activeIndex = Math.min(activeTestletIndex, quizTestlets.length - 1);
+    const activeTestlet = quizTestlets[activeIndex] ?? "";
     return (
       <div className="space-y-4">
         <StudySectionList sections={supportingSections} defaultOpenCount={2} />
@@ -825,14 +839,17 @@ function StudyOutput({
           error={testletError}
           onCreate={onCreateTestlet}
         />
-        {testlets.map((testlet, index) => (
-          <QuizTestlet
-            key={`${index}-${testlet}`}
-            title={`Testlet ${index + 1}`}
-            questions={parseQuizQuestions(testlet)}
-            fallback={testlet}
-          />
-        ))}
+        <TestletSwitcher
+          count={quizTestlets.length}
+          activeIndex={activeIndex}
+          onChange={setActiveTestletIndex}
+        />
+        <QuizTestlet
+          key={`${activeIndex}-${activeTestlet}`}
+          title={`Testlet ${activeIndex + 1}`}
+          questions={parseQuizQuestions(activeTestlet)}
+          fallback={activeTestlet}
+        />
       </div>
     );
   }
@@ -848,6 +865,44 @@ function StudyOutput({
   }
 
   return <StudySectionList sections={sections} defaultOpenCount={3} />;
+}
+
+function TestletSwitcher({
+  count,
+  activeIndex,
+  onChange,
+}: {
+  count: number;
+  activeIndex: number;
+  onChange: (index: number) => void;
+}) {
+  if (count <= 1) return null;
+
+  return (
+    <div className="rounded-xl border border-line bg-white p-3">
+      <label className="field-label !mb-2" htmlFor="testlet-select">
+        Testlet menu
+      </label>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <select
+          id="testlet-select"
+          value={activeIndex}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="input-base sm:max-w-xs"
+        >
+          {Array.from({ length: count }, (_, index) => (
+            <option key={index} value={index}>
+              Testlet {index + 1}
+              {index === count - 1 ? " - latest" : ""}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs leading-relaxed text-ink-muted">
+          Previous testlets stay tucked away here. The selected practice set opens full width.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 function StudySectionList({

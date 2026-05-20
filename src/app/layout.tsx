@@ -19,10 +19,12 @@ export const metadata: Metadata = {
     template: "%s - rewrito",
   },
   description:
-    "Humanize AI text, rewrite LinkedIn posts, improve professional emails, and study concepts clearly with rewrito.",
+    "Humanize AI text, check AI detector confidence, rewrite LinkedIn posts, improve professional emails, and study concepts clearly with rewrito.",
   keywords: [
     "AI humanizer",
     "LinkedIn post rewriter",
+    "AI detector",
+    "AI detection score",
     "email rewriter",
     "AI study assistant",
     "flashcard generator",
@@ -47,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "rewrito - AI-powered professional communication",
     description:
-      "Humanize AI text, rewrite LinkedIn posts, improve professional emails, and study concepts clearly.",
+      "Humanize AI text, check AI detector confidence, rewrite LinkedIn posts, improve professional emails, and study concepts clearly.",
     images: ["/rewrito-logo.png"],
   },
   robots: {

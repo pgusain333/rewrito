@@ -7,13 +7,14 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-3">
-            <Logo size={24} />
+            <Logo size={30} />
             <p className="max-w-xs text-sm text-ink-muted">
               AI-powered professional communication. Rough text in, refined out.
             </p>
           </div>
           <FooterCol title="Tools">
             <FooterLink href="/ai-humanizer">AI Humanizer</FooterLink>
+            <FooterLink href="/ai-detector">AI Detector</FooterLink>
             <FooterLink href="/linkedin-rewriter">LinkedIn Rewriter</FooterLink>
             <FooterLink href="/email-rewriter">Email Rewriter</FooterLink>
             <FooterLink href="/study-assistant">Rewrito Study</FooterLink>

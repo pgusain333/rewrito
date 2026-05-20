@@ -5,6 +5,7 @@ export const LS_KEYS = {
   anonId: "rewrito.anonId",
   anonCount: "rewrito.anonCount",
   useCasePrefix: "rewrito.useCase",
+  pendingName: "rewrito.pendingName",
 } as const;
 
 export type UsageState = {

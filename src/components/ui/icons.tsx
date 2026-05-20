@@ -92,6 +92,13 @@ export const StudyIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const ShieldCheckIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 3 5 6v5c0 4.4 2.9 8.4 7 10 4.1-1.6 7-5.6 7-10V6l-7-3z" />
+    <path d="m8.7 12.2 2.1 2.1 4.5-4.8" />
+  </Icon>
+);
+
 export const UploadIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M12 16V4" />

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Logo } from "@/components/ui/Logo";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { LS_KEYS } from "@/lib/usage/limits";
 
 type Props = {
   open: boolean;
@@ -20,6 +21,7 @@ export function LoginModal({
   subline = "Sign in to keep rewriting.",
 }: Props) {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -66,12 +68,16 @@ export function LoginModal({
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
-    const normalizedEmail = email.trim();
-    if (!normalizedEmail) return;
+      const normalizedEmail = email.trim();
+      const normalizedName = name.trim();
+      if (!normalizedEmail) return;
     setStatus("sending");
     setError(null);
     try {
       const supabase = createSupabaseBrowserClient();
+      if (normalizedName && typeof window !== "undefined") {
+        window.localStorage.setItem(LS_KEYS.pendingName, normalizedName);
+      }
       const emailRedirectTo =
         typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined;
       const { error } = await supabase.auth.signInWithOtp({
@@ -79,6 +85,7 @@ export function LoginModal({
         options: {
           emailRedirectTo,
           shouldCreateUser: true,
+          data: normalizedName ? { full_name: normalizedName, name: normalizedName } : undefined,
         },
       });
       if (error) {
@@ -108,7 +115,7 @@ export function LoginModal({
 
         <div className="mb-5 pr-10 text-center">
           <div className="mx-auto mb-4 flex justify-center">
-            <Logo size={42} />
+            <Logo size={54} />
           </div>
           <h2 id="login-headline" className="text-xl font-semibold text-ink">
             {headline}
@@ -146,6 +153,17 @@ export function LoginModal({
           </div>
         ) : (
           <form onSubmit={handleEmail} className="space-y-3">
+            <label className="block">
+              <span className="field-label">Name</span>
+              <input
+                type="text"
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+                className="input-base"
+              />
+            </label>
             <label className="block">
               <span className="field-label">Email</span>
               <input

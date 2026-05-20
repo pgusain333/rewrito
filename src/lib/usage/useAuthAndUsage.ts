@@ -8,6 +8,7 @@ import { ANON_LIMIT, USER_LIMIT, LS_KEYS } from "@/lib/usage/limits";
 export type SessionUser = {
   id: string;
   email: string | null;
+  name: string | null;
   plan?: "free" | "pro";
 };
 
@@ -57,9 +58,14 @@ export function useAuthAndUsage() {
 
     function toSessionUser(u: User): SessionUser {
       const rawPlan = u.app_metadata?.plan ?? u.user_metadata?.plan;
+      const rawName =
+        u.user_metadata?.full_name ??
+        u.user_metadata?.name ??
+        u.user_metadata?.display_name;
       return {
         id: u.id,
         email: u.email ?? null,
+        name: typeof rawName === "string" && rawName.trim() ? rawName.trim() : null,
         plan: rawPlan === "pro" ? "pro" : "free",
       };
     }
