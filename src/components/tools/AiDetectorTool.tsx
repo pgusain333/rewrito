@@ -28,7 +28,7 @@ export function AiDetectorTool() {
   const [copied, setCopied] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
-  const { user, anonId, used, limit, remaining, incrementAnon, setUsageFromServer } =
+  const { user, anonId, incrementAnon, setUsageFromServer } =
     useAuthAndUsage();
 
   const wordCount = useMemo(() => countWords(input), [input]);
@@ -49,10 +49,6 @@ export function AiDetectorTool() {
       setError("Paste at least a few sentences for a useful detector score.");
       return;
     }
-    if (!user && used >= limit) {
-      setShowLogin(true);
-      return;
-    }
     if (wordLimitExceeded) {
       if (!user) {
         setError(`Log in to continue with drafts over ${wordLimit.toLocaleString()} words.`);
@@ -65,11 +61,6 @@ export function AiDetectorTool() {
       }
       return;
     }
-    if (user && used >= limit) {
-      setShowUpgrade(true);
-      return;
-    }
-
     setLoading(true);
     setOutput("");
     setScores(null);
@@ -78,7 +69,7 @@ export function AiDetectorTool() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tool: "humanizer",
+          tool: "detector",
           text: input,
           tone: "natural",
           refinement: "medium",
@@ -130,7 +121,7 @@ export function AiDetectorTool() {
               </p>
             </div>
           </div>
-          <span className="chip w-fit">{remaining} uses left</span>
+          <span className="chip w-fit">{wordLimit.toLocaleString()} word input limit</span>
         </div>
       </div>
 
@@ -254,7 +245,7 @@ export function AiDetectorTool() {
 
       {scores && (
         <div className="space-y-4 border-t border-line bg-bg-soft p-5 sm:p-6">
-          <ScoreCard scores={scores} />
+          <ScoreCard scores={scores} variant="detector" />
           <AiSignalInsights original={input} rewritten={output} />
           <WritingCoachCard original={input} rewritten={output} />
         </div>

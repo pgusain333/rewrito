@@ -70,6 +70,7 @@ export function Navbar() {
         <div className="hidden items-center gap-1 md:flex">
           <NavLink href="/tools">Tools</NavLink>
           <NavLink href="/ai-detector">AI Detector</NavLink>
+          <NavLink href="/plagiarism-checker">Plagiarism</NavLink>
           <NavLink href="/study-assistant">Study</NavLink>
           <NavLink href="/pricing">Pricing</NavLink>
           <NavLink href="/faq">FAQ</NavLink>
@@ -130,6 +131,7 @@ export function Navbar() {
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
             <MobileLink href="/tools" onClick={() => setOpen(false)}>Tools</MobileLink>
             <MobileLink href="/ai-detector" onClick={() => setOpen(false)}>AI Detector</MobileLink>
+            <MobileLink href="/plagiarism-checker" onClick={() => setOpen(false)}>Plagiarism</MobileLink>
             <MobileLink href="/study-assistant" onClick={() => setOpen(false)}>Study</MobileLink>
             <MobileLink href="/pricing" onClick={() => setOpen(false)}>Pricing</MobileLink>
             <MobileLink href="/faq" onClick={() => setOpen(false)}>FAQ</MobileLink>

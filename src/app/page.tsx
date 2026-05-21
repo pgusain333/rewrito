@@ -16,13 +16,14 @@ import {
 } from "@/components/ui/icons";
 
 export const metadata: Metadata = {
-  title: "rewrito - AI Humanizer, AI Detector, Rewriter, and Study Assistant",
+  title: "rewrito - AI Humanizer, Detector, Plagiarism Checker, and Study Assistant",
   description:
-    "Build human intelligence with AI intelligence. Use rewrito to humanize AI text, check AI detector scores, rewrite LinkedIn posts and emails, create quizzes, flashcards, and study plans.",
+    "Build human intelligence with AI intelligence. Use rewrito to humanize AI text, check AI detector scores, review plagiarism risk, rewrite LinkedIn posts and emails, create quizzes, flashcards, and study plans.",
   keywords: uniqueKeywords(
     CORE_KEYWORDS,
     TOOL_KEYWORDS.humanizer,
     TOOL_KEYWORDS.detector,
+    TOOL_KEYWORDS.plagiarism,
     TOOL_KEYWORDS.linkedin,
     TOOL_KEYWORDS.email,
     TOOL_KEYWORDS.study
@@ -79,7 +80,7 @@ function Hero() {
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
             Humanize AI text, improve LinkedIn posts, rewrite professional emails,
-            check AI detector confidence, and learn the writing and study patterns behind every improvement.
+            check AI detector confidence, review originality risk, and learn the writing and study patterns behind every improvement.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/try" className="btn-primary">
@@ -137,6 +138,13 @@ const TOOL_CARDS = [
     accent: "bg-warning/10 text-warning",
   },
   {
+    icon: ShieldCheckIcon,
+    name: "Plagiarism Checker",
+    href: "/plagiarism-checker",
+    desc: "Check originality risk, underline copied-sounding phrases, and spot citation needs.",
+    accent: "bg-success/10 text-success",
+  },
+  {
     icon: LinkedinIcon,
     name: "LinkedIn Post Rewriter",
     href: "/linkedin-rewriter",
@@ -165,13 +173,13 @@ function ToolCards() {
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Five tools. One toolkit.
+            Six tools. One toolkit.
           </h2>
           <p className="mt-3 text-base text-ink-muted">
             Built for people who care how their writing lands and how clearly they learn.
           </p>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {TOOL_CARDS.map((t, idx) => (
             <Reveal key={t.name} delay={idx * 90}>
               <Link
@@ -286,6 +294,13 @@ function toolMockupCopy(tool: string) {
       prompt: "Check if this draft sounds AI-written.",
       output: "Detector-style score lowered with clearer human rhythm.",
       lines: ["Before", "After", "Coach"],
+    };
+  }
+  if (tool === "Plagiarism Checker") {
+    return {
+      prompt: "Check this draft for originality risk.",
+      output: "Risky phrases underlined with safer wording and citation notes.",
+      lines: ["Score", "Underlines", "Citations"],
     };
   }
   if (tool === "Professional Email Rewriter") {
@@ -650,6 +665,11 @@ function SearchIntent() {
       href: "/ai-detector",
     },
     {
+      title: "Plagiarism Checker",
+      body: "Review originality risk, underline copied-sounding text, and spot claims that may need citation before submitting.",
+      href: "/plagiarism-checker",
+    },
+    {
       title: "LinkedIn and Email Rewriter",
       body: "Rewrite LinkedIn posts, professional emails, follow-ups, and workplace messages into clearer communication.",
       href: "/tools",
@@ -673,7 +693,7 @@ function SearchIntent() {
             People come to rewrito when they need practical results: clearer writing, lower AI-sounding confidence, stronger professional communication, and study material that is easier to understand.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {items.map((item) => (
             <Link key={item.title} href={item.href} className="card group h-full p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card">
               <h3 className="text-base font-semibold text-ink">{item.title}</h3>
@@ -908,7 +928,7 @@ function UsageLimits() {
 const FAQS = [
   {
     q: "Is rewrito free to try?",
-    a: "Yes. You can start without signing up. Sign in with Google or email when you want to continue using the toolkit.",
+    a: "Yes. You can start without signing up. Sign in with Google or email when you want longer inputs, saved history, and a personalized dashboard.",
   },
   {
     q: "Will my writing sound like me?",
@@ -916,11 +936,15 @@ const FAQS = [
   },
   {
     q: "Do you store what I paste in?",
-    a: "Anonymous trials are not saved. For signed-in users, recent rewrites are saved to your dashboard so you can revisit them. You can delete history at any time.",
+    a: "Anonymous sessions are not saved. For signed-in users, recent rewrites are saved to your dashboard so you can revisit them. You can delete history at any time.",
   },
   {
     q: "Can Rewrito Study help with exam preparation?",
     a: "Yes. Rewrito Study can explain concepts simply, break problems into steps, generate quizzes, create flashcards, organize notes, and build study plans.",
+  },
+  {
+    q: "Does rewrito include plagiarism checking?",
+    a: "Yes. The Plagiarism Checker reviews originality risk, underlines copied-sounding phrases, improves wording, and flags citation-needed claims without inventing sources.",
   },
   {
     q: "Which AI model powers rewrito?",

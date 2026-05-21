@@ -32,6 +32,7 @@ import {
   DownloadIcon,
   LinkedinIcon,
   MailIcon,
+  ShieldCheckIcon,
   SparkleIcon,
   StudyIcon,
   TrashIcon,
@@ -82,9 +83,6 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
   const {
     user,
     anonId,
-    used,
-    limit,
-    remaining,
     incrementAnon,
     setUsageFromServer,
   } = useAuthAndUsage();
@@ -109,13 +107,15 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       : studyMode === "studyplan"
       ? "Build study plan"
       : "Create study guide";
+  const primaryActionLabel =
+    tool === "plagiarism"
+      ? "Check originality"
+      : tool === "detector"
+      ? "Analyze and humanize"
+      : "Rewrite with rewrito";
   const charCount = input.length;
   const outputWords = useMemo(() => countWords(output), [output]);
-  const usageText = user
-    ? remaining > 0
-      ? `${remaining} uses left`
-      : "Limit reached"
-    : `${remaining} uses left`;
+  const usageText = `${wordLimitLabel} word input limit`;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -188,10 +188,6 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       );
       return;
     }
-    if (!user && used >= limit) {
-      setShowLogin(true);
-      return;
-    }
     if (wordLimitExceeded) {
       if (!user) {
         setError(`Log in to continue with drafts over ${wordLimitLabel} words.`);
@@ -209,11 +205,6 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       setShowLogin(true);
       return;
     }
-    if (user && used >= limit) {
-      setShowUpgrade(true);
-      return;
-    }
-
     setLoading(true);
     setOutput("");
     setExtraTestlets([]);
@@ -276,15 +267,6 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       setShowUpgrade(true);
       return;
     }
-    if (!user && used >= limit) {
-      setShowLogin(true);
-      return;
-    }
-    if (user && used >= limit) {
-      setShowUpgrade(true);
-      return;
-    }
-
     setCreatingTestlet(true);
     try {
       const res = await fetch("/api/rewrite", {
@@ -407,6 +389,8 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
   const ToolIcon =
     tool === "humanizer"
       ? SparkleIcon
+      : tool === "detector" || tool === "plagiarism"
+      ? ShieldCheckIcon
       : tool === "linkedin"
       ? LinkedinIcon
       : tool === "email"
@@ -509,12 +493,16 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
             className="input-base resize-y leading-relaxed"
           />
 
-          {tool === "humanizer" && input.trim() && (
+          {(tool === "humanizer" || tool === "detector" || tool === "plagiarism") && input.trim() && (
             <AiSignalTextBox
               text={input}
               mode="risk"
-              title="AI-sounding text"
-              description="Amber underlines mark phrases to humanize first."
+              title={tool === "plagiarism" ? "Originality-risk text" : "AI-sounding text"}
+              description={
+                tool === "plagiarism"
+                  ? "Amber underlines mark phrases that may need original wording, specificity, or citation."
+                  : "Amber underlines mark phrases to humanize first."
+              }
             />
           )}
 
@@ -636,7 +624,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
             ) : (
               <>
                 <WandIcon size={16} />
-                {isStudy ? studyActionLabel : "Rewrite with rewrito"}
+                {isStudy ? studyActionLabel : primaryActionLabel}
               </>
             )}
           </button>
@@ -670,6 +658,10 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                   : studyMode === "flashcards"
                   ? "Flashcards"
                   : "Study guide"
+                : tool === "plagiarism"
+                ? "Originality report"
+                : tool === "detector"
+                ? "Humanized output"
                 : "Rewritten"}
             </label>
             <div className="flex items-center gap-1.5">
@@ -714,7 +706,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                   onCreateTestlet={handleCreateTestlet}
                 />
               ) : (
-                tool === "humanizer" ? (
+                tool === "humanizer" || tool === "detector" ? (
                   <AiSignalTextBox
                     text={output}
                     compareText={input}
@@ -722,6 +714,8 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                     title="Humanized changes"
                     description="Green underlines mark wording rewrito changed to make the draft sound more human."
                   />
+                ) : tool === "plagiarism" ? (
+                  <FormattedText text={output} />
                 ) : (
                   <FormattedText text={output} />
                 )
@@ -733,7 +727,9 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                     ? "Your interactive quiz testlet will appear here."
                     : studyMode === "flashcards"
                     ? "Your flip-ready flashcards will appear here."
-                    : "Your structured study guide will appear here."
+                  : "Your structured study guide will appear here."
+                  : tool === "plagiarism"
+                  ? "Your originality score, underlined-risk review, and revised draft will appear here."
                   : "Your refined version will appear here."}
               </span>
             )}
@@ -766,8 +762,18 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
 
       {scores && tool !== "study" && (
         <div className="space-y-4 border-t border-line bg-bg-soft p-5 sm:p-6 animate-fade-up">
-          <ScoreCard scores={scores} />
-          {tool === "humanizer" && <AiSignalInsights original={input} rewritten={output} />}
+          <ScoreCard scores={scores} variant={tool === "plagiarism" ? "plagiarism" : tool === "detector" ? "detector" : "ai"} />
+          {(tool === "humanizer" || tool === "detector") && (
+            <AiSignalInsights original={input} rewritten={output} />
+          )}
+          {tool === "plagiarism" && (
+            <AiSignalTextBox
+              text={input}
+              mode="risk"
+              title="Underlined originality risks"
+              description="Amber underlines show phrases that may need more original wording, more specificity, or a citation check."
+            />
+          )}
           <WritingCoachCard original={input} rewritten={output} />
         </div>
       )}
@@ -789,6 +795,10 @@ function placeholderFor(tool: ToolType): string {
       return "Paste a rough email draft...";
     case "linkedin":
       return "Paste rough notes for your LinkedIn post...";
+    case "detector":
+      return "Paste text you want to check for detector-style AI confidence...";
+    case "plagiarism":
+      return "Paste a paragraph, essay section, report, or draft you want checked for originality risk and citation needs...";
     case "study":
       return "Paste a textbook paragraph, assignment question, accounting problem, lecture notes, exam question, or confusing concept...";
     case "humanizer":

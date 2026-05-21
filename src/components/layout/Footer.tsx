@@ -15,6 +15,7 @@ export function Footer() {
           <FooterCol title="Tools">
             <FooterLink href="/ai-humanizer">AI Humanizer</FooterLink>
             <FooterLink href="/ai-detector">AI Detector</FooterLink>
+            <FooterLink href="/plagiarism-checker">Plagiarism Checker</FooterLink>
             <FooterLink href="/linkedin-rewriter">LinkedIn Rewriter</FooterLink>
             <FooterLink href="/email-rewriter">Email Rewriter</FooterLink>
             <FooterLink href="/study-assistant">Rewrito Study</FooterLink>

@@ -1,11 +1,11 @@
 # rewrito
 
-AI-powered professional communication: humanize AI text, rewrite LinkedIn posts, and improve professional emails.
+AI-powered writing, originality review, and study support: humanize AI text, check detector confidence, review plagiarism risk, rewrite LinkedIn posts and emails, and study clearly.
 
 ## What's Included
 
-- AI Humanizer, LinkedIn Post Rewriter, and Professional Email Rewriter
-- Anonymous trials with server-side usage enforcement
+- AI Humanizer, AI Detector Score, Plagiarism Checker, LinkedIn Post Rewriter, Professional Email Rewriter, and Rewrito Study
+- Word-limit based access controls with server-side enforcement
 - Supabase Auth with Google OAuth, email/password login, email confirmation, and optional magic links
 - Resend welcome emails after first successful sign-in
 - Dashboard with rewrite history

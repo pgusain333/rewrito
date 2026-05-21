@@ -69,11 +69,11 @@ export default function Page() {
         },
         {
           q: "Can I use it for sensitive emails?",
-          a: "rewrito is great for tone-balancing tricky emails (declining requests, following up, giving feedback). For confidential matters, anonymous trials are not stored.",
+          a: "rewrito is great for tone-balancing tricky emails (declining requests, following up, giving feedback). For confidential matters, anonymous sessions are not stored.",
         },
         {
           q: "How long can the email be?",
-          a: "Up to 8,000 characters per rewrite. Long threads can be rewritten in sections.",
+          a: "Signed-in users can paste up to 1,200 words per input. Long threads work best when rewritten in sections.",
         },
       ]}
     />

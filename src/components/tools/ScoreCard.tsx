@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import type { ScorePair } from "@/lib/prompts";
 
-type Props = { scores: ScorePair };
+type ScoreVariant = "ai" | "detector" | "plagiarism";
+
+type Props = {
+  scores: ScorePair;
+  variant?: ScoreVariant;
+};
 
 function qualityBand(score: number): { label: string; color: string } {
   if (score >= 85) return { label: "Excellent", color: "var(--brand)" };
@@ -12,7 +17,7 @@ function qualityBand(score: number): { label: string; color: string } {
   return { label: "Weak", color: "#EF4444" };
 }
 
-function aiBand(score: number): { label: string; color: string } {
+function riskBand(score: number): { label: string; color: string } {
   if (score <= 25) return { label: "Low", color: "#10B981" };
   if (score <= 55) return { label: "Mixed", color: "#F59E0B" };
   return { label: "High", color: "#EF4444" };
@@ -39,7 +44,7 @@ function useCountUp(target: number, durationMs = 900): number {
   return value;
 }
 
-export function ScoreCard({ scores }: Props) {
+export function ScoreCard({ scores, variant = "ai" }: Props) {
   const beforeOverall = useCountUp(scores.before.overall);
   const afterOverall = useCountUp(scores.after.overall);
   const delta = scores.after.overall - scores.before.overall;
@@ -48,6 +53,7 @@ export function ScoreCard({ scores }: Props) {
   const beforeAi = scores.before.aiGenerated ?? 0;
   const afterAi = scores.after.aiGenerated ?? 0;
   const aiDrop = Math.max(0, beforeAi - afterAi);
+  const copy = variantCopy(variant);
 
   return (
     <div className="card overflow-hidden">
@@ -69,7 +75,7 @@ export function ScoreCard({ scores }: Props) {
               <path d="m7 14 4-4 4 4 5-5" />
             </svg>
           </span>
-          <h4 className="text-sm font-semibold text-ink">Quality and AI-confidence proof</h4>
+          <h4 className="text-sm font-semibold text-ink">{copy.heading}</h4>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -85,7 +91,7 @@ export function ScoreCard({ scores }: Props) {
           )}
           {aiDrop > 0 && (
             <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
-              -{aiDrop}% AI confidence
+              -{aiDrop}% {copy.dropLabel}
             </span>
           )}
         </div>
@@ -97,6 +103,7 @@ export function ScoreCard({ scores }: Props) {
           overall={beforeOverall}
           targetOverall={scores.before.overall}
           breakdown={scores.before}
+          variant={variant}
           accent={beforeBand.color}
           bandLabel={beforeBand.label}
         />
@@ -105,6 +112,7 @@ export function ScoreCard({ scores }: Props) {
           overall={afterOverall}
           targetOverall={scores.after.overall}
           breakdown={scores.after}
+          variant={variant}
           accent={afterBand.color}
           bandLabel={afterBand.label}
           highlight
@@ -119,6 +127,7 @@ function ScoreColumn({
   overall,
   targetOverall,
   breakdown,
+  variant,
   accent,
   bandLabel,
   highlight = false,
@@ -132,12 +141,14 @@ function ScoreColumn({
     conciseness: number;
     aiGenerated?: number;
   };
+  variant: ScoreVariant;
   accent: string;
   bandLabel: string;
   highlight?: boolean;
 }) {
   const aiScore = breakdown.aiGenerated ?? 0;
-  const ai = aiBand(aiScore);
+  const ai = riskBand(aiScore);
+  const copy = variantCopy(variant);
 
   return (
     <div className={`p-5 ${highlight ? "bg-white" : "bg-bg-soft/40"}`}>
@@ -165,13 +176,13 @@ function ScoreColumn({
 
       <ul className="mt-4 space-y-2.5">
         <Bar label="Clarity" value={breakdown.clarity} accent={accent} />
-        <Bar label="Naturalness" value={breakdown.naturalness} accent={accent} />
+        <Bar label={copy.middleMetric} value={breakdown.naturalness} accent={accent} />
         <Bar label="Conciseness" value={breakdown.conciseness} accent={accent} />
       </ul>
 
       <div className="mt-4 border-t border-line pt-4">
         <div className="mb-1 flex items-center justify-between text-[11px]">
-          <span className="text-ink-muted">AI-generated confidence</span>
+          <span className="text-ink-muted">{copy.riskMetric}</span>
           <span className="font-medium" style={{ color: ai.color }}>
             {aiScore}% {ai.label}
           </span>
@@ -189,6 +200,31 @@ function ScoreColumn({
       </div>
     </div>
   );
+}
+
+function variantCopy(variant: ScoreVariant) {
+  if (variant === "plagiarism") {
+    return {
+      heading: "Originality score and risk proof",
+      riskMetric: "Plagiarism-style similarity risk",
+      dropLabel: "similarity risk",
+      middleMetric: "Originality",
+    };
+  }
+  if (variant === "detector") {
+    return {
+      heading: "Quality and AI-confidence proof",
+      riskMetric: "AI-generated confidence",
+      dropLabel: "AI confidence",
+      middleMetric: "Naturalness",
+    };
+  }
+  return {
+    heading: "Quality and AI-confidence proof",
+    riskMetric: "AI-generated confidence",
+    dropLabel: "AI confidence",
+    middleMetric: "Naturalness",
+  };
 }
 
 function Ring({

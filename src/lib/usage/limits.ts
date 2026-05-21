@@ -1,5 +1,4 @@
-export const ANON_LIMIT = 10;
-export const USER_LIMIT = 30;
+export const USAGE_COUNT_TRACKING_LIMIT = 1000000;
 export const ANON_WORD_LIMIT = 500;
 export const USER_WORD_LIMIT = 1200;
 export const PRO_WORD_LIMIT = 4000;

@@ -14,13 +14,14 @@ import {
 } from "@/components/ui/icons";
 
 export const metadata: Metadata = pageMetadata({
-  title: "AI Writing Tools - Humanizer, Detector, Rewriters, Study Assistant",
+  title: "AI Writing Tools - Humanizer, Detector, Plagiarism, Study",
   description:
-    "Explore rewrito's AI Humanizer, AI Detector Score, LinkedIn Post Rewriter, Professional Email Rewriter, and AI Study Assistant in one toolkit.",
+    "Explore rewrito's AI Humanizer, AI Detector Score, Plagiarism Checker, LinkedIn Post Rewriter, Professional Email Rewriter, and AI Study Assistant in one toolkit.",
   path: "/tools",
   keywords: uniqueKeywords(
     TOOL_KEYWORDS.humanizer,
     TOOL_KEYWORDS.detector,
+    TOOL_KEYWORDS.plagiarism,
     TOOL_KEYWORDS.linkedin,
     TOOL_KEYWORDS.email,
     TOOL_KEYWORDS.study
@@ -61,6 +62,14 @@ const tools = [
     points: ["Shows before and after scores", "Humanizes high-risk drafts", "Teaches better writing habits"],
   },
   {
+    icon: ShieldCheckIcon,
+    name: "Plagiarism Checker",
+    href: "/plagiarism-checker",
+    description:
+      "Check originality risk, underline copied-sounding phrases, improve wording, and spot claims that may need citation.",
+    points: ["Originality-risk score", "Underlined similarity signals", "Citation-needed review"],
+  },
+  {
     icon: StudyIcon,
     name: "Rewrito Study",
     href: "/study-assistant",
@@ -76,7 +85,7 @@ export default function ToolsPage() {
     "@type": "CollectionPage",
     name: "rewrito AI Writing Tools",
     description:
-      "AI tools for humanizing AI text, checking AI detector confidence, rewriting LinkedIn posts, improving professional emails, and learning concepts clearly.",
+      "AI tools for humanizing AI text, checking AI detector confidence, reviewing plagiarism risk, rewriting LinkedIn posts, improving professional emails, and learning concepts clearly.",
     mainEntity: tools.map((tool) => ({
       "@type": "SoftwareApplication",
       name: tool.name,
@@ -90,7 +99,13 @@ export default function ToolsPage() {
       <Navbar />
       <main>
         <section className="bg-bg">
-          <div className="mx-auto max-w-6xl px-5 pb-10 pt-14 sm:px-8 sm:pb-14 sm:pt-20">
+          <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
+            <ToolWorkspace />
+          </div>
+        </section>
+
+        <section className="bg-bg">
+          <div className="mx-auto max-w-6xl px-5 pb-10 pt-4 sm:px-8 sm:pb-14 sm:pt-8">
             <span className="chip mb-5">AI writing toolkit</span>
             <h1 className="max-w-3xl text-balance text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
               Tools for writing, studying, and checking AI confidence.
@@ -103,7 +118,7 @@ export default function ToolsPage() {
         </section>
 
         <section className="bg-bg-section/60">
-          <div className="mx-auto grid max-w-6xl gap-5 px-5 py-14 sm:grid-cols-2 sm:px-8 sm:py-20 lg:grid-cols-3 xl:grid-cols-5">
+          <div className="mx-auto grid max-w-6xl gap-5 px-5 py-14 sm:grid-cols-2 sm:px-8 sm:py-20 lg:grid-cols-3 xl:grid-cols-6">
             {tools.map((tool) => (
               <article key={tool.name} className="card flex h-full flex-col p-6">
                 <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-softPurple text-brand">
@@ -127,19 +142,6 @@ export default function ToolsPage() {
           </div>
         </section>
 
-        <section className="bg-bg">
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
-            <div className="mb-10 max-w-2xl">
-              <h2 className="text-3xl font-semibold tracking-tight text-ink">
-                Try the toolkit
-              </h2>
-              <p className="mt-3 text-base text-ink-muted">
-                Paste a draft or study material, choose the right settings, and compare the result.
-              </p>
-            </div>
-            <ToolWorkspace />
-          </div>
-        </section>
       </main>
       <Footer />
       <script

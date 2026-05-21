@@ -23,17 +23,16 @@ import {
   type QuizQuestionCount,
 } from "@/lib/prompts";
 import {
-  ANON_LIMIT,
-  USER_LIMIT,
   ANON_WORD_LIMIT,
   USER_WORD_LIMIT,
   PRO_WORD_LIMIT,
+  USAGE_COUNT_TRACKING_LIMIT,
 } from "@/lib/usage/limits";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MAX_INPUT_CHARS = 8000;
+const MAX_INPUT_CHARS = 26000;
 
 type Body = {
   tool: ToolType;
@@ -121,7 +120,6 @@ export async function POST(req: Request) {
   const rawPlan = user?.app_metadata?.plan ?? user?.user_metadata?.plan;
   const isPaidUser = rawPlan === "pro";
   let used = 0;
-  let limit = user ? USER_LIMIT : ANON_LIMIT;
   let usageRowId: string | null = null;
   const wordCount = countWords(text);
   const wordLimit = isPaidUser ? PRO_WORD_LIMIT : user ? USER_WORD_LIMIT : ANON_WORD_LIMIT;
@@ -135,8 +133,6 @@ export async function POST(req: Request) {
           ? `Upgrade to continue with drafts over ${wordLimit.toLocaleString()} words.`
           : `Log in to continue with drafts over ${wordLimit.toLocaleString()} words.`,
         used,
-        limit,
-        remaining: Math.max(0, limit - used),
         requiresAuth: !user,
         requiresUpgrade: !!user && !isPaidUser,
       },
@@ -161,21 +157,23 @@ export async function POST(req: Request) {
       : 5;
 
   if (user) {
-    limit = USER_LIMIT;
     const { data: row } = await svc
       .from("usage_limits")
-      .select("id, request_count, max_requests")
+      .select("id, request_count")
       .eq("user_id", user.id)
       .maybeSingle();
 
     if (row) {
       used = row.request_count ?? 0;
-      limit = row.max_requests ?? USER_LIMIT;
       usageRowId = row.id;
     } else {
       const { data: inserted } = await svc
         .from("usage_limits")
-        .insert({ user_id: user.id, request_count: 0, max_requests: USER_LIMIT })
+        .insert({
+          user_id: user.id,
+          request_count: 0,
+          max_requests: USAGE_COUNT_TRACKING_LIMIT,
+        })
         .select("id")
         .single();
       usageRowId = inserted?.id ?? null;
@@ -191,13 +189,12 @@ export async function POST(req: Request) {
     }
     const { data: row } = await svc
       .from("usage_limits")
-      .select("id, request_count, max_requests")
+      .select("id, request_count")
       .is("user_id", null)
       .eq("anonymous_id", anonId)
       .maybeSingle();
     if (row) {
       used = row.request_count ?? 0;
-      limit = Math.max(row.max_requests ?? ANON_LIMIT, ANON_LIMIT);
       usageRowId = row.id;
     } else {
       const { data: inserted } = await svc
@@ -205,28 +202,12 @@ export async function POST(req: Request) {
         .insert({
           anonymous_id: anonId,
           request_count: 0,
-          max_requests: ANON_LIMIT,
+          max_requests: USAGE_COUNT_TRACKING_LIMIT,
         })
         .select("id")
         .single();
       usageRowId = inserted?.id ?? null;
     }
-  }
-
-  if (used >= limit) {
-    return NextResponse.json(
-      {
-        error: user
-          ? "You've reached your rewrite limit."
-          : "Log in to continue working.",
-        used,
-        limit,
-        remaining: 0,
-        requiresAuth: !user,
-        requiresUpgrade: !!user,
-      },
-      { status: 429 }
-    );
   }
 
   // ---- Call AI ----
@@ -328,8 +309,6 @@ export async function POST(req: Request) {
     output,
     scores,
     used: newCount,
-    limit,
-    remaining: Math.max(0, limit - newCount),
   });
 }
 
@@ -404,17 +383,30 @@ function stabilizeScores(scores: ScorePair | null, tool: ToolType): ScorePair | 
   const qualityFloor =
     tool === "humanizer"
       ? { clarity: 18, naturalness: 24, conciseness: 14, overall: 22 }
+      : tool === "detector"
+      ? { clarity: 18, naturalness: 24, conciseness: 14, overall: 22 }
+      : tool === "plagiarism"
+      ? { clarity: 18, naturalness: 26, conciseness: 12, overall: 24 }
       : tool === "linkedin"
       ? { clarity: 16, naturalness: 18, conciseness: 12, overall: 18 }
       : { clarity: 18, naturalness: 14, conciseness: 18, overall: 18 };
-  const aiDrop = tool === "humanizer" ? 38 : tool === "linkedin" ? 28 : 24;
+  const aiDrop =
+    tool === "humanizer" || tool === "detector"
+      ? 38
+      : tool === "plagiarism"
+      ? 42
+      : tool === "linkedin"
+      ? 28
+      : 24;
 
   const before = {
     clarity: clamp(Math.min(scores.before.clarity, 72)),
     naturalness: clamp(Math.min(scores.before.naturalness, 68)),
     conciseness: clamp(Math.min(scores.before.conciseness, 72)),
     overall: clamp(Math.min(scores.before.overall, 70)),
-    aiGenerated: clamp(Math.max(scores.before.aiGenerated ?? 0, tool === "humanizer" ? 72 : 58)),
+    aiGenerated: clamp(
+      Math.max(scores.before.aiGenerated ?? 0, tool === "humanizer" || tool === "detector" ? 72 : tool === "plagiarism" ? 68 : 58)
+    ),
   };
 
   const after = {
@@ -426,10 +418,10 @@ function stabilizeScores(scores: ScorePair | null, tool: ToolType): ScorePair | 
   };
 
   after.clarity = clamp(Math.max(after.clarity, 88));
-  after.naturalness = clamp(Math.max(after.naturalness, tool === "humanizer" ? 92 : 88));
+  after.naturalness = clamp(Math.max(after.naturalness, tool === "humanizer" || tool === "detector" || tool === "plagiarism" ? 92 : 88));
   after.conciseness = clamp(Math.max(after.conciseness, 86));
   after.overall = clamp(Math.max(after.overall, 90));
-  after.aiGenerated = clamp(Math.min(after.aiGenerated, tool === "humanizer" ? 18 : 26));
+  after.aiGenerated = clamp(Math.min(after.aiGenerated, tool === "humanizer" || tool === "detector" ? 18 : tool === "plagiarism" ? 16 : 26));
 
   return { before, after };
 }
@@ -439,6 +431,18 @@ function fallbackScores(tool: ToolType): ScorePair {
     return {
       before: { clarity: 62, naturalness: 48, conciseness: 58, aiGenerated: 82, overall: 56 },
       after: { clarity: 91, naturalness: 94, conciseness: 88, aiGenerated: 14, overall: 92 },
+    };
+  }
+  if (tool === "detector") {
+    return {
+      before: { clarity: 62, naturalness: 48, conciseness: 58, aiGenerated: 82, overall: 56 },
+      after: { clarity: 91, naturalness: 94, conciseness: 88, aiGenerated: 14, overall: 92 },
+    };
+  }
+  if (tool === "plagiarism") {
+    return {
+      before: { clarity: 61, naturalness: 52, conciseness: 58, aiGenerated: 76, overall: 57 },
+      after: { clarity: 92, naturalness: 94, conciseness: 86, aiGenerated: 12, overall: 93 },
     };
   }
   if (tool === "linkedin") {

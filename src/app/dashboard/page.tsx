@@ -12,7 +12,7 @@ import {
   type StudyMode,
   type ToolType,
 } from "@/lib/prompts";
-import { FREE_HISTORY_LIMIT, PRO_WORD_LIMIT, USER_LIMIT, USER_WORD_LIMIT } from "@/lib/usage/limits";
+import { FREE_HISTORY_LIMIT, PRO_WORD_LIMIT, USER_WORD_LIMIT } from "@/lib/usage/limits";
 import {
   ArrowRightIcon,
   LinkedinIcon,
@@ -233,6 +233,8 @@ export default async function DashboardPage() {
                           ? row.scores.after.overall - row.scores.before.overall
                           : null;
                         const aiConfidence = row.scores?.after.aiGenerated;
+                        const riskLabel =
+                          row.tool_type === "plagiarism" ? "Similarity risk" : "AI confidence";
                         const modeLabel = row.study_mode
                           ? STUDY_MODES.find((mode) => mode.value === row.study_mode)?.label ??
                             row.study_mode
@@ -281,7 +283,9 @@ export default async function DashboardPage() {
                                     )}
                                   </span>
                                   {typeof aiConfidence === "number" && (
-                                    <span className="block text-ink-muted">AI {aiConfidence}%</span>
+                                    <span className="block text-ink-muted">
+                                      {riskLabel} {aiConfidence}%
+                                    </span>
                                   )}
                                 </div>
                               ) : (
@@ -411,12 +415,11 @@ function DashboardSidebar({
   name: string;
   used: number;
 }) {
-  const remaining = Math.max(0, USER_LIMIT - used);
-  const progress = Math.min(100, Math.round((used / USER_LIMIT) * 100));
   const navItems = [
     { href: "/try", label: "New session", Icon: WandIcon, active: true },
     { href: "/ai-humanizer", label: "AI Humanizer", Icon: SparkleIcon },
     { href: "/ai-detector", label: "AI Detector", Icon: ShieldCheckIcon },
+    { href: "/plagiarism-checker", label: "Plagiarism Checker", Icon: ShieldCheckIcon },
     { href: "/linkedin-rewriter", label: "LinkedIn Rewriter", Icon: LinkedinIcon },
     { href: "/email-rewriter", label: "Email Rewriter", Icon: MailIcon },
     { href: "/study-assistant", label: "Rewrito Study", Icon: StudyIcon, badge: "New" },
@@ -456,18 +459,15 @@ function DashboardSidebar({
         </nav>
         <div className="mt-5 rounded-2xl border border-line bg-bg-soft p-4">
           <div className="flex items-center justify-between text-xs font-semibold text-ink-muted">
-            <span>Sessions remaining</span>
-            <span>{remaining}</span>
+            <span>Saved workspace</span>
+            <span>{USER_WORD_LIMIT.toLocaleString()} words</span>
           </div>
           <div className="mt-2 text-2xl font-semibold tracking-tight text-ink">
-            {used} / {USER_LIMIT}
+            {used}
           </div>
-          <div className="mt-3 h-2 rounded-full bg-line">
-            <div
-              className="h-full rounded-full bg-brand-gradient"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+          <p className="mt-2 text-xs leading-relaxed text-ink-muted">
+            Sessions created. Your latest {FREE_HISTORY_LIMIT} are kept here on the free plan.
+          </p>
           <Link
             href="/pricing"
             className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-brand"

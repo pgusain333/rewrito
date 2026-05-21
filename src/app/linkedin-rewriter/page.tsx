@@ -69,7 +69,7 @@ export default function Page() {
         },
         {
           q: "How long can my draft be?",
-          a: "Up to 8,000 characters per rewrite. Most LinkedIn posts perform best around 1,200-1,800 characters.",
+          a: "Signed-in users can paste up to 1,200 words per input. Most LinkedIn posts still perform best when the final version is much shorter and easy to scan.",
         },
         {
           q: "Does it add emojis or hashtags?",

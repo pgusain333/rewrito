@@ -73,7 +73,7 @@ export default function Page() {
         },
         {
           q: "What's the input limit?",
-          a: "You can paste up to 8,000 characters per rewrite (roughly 1,200 words).",
+          a: "Anonymous users can work with shorter drafts. Signed-in users can paste up to 1,200 words per input, with premium-ready limits for longer drafts.",
         },
       ]}
     />

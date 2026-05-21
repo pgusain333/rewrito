@@ -1,4 +1,4 @@
-export type ToolType = "humanizer" | "linkedin" | "email" | "study";
+export type ToolType = "humanizer" | "detector" | "linkedin" | "email" | "plagiarism" | "study";
 export type Tone =
   | "professional"
   | "natural"
@@ -36,6 +36,13 @@ export const TOOLS: Record<
     description:
       "Rewrite AI-generated text into natural, human, professional writing while preserving the original meaning.",
   },
+  detector: {
+    slug: "ai-detector",
+    name: "AI Detector Score",
+    tagline: "Check AI confidence before you publish",
+    description:
+      "Estimate AI-writing confidence, highlight AI-sounding phrases, humanize risky wording, and learn better writing patterns.",
+  },
   linkedin: {
     slug: "linkedin-rewriter",
     name: "LinkedIn Post Rewriter",
@@ -49,6 +56,13 @@ export const TOOLS: Record<
     tagline: "Clear, polite, confident emails - fast",
     description:
       "Rewrite rough email text into a concise, professional message that keeps your intent.",
+  },
+  plagiarism: {
+    slug: "plagiarism-checker",
+    name: "Plagiarism Checker",
+    tagline: "Check originality risk and citation needs",
+    description:
+      "Review writing for plagiarism-style similarity risk, underlined copied-sounding passages, originality score, and citation guidance.",
   },
   study: {
     slug: "study-assistant",
@@ -122,7 +136,7 @@ function toneInstruction(tone: Tone): string {
 }
 
 const SHARED_GUARDRAILS = [
-  "Return ONLY the rewritten text. No preamble, no explanations, no quotation marks around the result, no markdown fences.",
+  "Follow the tool-specific output format. No markdown fences.",
   "Do not invent facts, names, numbers, or claims that are not present in the input.",
   "Preserve the user's original meaning and intent.",
   "Avoid cliches and filler phrases such as 'in today's world', 'delve into', 'navigate the landscape', 'unlock', 'leverage', 'in conclusion'.",
@@ -171,6 +185,27 @@ Goals:
 - If a subject line is not provided, do not invent one unless the user asked.
 - Maintain a standard email structure (greeting, body, sign-off) only if appropriate to the input.
 - Make the final email easier to act on, with cleaner ask, clearer context, and less friction.`,
+    detector: `You are an expert editor specializing in lowering AI-writing confidence while improving quality.
+Goals:
+- Rewrite the text into a more natural, specific, human-sounding draft.
+- Reduce detector-style risk signals: generic phrasing, polished symmetry, repetitive sentence shapes, and vague claims.
+- Preserve all facts, names, dates, numbers, and intent exactly.
+- Keep the output professional, useful, and ready to review.
+- Teach by example through the improved draft itself, not through a separate explanation.`,
+    plagiarism: `You are an originality and plagiarism-risk editor.
+Goals:
+- Review the input for copied-sounding, source-dependent, generic, or insufficiently attributed phrasing.
+- Rewrite risky passages into more original wording while preserving meaning and factual claims.
+- Add citation-needed notes inline only where a claim clearly needs attribution, using [citation needed] rather than fake citations.
+- Do not invent sources, authors, page numbers, URLs, studies, legal authorities, or academic references.
+- Improve originality, specificity, structure, and clarity.
+- Keep the result as a usable revised draft, followed by a short originality report.
+
+Output:
+- First provide "Revised draft" with the improved text.
+- Then provide "Originality report" with a compact table: Risk area, Why it matters, What changed.
+- Then provide "Citation checks" with bullets only for claims that may need a source.
+- Be transparent that this is a similarity-risk review, not a database scan.`,
   };
 
   if (tool === "study") {
@@ -194,11 +229,12 @@ Presentation:
 - If the input naturally contains comparisons, schedules, options, formulas, lists, or before/after items, use a simple markdown table.
 - For emails, keep a readable email shape.
 - For LinkedIn, output a finished post with blank lines between short paragraphs, a concrete hook, a clear middle, and a natural final line.
-- For humanizer, preserve the user's intended format.`;
+- For humanizer, preserve the user's intended format.
+- For humanizer, detector, LinkedIn, and email tools, return only the finished rewritten text unless the tool-specific instructions request a report.`;
 }
 
 export function buildUserPrompt(input: string): string {
-  return `Rewrite the following text according to the rules above. Return only the rewritten version.\n\nText begins:\n${input}\nText ends.`;
+  return `Process the following text according to the rules and output format above.\n\nText begins:\n${input}\nText ends.`;
 }
 
 export function buildStudySystemPrompt({
@@ -378,9 +414,21 @@ export function buildScoringSystemPrompt(tool: ToolType): string {
       "Score with a focus on hook quality, scannability, and authenticity for LinkedIn.",
     email:
       "Score with a focus on professional clarity, politeness, and conciseness.",
+    detector:
+      "Score with a focus on detector-style AI confidence, human rhythm, specificity, and natural writing.",
+    plagiarism:
+      "Score with a focus on originality, citation readiness, low similarity risk, clarity, and responsible paraphrasing. For this tool, use the naturalness field as the originality score.",
     study:
       "Score with a focus on educational clarity, structure, usefulness, and beginner-friendly explanation.",
   };
+  const riskDefinition =
+    tool === "plagiarism"
+      ? `Also score "aiGenerated" from 0 to 100 as plagiarism-style similarity risk:
+- 0 means very original, well-paraphrased, and citation-ready
+- 100 means high similarity risk, source-dependent wording, or uncited copied-sounding claims`
+      : `Also score "aiGenerated" from 0 to 100:
+- 0 means very likely human-written
+- 100 means very likely AI-generated`;
 
   return `You are an impartial writing-quality evaluator.
 
@@ -389,9 +437,7 @@ Given an ORIGINAL piece of text and a REWRITTEN version, score each one on three
 - naturalness: how human and unforced the writing reads
 - conciseness: how efficient the wording is (no filler, no padding)
 
-Also score "aiGenerated" from 0 to 100:
-- 0 means very likely human-written
-- 100 means very likely AI-generated
+${riskDefinition}
 
 Also produce an "overall" score from 0 to 100 that reflects the writing's overall quality on a professional bar.
 

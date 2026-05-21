@@ -116,6 +116,12 @@ export default function StudyAssistantPage() {
     <>
       <Navbar />
       <main>
+        <section id="study-tool" className="bg-bg">
+          <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
+            <ToolWorkspace initialTool="study" lockTool />
+          </div>
+        </section>
+
         <section className="relative overflow-hidden bg-bg">
           <div aria-hidden className="hero-abstract">
             <div className="grid-overlay" />
@@ -154,12 +160,6 @@ export default function StudyAssistantPage() {
               </div>
               <StudyHeroMockup />
             </div>
-          </div>
-        </section>
-
-        <section id="study-tool" className="bg-bg">
-          <div className="mx-auto max-w-6xl px-5 pb-16 sm:px-8 sm:pb-24">
-            <ToolWorkspace initialTool="study" lockTool />
           </div>
         </section>
 

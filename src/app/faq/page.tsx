@@ -6,17 +6,17 @@ import { ArrowRightIcon } from "@/components/ui/icons";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "rewrito FAQ - AI Humanizer, Detector, Rewriter, and Study Questions",
+  title: "rewrito FAQ - AI Humanizer, Detector, Plagiarism, and Study Questions",
   description:
-    "Answers to common questions about rewrito, free access, saved history, AI humanizing, detector scores, Rewrito Study, privacy, and mobile support.",
+    "Answers to common questions about rewrito, free access, saved history, AI humanizing, detector scores, plagiarism checking, Rewrito Study, privacy, and mobile support.",
   path: "/faq",
-  keywords: ["rewrito FAQ", "AI humanizer questions", "AI detector score questions", "AI study assistant questions"],
+  keywords: ["rewrito FAQ", "AI humanizer questions", "AI detector score questions", "plagiarism checker questions", "AI study assistant questions"],
 });
 
 const faqs = [
   {
     q: "Is rewrito free to try?",
-    a: "Yes. You can start without signing up. Sign in with Google or email when you want to continue using the toolkit.",
+    a: "Yes. You can start without signing up. Sign in with Google or email when you want longer inputs, saved history, and a personalized dashboard.",
   },
   {
     q: "Will my writing sound like me?",
@@ -24,11 +24,15 @@ const faqs = [
   },
   {
     q: "Do you store what I paste in?",
-    a: "Anonymous trials are not saved. For signed-in users, recent rewrites are saved to your dashboard so you can revisit useful drafts.",
+    a: "Anonymous sessions are not saved. For signed-in users, recent rewrites are saved to your dashboard so you can revisit useful drafts.",
   },
   {
     q: "Which tools are included?",
-    a: "rewrito includes an AI Humanizer, AI Detector Score, LinkedIn Post Rewriter, Professional Email Rewriter, and Rewrito Study.",
+    a: "rewrito includes an AI Humanizer, AI Detector Score, Plagiarism Checker, LinkedIn Post Rewriter, Professional Email Rewriter, and Rewrito Study.",
+  },
+  {
+    q: "Does the Plagiarism Checker scan databases?",
+    a: "No. It provides an originality-risk review with underlined copied-sounding phrases and citation-needed guidance. It is not an official university database match report.",
   },
   {
     q: "What does Rewrito Study do?",
@@ -44,7 +48,7 @@ const faqs = [
   },
   {
     q: "What is the input limit?",
-    a: "You can paste up to 8,000 characters per rewrite, which is roughly 1,200 words depending on the text.",
+    a: "Anonymous users can paste shorter drafts. Signed-in users can work with up to 1,200 words per input, and premium-ready limits are designed for longer workflows.",
   },
 ];
 
@@ -73,7 +77,7 @@ export default function FAQPage() {
               Common questions about rewrito.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
-              Quick answers about free access, saved rewrites, AI scoring, privacy, writing tools, and Rewrito Study.
+              Quick answers about free access, saved rewrites, AI scoring, plagiarism review, privacy, writing tools, and Rewrito Study.
             </p>
           </div>
         </section>

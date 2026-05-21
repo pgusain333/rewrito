@@ -65,6 +65,12 @@ export default function AiDetectorPage() {
     <>
       <Navbar />
       <main>
+        <section id="detector" className="bg-bg-section/60">
+          <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
+            <AiDetectorTool />
+          </div>
+        </section>
+
         <section className="relative overflow-hidden bg-bg">
           <div aria-hidden className="hero-abstract opacity-70">
             <div className="grid-overlay" />
@@ -95,12 +101,6 @@ export default function AiDetectorPage() {
               </div>
               <DetectorHeroMockup />
             </div>
-          </div>
-        </section>
-
-        <section id="detector" className="bg-bg-section/60">
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
-            <AiDetectorTool />
           </div>
         </section>
 

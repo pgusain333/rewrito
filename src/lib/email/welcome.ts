@@ -60,7 +60,7 @@ function buildWelcomeEmailHtml() {
   </head>
   <body style="margin:0;background:#f6f8fc;font-family:Arial,Helvetica,sans-serif;color:#111827;">
     <div style="display:none;max-height:0;overflow:hidden;color:transparent;opacity:0;">
-      Explore rewrito's five tools for writing, reviewing, and studying with more clarity.
+      Explore rewrito's six tools for writing, reviewing, originality checking, and studying with more clarity.
     </div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" class="email-bg" style="background:#f6f8fc;padding:34px 14px;">
       <tr>
@@ -103,7 +103,7 @@ function buildWelcomeEmailHtml() {
                     <td style="padding:18px;">
                       <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                         <tr>
-                          ${metricBlock("5", "focused tools", "#7c3aed")}
+                          ${metricBlock("6", "focused tools", "#7c3aed")}
                           ${metricBlock("1", "clean workspace", "#06b6d4")}
                           ${metricBlock("AI", "writing guidance", "#10b981")}
                         </tr>
@@ -122,11 +122,12 @@ function buildWelcomeEmailHtml() {
                     ${toolCard("AI Detector Score", "Check detector-style confidence before sharing your writing.", "#fff7ed", "#f59e0b")}
                   </tr>
                   <tr>
+                    ${toolCard("Plagiarism Checker", "Review originality risk, copied-sounding wording, and citation needs.", "#ecfdf5", "#10b981")}
                     ${toolCard("LinkedIn Rewriter", "Turn rough notes into polished posts with stronger hooks.", "#e0f7ff", "#06b6d4")}
-                    ${toolCard("Email Rewriter", "Rewrite emails so they feel concise, polite, and confident.", "#f8fafc", "#111827")}
                   </tr>
                   <tr>
-                    <td class="tool-cell" colspan="2" style="padding:6px 0 0;">
+                    ${toolCard("Email Rewriter", "Rewrite emails so they feel concise, polite, and confident.", "#f8fafc", "#111827")}
+                    <td class="tool-cell" style="padding:6px 0 0;padding-left:6px;">
                       <div class="tool-card" style="border:1px solid #e5e7eb;border-radius:18px;background:#ffffff;padding:16px;">
                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                           <tr>
@@ -228,6 +229,7 @@ Inside rewrito:
 
 AI Humanizer - Make AI-generated text sound natural, specific, and professional.
 AI Detector Score - Check detector-style confidence and understand what makes writing feel AI-written.
+Plagiarism Checker - Review originality risk, copied-sounding wording, and citation needs.
 LinkedIn Post Rewriter - Turn rough notes into polished LinkedIn posts with stronger hooks and cleaner flow.
 Professional Email Rewriter - Rewrite emails so they feel concise, polite, and confident.
 Rewrito Study - Explain concepts, create quizzes, build flashcards, organize notes, and prepare study plans.

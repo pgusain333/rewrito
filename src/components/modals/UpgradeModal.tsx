@@ -17,10 +17,10 @@ export function UpgradeModal({ open, onClose }: Props) {
           </svg>
         </div>
         <h2 id="upgrade-headline" className="text-xl font-semibold text-ink">
-          You've reached your rewrite limit
+          Unlock longer inputs
         </h2>
         <p className="mt-1.5 text-sm text-ink-muted">
-          Premium plans are coming soon. Join the waitlist for early access and launch pricing.
+          Premium plans are coming soon for longer drafts, deeper history, and advanced guidance.
         </p>
       </div>
 

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { ANON_LIMIT, USER_LIMIT, LS_KEYS } from "@/lib/usage/limits";
+import { USAGE_COUNT_TRACKING_LIMIT, LS_KEYS } from "@/lib/usage/limits";
 
 export type SessionUser = {
   id: string;
@@ -127,7 +127,7 @@ export function useAuthAndUsage() {
     setUserUsed(0);
   }, []);
 
-  const limit = user ? USER_LIMIT : ANON_LIMIT;
+  const limit = USAGE_COUNT_TRACKING_LIMIT;
   const used = user ? userUsed : anonUsed;
   const remaining = Math.max(0, limit - used);
 

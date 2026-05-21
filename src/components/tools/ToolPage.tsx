@@ -19,8 +19,10 @@ export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props
   const meta = TOOLS[tool];
   const toolKeywordMap: Record<ToolType, readonly string[]> = {
     humanizer: TOOL_KEYWORDS.humanizer,
+    detector: TOOL_KEYWORDS.detector,
     linkedin: TOOL_KEYWORDS.linkedin,
     email: TOOL_KEYWORDS.email,
+    plagiarism: TOOL_KEYWORDS.plagiarism,
     study: TOOL_KEYWORDS.study,
   };
   const pagePath = `/${meta.slug}`;
@@ -61,7 +63,13 @@ export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props
       <Navbar />
       <main>
         <section className="bg-bg">
-          <div className="mx-auto max-w-5xl px-5 pb-10 pt-12 sm:px-8 sm:pb-14 sm:pt-16">
+          <div className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-10">
+            <ToolWorkspace initialTool={tool} lockTool />
+          </div>
+        </section>
+
+        <section className="bg-bg">
+          <div className="mx-auto max-w-5xl px-5 pb-10 pt-4 sm:px-8 sm:pb-14 sm:pt-8">
             <nav className="mb-5 text-sm text-ink-muted">
               <Link href="/" className="hover:text-ink">Home</Link>
               <span className="mx-2 text-ink-subtle">/</span>
@@ -73,12 +81,6 @@ export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props
             <p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
               {intro.lead}
             </p>
-          </div>
-        </section>
-
-        <section className="bg-bg">
-          <div className="mx-auto max-w-5xl px-5 pb-16 sm:px-8 sm:pb-24">
-            <ToolWorkspace initialTool={tool} lockTool />
           </div>
         </section>
 
@@ -205,11 +207,17 @@ function seoIntentCopy(tool: ToolType) {
   if (tool === "humanizer") {
     return "Use it when you need to humanize AI text, reduce robotic phrasing, keep meaning intact, and make a draft sound natural before publishing.";
   }
+  if (tool === "detector") {
+    return "Use it when you need detector-style AI confidence scoring, humanized improvements, and clearer writing lessons before publishing.";
+  }
   if (tool === "linkedin") {
     return "Use it when you need a LinkedIn post rewriter that creates a clear hook, short paragraphs, stronger structure, and a professional voice.";
   }
   if (tool === "email") {
     return "Use it when you need a professional email rewriter for polite follow-ups, concise workplace replies, client emails, and confident business communication.";
+  }
+  if (tool === "plagiarism") {
+    return "Use it when you need a plagiarism checker for originality risk, underlined similarity signals, citation-needed review, and safer wording.";
   }
   return "Use it when you need an AI study assistant to explain concepts, organize notes, create quizzes and flashcards, or build a study plan.";
 }

@@ -28,7 +28,7 @@ export function StudyFlashcardsWorkspace() {
   const [showLogin, setShowLogin] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
 
-  const { user, anonId, used, limit, remaining, incrementAnon, setUsageFromServer } =
+  const { user, anonId, incrementAnon, setUsageFromServer } =
     useAuthAndUsage();
   const isPaidUser = user?.plan === "pro";
   const wordCount = useMemo(() => countWords(material), [material]);
@@ -40,14 +40,6 @@ export function StudyFlashcardsWorkspace() {
     setError(null);
     if (material.trim().length < 20) {
       setError("Paste study material first so rewrito can create useful flashcards.");
-      return;
-    }
-    if (!user && used >= limit) {
-      setShowLogin(true);
-      return;
-    }
-    if (user && used >= limit) {
-      setShowUpgrade(true);
       return;
     }
     if (wordLimitExceeded) {
@@ -137,7 +129,7 @@ export function StudyFlashcardsWorkspace() {
             </div>
             <div className="grid grid-cols-2 gap-2 text-center sm:flex sm:text-left">
               <StatPill label="Cards" value={cards.length ? `${cards.length}` : "8-12"} />
-              <StatPill label="Uses left" value={`${remaining}`} />
+              <StatPill label="Word limit" value={wordLimit.toLocaleString()} />
             </div>
           </div>
         </div>

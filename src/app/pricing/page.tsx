@@ -9,9 +9,9 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "rewrito Pricing - Free AI Writing and Study Tools",
   description:
-    "Compare rewrito free, signed-in, and premium-ready limits for AI humanizing, detector scores, LinkedIn rewriting, email rewriting, quizzes, flashcards, and study plans.",
+    "Compare rewrito free, signed-in, and premium-ready limits for AI humanizing, detector scores, plagiarism checking, LinkedIn rewriting, email rewriting, quizzes, flashcards, and study plans.",
   path: "/pricing",
-  keywords: ["rewrito pricing", "free AI humanizer", "free AI writing tools", "AI study tool pricing"],
+  keywords: ["rewrito pricing", "free AI humanizer", "free AI writing tools", "AI study tool pricing", "plagiarism checker pricing"],
 });
 
 export default function PricingPage() {
@@ -46,7 +46,7 @@ export default function PricingPage() {
                 </div>
                 <ul className="mt-6 space-y-3 text-sm text-ink">
                   <Feat>Start without sign-up</Feat>
-                  <Feat>All 5 tools</Feat>
+                  <Feat>All 6 tools</Feat>
                   <Feat>{ANON_WORD_LIMIT} words per input</Feat>
                   <Feat>Core tones and Medium refinement</Feat>
                   <Feat>Copy and download output</Feat>

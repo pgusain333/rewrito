@@ -42,6 +42,12 @@ export default function RewritoStudyQuizPage() {
     <>
       <Navbar />
       <main>
+        <section id="quiz-workspace" className="bg-bg">
+          <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-10">
+            <StudyQuizWorkspace />
+          </div>
+        </section>
+
         <section className="relative overflow-hidden bg-bg">
           <div aria-hidden className="hero-abstract opacity-70">
             <div className="grid-overlay" />
@@ -84,12 +90,6 @@ export default function RewritoStudyQuizPage() {
               </div>
               <QuizHeroMockup />
             </div>
-          </div>
-        </section>
-
-        <section id="quiz-workspace" className="bg-bg">
-          <div className="mx-auto max-w-7xl px-5 pb-16 sm:px-8 sm:pb-24">
-            <StudyQuizWorkspace />
           </div>
         </section>
       </main>

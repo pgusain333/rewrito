@@ -6,7 +6,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Terms of Use - rewrito AI Writing and Study Tools",
   description:
-    "Terms of Use for rewrito's AI Humanizer, AI Detector Score, LinkedIn Rewriter, Email Rewriter, and Rewrito Study tools.",
+    "Terms of Use for rewrito's AI Humanizer, AI Detector Score, Plagiarism Checker, LinkedIn Rewriter, Email Rewriter, and Rewrito Study tools.",
   path: "/terms",
   keywords: ["rewrito terms", "AI writing tool terms", "AI study assistant terms"],
 });
