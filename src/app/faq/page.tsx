@@ -3,19 +3,15 @@ import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ArrowRightIcon } from "@/components/ui/icons";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "FAQ - rewrito",
+export const metadata: Metadata = pageMetadata({
+  title: "rewrito FAQ - AI Humanizer, Detector, Rewriter, and Study Questions",
   description:
-    "Answers to common questions about rewrito, free access, saved history, AI rewriting, Rewrito Study, privacy, and mobile support.",
-  alternates: { canonical: "/faq" },
-  openGraph: {
-    title: "FAQ - rewrito",
-    description:
-      "Learn how rewrito works, what is stored, which tools are included, and how to start rewriting or studying.",
-    url: "/faq",
-  },
-};
+    "Answers to common questions about rewrito, free access, saved history, AI humanizing, detector scores, Rewrito Study, privacy, and mobile support.",
+  path: "/faq",
+  keywords: ["rewrito FAQ", "AI humanizer questions", "AI detector score questions", "AI study assistant questions"],
+});
 
 const faqs = [
   {
@@ -32,7 +28,7 @@ const faqs = [
   },
   {
     q: "Which tools are included?",
-    a: "rewrito includes an AI Humanizer, a LinkedIn Post Rewriter, a Professional Email Rewriter, and Rewrito Study.",
+    a: "rewrito includes an AI Humanizer, AI Detector Score, LinkedIn Post Rewriter, Professional Email Rewriter, and Rewrito Study.",
   },
   {
     q: "What does Rewrito Study do?",

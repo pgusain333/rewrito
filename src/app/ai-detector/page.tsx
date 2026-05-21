@@ -5,40 +5,38 @@ import { Footer } from "@/components/layout/Footer";
 import { AudienceShowcase } from "@/components/marketing/AudienceShowcase";
 import { AiDetectorTool } from "@/components/tools/AiDetectorTool";
 import { ArrowRightIcon, ShieldCheckIcon } from "@/components/ui/icons";
+import { breadcrumbJsonLd, pageMetadata, softwareAppJsonLd, TOOL_KEYWORDS } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "AI Detector Score - Check AI Writing Confidence",
   description:
-    "Check AI-generated writing confidence with rewrito's AI detector score tool. See detector-style before and after scores, humanize drafts, and learn how to write more naturally.",
-  alternates: { canonical: "/ai-detector" },
-  keywords: [
-    "AI detector",
-    "AI detection score",
-    "AI humanizer detector",
-    "GPTZero score",
-    "Originality.ai score",
-    "Turnitin AI detector",
-  ],
-  openGraph: {
-    title: "AI Detector Score - rewrito",
-    description:
-      "Check detector-style AI confidence, humanize drafts, and learn the writing patterns that lower AI-detection risk.",
-    url: "/ai-detector",
-  },
-};
+    "Check AI writing confidence with rewrito's AI Detector Score. See detector-style before and after scores, humanize high-risk text, and learn better writing patterns.",
+  path: "/ai-detector",
+  keywords: TOOL_KEYWORDS.detector,
+});
 
 export default function AiDetectorPage() {
+  const appJsonLd = withoutContext(
+    softwareAppJsonLd({
+      name: "rewrito AI Detector Score",
+      description:
+        "AI detector-style confidence scoring for writing review, before and after humanizing drafts.",
+      path: "/ai-detector",
+      keywords: TOOL_KEYWORDS.detector,
+    })
+  );
+  const breadcrumb = withoutContext(
+    breadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Tools", path: "/tools" },
+      { name: "AI Detector Score", path: "/ai-detector" },
+    ])
+  );
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "SoftwareApplication",
-        name: "rewrito AI Detector Score",
-        applicationCategory: "WritingApplication",
-        operatingSystem: "Web",
-        url: "https://rewrito.ai/ai-detector",
-        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      },
+      appJsonLd,
+      breadcrumb,
       {
         "@type": "FAQPage",
         mainEntity: [
@@ -178,6 +176,11 @@ export default function AiDetectorPage() {
       />
     </>
   );
+}
+
+function withoutContext<T extends Record<string, unknown>>(value: T) {
+  const { ["@context"]: _context, ...rest } = value;
+  return rest;
 }
 
 function DetectorHeroMockup() {

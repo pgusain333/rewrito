@@ -4,21 +4,40 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { StudyFlashcardsWorkspace } from "@/components/study/StudyFlashcardsWorkspace";
 import { ArrowRightIcon, StudyIcon } from "@/components/ui/icons";
+import { breadcrumbJsonLd, pageMetadata, softwareAppJsonLd, TOOL_KEYWORDS } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "AI Flashcard Generator - Rewrito Study",
+export const metadata: Metadata = pageMetadata({
+  title: "AI Flashcard Generator - Create Flip Cards from Notes",
   description:
-    "Create interactive flip flashcards from notes, formulas, definitions, and exam material with Rewrito Study.",
-  alternates: { canonical: "/study-assistant/flashcards" },
-  openGraph: {
-    title: "AI Flashcard Generator - Rewrito Study",
-    description:
-      "Turn study notes into flip-ready Q/A cards for active recall and exam revision.",
-    url: "/study-assistant/flashcards",
-  },
-};
+    "Create interactive AI flashcards from notes, formulas, definitions, and exam material. Turn study content into flip-ready Q/A cards with Rewrito Study.",
+  path: "/study-assistant/flashcards",
+  keywords: ["AI flashcard generator", "flashcard maker", "active recall flashcards", ...TOOL_KEYWORDS.study],
+});
 
 export default function RewritoStudyFlashcardsPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      withoutContext(
+        softwareAppJsonLd({
+          name: "Rewrito Study AI Flashcard Generator",
+          description:
+            "AI flashcard generator for turning notes, definitions, formulas, and concepts into active recall cards.",
+          path: "/study-assistant/flashcards",
+          category: "EducationalApplication",
+          keywords: ["AI flashcard generator", "flashcard maker", "active recall"],
+        })
+      ),
+      withoutContext(
+        breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Rewrito Study", path: "/study-assistant" },
+          { name: "Flashcards", path: "/study-assistant/flashcards" },
+        ])
+      ),
+    ],
+  };
+
   return (
     <>
       <Navbar />
@@ -75,8 +94,17 @@ export default function RewritoStudyFlashcardsPage() {
         </section>
       </main>
       <Footer />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     </>
   );
+}
+
+function withoutContext<T extends Record<string, unknown>>(value: T) {
+  const { ["@context"]: _context, ...rest } = value;
+  return rest;
 }
 
 function FlashcardHeroMockup() {

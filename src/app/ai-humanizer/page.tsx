@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
 import { ToolPage } from "@/components/tools/ToolPage";
+import { pageMetadata, TOOL_KEYWORDS } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "AI Humanizer - rewrite AI text to sound natural",
+export const metadata: Metadata = pageMetadata({
+  title: "Free AI Humanizer - Humanize AI Text Naturally",
   description:
-    "Free AI Humanizer. Rewrite AI-generated text into natural, human, professional writing while preserving the original meaning.",
-  alternates: { canonical: "/ai-humanizer" },
-  openGraph: {
-    title: "AI Humanizer - rewrite AI text to sound natural",
-    description:
-      "Turn AI-generated text into natural, human, professional writing - without losing meaning.",
-    url: "/ai-humanizer",
-  },
-};
+    "Use rewrito's free AI Humanizer to humanize AI text, remove robotic phrasing, improve natural rhythm, and preserve meaning in professional writing.",
+  path: "/ai-humanizer",
+  keywords: TOOL_KEYWORDS.humanizer,
+});
 
 export default function Page() {
   return (

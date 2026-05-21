@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
 import { ToolPage } from "@/components/tools/ToolPage";
+import { pageMetadata, TOOL_KEYWORDS } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "LinkedIn Post Rewriter - polish your post in seconds",
+export const metadata: Metadata = pageMetadata({
+  title: "LinkedIn Post Rewriter - Clear Hooks and Better Posts",
   description:
-    "Free LinkedIn Post Rewriter. Turn rough notes into a clear, professional LinkedIn post with a real hook - no fake hype, no motivational fluff.",
-  alternates: { canonical: "/linkedin-rewriter" },
-  openGraph: {
-    title: "LinkedIn Post Rewriter - polish your post in seconds",
-    description:
-      "Turn rough notes into a clear LinkedIn post. Real hook, real voice, no clickbait.",
-    url: "/linkedin-rewriter",
-  },
-};
+    "Rewrite LinkedIn posts with rewrito. Turn rough notes into a professional LinkedIn post with a stronger hook, short paragraphs, clear structure, and no fake hype.",
+  path: "/linkedin-rewriter",
+  keywords: TOOL_KEYWORDS.linkedin,
+});
 
 export default function Page() {
   return (

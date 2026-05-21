@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
 import { ToolPage } from "@/components/tools/ToolPage";
+import { pageMetadata, TOOL_KEYWORDS } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Professional Email Rewriter - clear, polite, confident emails",
+export const metadata: Metadata = pageMetadata({
+  title: "Professional Email Rewriter - Polite, Clear AI Emails",
   description:
-    "Free Professional Email Rewriter. Rewrite rough email drafts into concise, polite, confident emails while keeping your intent.",
-  alternates: { canonical: "/email-rewriter" },
-  openGraph: {
-    title: "Professional Email Rewriter - clear, polite, confident emails",
-    description:
-      "Paste a rough email draft. Get a concise, polite, confident version in seconds.",
-    url: "/email-rewriter",
-  },
-};
+    "Rewrite emails professionally with rewrito. Turn rough drafts, follow-ups, client replies, and workplace messages into concise, polite, confident emails.",
+  path: "/email-rewriter",
+  keywords: TOOL_KEYWORDS.email,
+});
 
 export default function Page() {
   return (

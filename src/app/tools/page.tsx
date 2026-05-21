@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
+import { absoluteUrl, pageMetadata, TOOL_KEYWORDS, uniqueKeywords } from "@/lib/seo";
 import {
   ArrowRightIcon,
   LinkedinIcon,
@@ -12,18 +13,19 @@ import {
   StudyIcon,
 } from "@/components/ui/icons";
 
-export const metadata: Metadata = {
-  title: "AI Writing Tools - rewrito",
+export const metadata: Metadata = pageMetadata({
+  title: "AI Writing Tools - Humanizer, Detector, Rewriters, Study Assistant",
   description:
-    "Explore rewrito's AI Humanizer, AI Detector Score, LinkedIn Post Rewriter, Professional Email Rewriter, and AI Study Assistant.",
-  alternates: { canonical: "/tools" },
-  openGraph: {
-    title: "AI Writing Tools - rewrito",
-    description:
-      "Humanize AI text, check AI detector confidence, polish LinkedIn posts, rewrite professional emails, and study concepts clearly with rewrito.",
-    url: "/tools",
-  },
-};
+    "Explore rewrito's AI Humanizer, AI Detector Score, LinkedIn Post Rewriter, Professional Email Rewriter, and AI Study Assistant in one toolkit.",
+  path: "/tools",
+  keywords: uniqueKeywords(
+    TOOL_KEYWORDS.humanizer,
+    TOOL_KEYWORDS.detector,
+    TOOL_KEYWORDS.linkedin,
+    TOOL_KEYWORDS.email,
+    TOOL_KEYWORDS.study
+  ),
+});
 
 const tools = [
   {
@@ -79,7 +81,7 @@ export default function ToolsPage() {
       "@type": "SoftwareApplication",
       name: tool.name,
       applicationCategory: tool.href === "/study-assistant" ? "EducationalApplication" : "WritingApplication",
-      url: tool.href,
+      url: absoluteUrl(tool.href),
     })),
   };
 

@@ -4,12 +4,15 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CheckIcon, ArrowRightIcon } from "@/components/ui/icons";
 import { ANON_WORD_LIMIT, FREE_HISTORY_LIMIT, PRO_WORD_LIMIT, USER_WORD_LIMIT } from "@/lib/usage/limits";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Pricing - rewrito",
-  description: "Simple pricing for rewrito. Free to try, premium plans coming soon.",
-  alternates: { canonical: "/pricing" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "rewrito Pricing - Free AI Writing and Study Tools",
+  description:
+    "Compare rewrito free, signed-in, and premium-ready limits for AI humanizing, detector scores, LinkedIn rewriting, email rewriting, quizzes, flashcards, and study plans.",
+  path: "/pricing",
+  keywords: ["rewrito pricing", "free AI humanizer", "free AI writing tools", "AI study tool pricing"],
+});
 
 export default function PricingPage() {
   return (

@@ -5,6 +5,7 @@ import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 import { AudienceShowcase, type AudienceCard } from "@/components/marketing/AudienceShowcase";
 import { ArrowRightIcon } from "@/components/ui/icons";
 import { TOOLS, type ToolType } from "@/lib/prompts";
+import { breadcrumbJsonLd, softwareAppJsonLd, TOOL_KEYWORDS } from "@/lib/seo";
 
 type Props = {
   tool: ToolType;
@@ -16,14 +17,43 @@ type Props = {
 
 export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props) {
   const meta = TOOLS[tool];
-  const faqJsonLd = {
+  const toolKeywordMap: Record<ToolType, readonly string[]> = {
+    humanizer: TOOL_KEYWORDS.humanizer,
+    linkedin: TOOL_KEYWORDS.linkedin,
+    email: TOOL_KEYWORDS.email,
+    study: TOOL_KEYWORDS.study,
+  };
+  const pagePath = `/${meta.slug}`;
+  const appJsonLd = withoutContext(
+    softwareAppJsonLd({
+      name: `rewrito ${meta.name}`,
+      description: meta.description,
+      path: pagePath,
+      category: tool === "study" ? "EducationalApplication" : "WritingApplication",
+      keywords: toolKeywordMap[tool],
+    })
+  );
+  const breadcrumb = withoutContext(
+    breadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Tools", path: "/tools" },
+      { name: meta.name, path: pagePath },
+    ])
+  );
+  const pageJsonLd = {
     "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faq.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
+    "@graph": [
+      appJsonLd,
+      breadcrumb,
+      {
+        "@type": "FAQPage",
+        mainEntity: faq.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      },
+    ],
   };
 
   return (
@@ -69,6 +99,32 @@ export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props
                 </li>
               ))}
             </ul>
+          </div>
+        </section>
+
+        <section className="bg-bg">
+          <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
+            <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+              <div>
+                <span className="chip mb-5">{meta.name} guide</span>
+                <h2 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+                  A focused workspace for clearer, more useful output.
+                </h2>
+                <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+                  rewrito combines AI intelligence with practical review habits, so every session helps you improve the result and understand why it improved.
+                </p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <SeoSignalCard
+                  title="Built for the job"
+                  body={seoIntentCopy(tool)}
+                />
+                <SeoSignalCard
+                  title="Built for learning"
+                  body="The output is paired with structure, scores, or coaching so users build human judgment instead of only receiving a finished answer."
+                />
+              </div>
+            </div>
           </div>
         </section>
 
@@ -125,8 +181,35 @@ export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
       />
     </>
   );
+}
+
+function withoutContext<T extends Record<string, unknown>>(value: T) {
+  const { ["@context"]: _context, ...rest } = value;
+  return rest;
+}
+
+function SeoSignalCard({ title, body }: { title: string; body: string }) {
+  return (
+    <article className="rounded-2xl border border-line bg-white p-5 shadow-soft">
+      <h3 className="text-base font-semibold text-ink">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-ink-muted">{body}</p>
+    </article>
+  );
+}
+
+function seoIntentCopy(tool: ToolType) {
+  if (tool === "humanizer") {
+    return "Use it when you need to humanize AI text, reduce robotic phrasing, keep meaning intact, and make a draft sound natural before publishing.";
+  }
+  if (tool === "linkedin") {
+    return "Use it when you need a LinkedIn post rewriter that creates a clear hook, short paragraphs, stronger structure, and a professional voice.";
+  }
+  if (tool === "email") {
+    return "Use it when you need a professional email rewriter for polite follow-ups, concise workplace replies, client emails, and confident business communication.";
+  }
+  return "Use it when you need an AI study assistant to explain concepts, organize notes, create quizzes and flashcards, or build a study plan.";
 }

@@ -2,19 +2,21 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
+import { pageMetadata, TOOL_KEYWORDS, uniqueKeywords } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Try rewrito Free - AI Writing Tool",
+export const metadata: Metadata = pageMetadata({
+  title: "Try rewrito Free - AI Humanizer, Rewriter, Detector, Study Tool",
   description:
-    "Try rewrito free. Humanize AI text, rewrite LinkedIn posts, improve professional emails, and study concepts clearly in one workspace.",
-  alternates: { canonical: "/try" },
-  openGraph: {
-    title: "Try rewrito Free - AI Writing Tool",
-    description:
-      "Paste a draft or study material, choose a mode, and get clearer output with rewrito.",
-    url: "/try",
-  },
-};
+    "Try rewrito free. Humanize AI text, rewrite LinkedIn posts, improve professional emails, check AI detector confidence, and study concepts clearly in one workspace.",
+  path: "/try",
+  keywords: uniqueKeywords(
+    TOOL_KEYWORDS.humanizer,
+    TOOL_KEYWORDS.detector,
+    TOOL_KEYWORDS.linkedin,
+    TOOL_KEYWORDS.email,
+    TOOL_KEYWORDS.study
+  ),
+});
 
 export default function TryPage() {
   return (

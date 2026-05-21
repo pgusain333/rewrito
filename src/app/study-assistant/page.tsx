@@ -6,19 +6,15 @@ import { Footer } from "@/components/layout/Footer";
 import { AudienceShowcase } from "@/components/marketing/AudienceShowcase";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 import { ArrowRightIcon, CheckIcon, StudyIcon } from "@/components/ui/icons";
+import { absoluteUrl, breadcrumbJsonLd, pageMetadata, softwareAppJsonLd, TOOL_KEYWORDS } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "AI Study Assistant - Understand Concepts Clearly | rewrito",
+export const metadata: Metadata = pageMetadata({
+  title: "AI Study Assistant - Explain Concepts, Notes, Quizzes, Flashcards",
   description:
-    "Rewrito Study helps students understand concepts, organize notes, generate flashcards, create quizzes, and learn more effectively.",
-  alternates: { canonical: "/study-assistant" },
-  openGraph: {
-    title: "AI Study Assistant - Understand Concepts Clearly | rewrito",
-    description:
-      "Turn confusing study material into clear explanations, notes, quizzes, flashcards, and study plans.",
-    url: "/study-assistant",
-  },
-};
+    "Rewrito Study is an AI study assistant that explains concepts clearly, organizes notes, creates quiz testlets and flashcards, and builds practical study plans.",
+  path: "/study-assistant",
+  keywords: TOOL_KEYWORDS.study,
+});
 
 const modes = [
   {
@@ -72,28 +68,48 @@ const faq = [
 ];
 
 export default function StudyAssistantPage() {
-  const appJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Rewrito Study",
-    applicationCategory: "EducationalApplication",
-    operatingSystem: "Web",
-    description:
-      "AI study assistant for clear explanations, organized notes, quizzes, flashcards, and study plans.",
-    url: "/study-assistant",
-  };
+  const appJsonLd = withoutContext(
+    softwareAppJsonLd({
+      name: "Rewrito Study",
+      description:
+        "AI study assistant for clear explanations, organized notes, quiz testlets, flashcards, and study plans.",
+      path: "/study-assistant",
+      category: "EducationalApplication",
+      keywords: TOOL_KEYWORDS.study,
+    })
+  );
+  const breadcrumb = withoutContext(
+    breadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Tools", path: "/tools" },
+      { name: "Rewrito Study", path: "/study-assistant" },
+    ])
+  );
 
-  const faqJsonLd = {
+  const pageJsonLd = {
     "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faq.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.a,
+    "@graph": [
+      appJsonLd,
+      breadcrumb,
+      {
+        "@type": "FAQPage",
+        mainEntity: faq.map((item) => ({
+          "@type": "Question",
+          name: item.q,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item.a,
+          },
+        })),
       },
-    })),
+      {
+        "@type": "WebPage",
+        name: "AI Study Assistant",
+        url: absoluteUrl("/study-assistant"),
+        description:
+          "Rewrito Study helps students understand concepts, organize notes, create quizzes and flashcards, and prepare for exams.",
+      },
+    ],
   };
 
   return (
@@ -285,14 +301,15 @@ export default function StudyAssistantPage() {
       <Footer />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(appJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
       />
     </>
   );
+}
+
+function withoutContext<T extends Record<string, unknown>>(value: T) {
+  const { ["@context"]: _context, ...rest } = value;
+  return rest;
 }
 
 function StudyHeroMockup() {

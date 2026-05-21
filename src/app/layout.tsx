@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { CORE_KEYWORDS, SITE_TAGLINE, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({
@@ -9,36 +10,24 @@ const inter = Inter({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rewrito.ai";
+const siteUrl = SITE_URL;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: "rewrito",
   title: {
-    default: "rewrito - Human intelligence with AI intelligence",
+    default: "rewrito - AI Humanizer, Detector, Rewriter, and Study Assistant",
     template: "%s - rewrito",
   },
   description:
-    "Build human intelligence with AI intelligence. Humanize AI text, check detector confidence, rewrite professional communication, and study concepts clearly with rewrito.",
-  keywords: [
-    "AI humanizer",
-    "LinkedIn post rewriter",
-    "AI detector",
-    "AI detection score",
-    "email rewriter",
-    "AI study assistant",
-    "flashcard generator",
-    "quiz generator",
-    "AI writing tool",
-    "professional communication",
-    "rewrito",
-  ],
+    "Build human intelligence with AI intelligence. Humanize AI text, check AI detector confidence, rewrite LinkedIn posts and emails, and study concepts clearly with rewrito.",
+  keywords: CORE_KEYWORDS,
   authors: [{ name: "rewrito" }],
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: siteUrl,
-    title: "rewrito - Human intelligence with AI intelligence",
+    title: "rewrito - AI Humanizer, Detector, Rewriter, and Study Assistant",
     description:
       "Human intelligence with AI intelligence. Humanize AI text, polish LinkedIn posts, rewrite emails, study clearly, and learn better patterns as you work.",
     siteName: "rewrito",
@@ -47,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "rewrito - Human intelligence with AI intelligence",
+    title: "rewrito - AI Humanizer, Detector, Rewriter, and Study Assistant",
     description:
       "Humanize AI text, check detector confidence, rewrite professional communication, study clearly, and learn better patterns as you work.",
     images: ["/rewrito-logo.png"],
@@ -77,6 +66,7 @@ const jsonLd = {
       name: "rewrito",
       url: siteUrl,
       logo: `${siteUrl}/rewrito-logo.png`,
+      slogan: SITE_TAGLINE,
       contactPoint: {
         "@type": "ContactPoint",
         email: "hello@rewrito.ai",
@@ -88,6 +78,8 @@ const jsonLd = {
       "@id": `${siteUrl}/#website`,
       name: "rewrito",
       url: siteUrl,
+      description:
+        "AI writing and study toolkit for humanizing AI text, checking AI detector confidence, rewriting professional communication, and learning clearly.",
       publisher: { "@id": `${siteUrl}/#organization` },
     },
     {
@@ -96,6 +88,8 @@ const jsonLd = {
       url: siteUrl,
       applicationCategory: "WritingApplication",
       operatingSystem: "Web",
+      slogan: SITE_TAGLINE,
+      keywords: CORE_KEYWORDS.join(", "),
       offers: {
         "@type": "Offer",
         price: "0",

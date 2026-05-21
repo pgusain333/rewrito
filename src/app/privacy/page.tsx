@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy - rewrito",
+export const metadata: Metadata = pageMetadata({
+  title: "Privacy Policy - rewrito AI Writing and Study Tools",
   description:
-    "Privacy policy for rewrito, including accounts, AI processing, analytics, saved history, and user choices.",
-  alternates: { canonical: "/privacy" },
-};
+    "Privacy policy for rewrito, including accounts, AI processing, analytics, saved history, data retention, service providers, and user choices.",
+  path: "/privacy",
+  keywords: ["rewrito privacy", "AI writing tool privacy", "AI study assistant privacy"],
+});
 
 const lastUpdated = "May 21, 2026";
 

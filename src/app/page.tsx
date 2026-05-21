@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 import { Reveal } from "@/components/ui/Reveal";
+import { CORE_KEYWORDS, SITE_TAGLINE, TOOL_KEYWORDS, uniqueKeywords } from "@/lib/seo";
 import {
   ArrowRightIcon,
   LinkedinIcon,
@@ -15,9 +16,17 @@ import {
 } from "@/components/ui/icons";
 
 export const metadata: Metadata = {
-  title: "rewrito - Human intelligence with AI intelligence",
+  title: "rewrito - AI Humanizer, AI Detector, Rewriter, and Study Assistant",
   description:
-    "Build human intelligence with AI intelligence. Humanize AI text, check AI detection scores, rewrite professional communication, and study concepts clearly with rewrito.",
+    "Build human intelligence with AI intelligence. Use rewrito to humanize AI text, check AI detector scores, rewrite LinkedIn posts and emails, create quizzes, flashcards, and study plans.",
+  keywords: uniqueKeywords(
+    CORE_KEYWORDS,
+    TOOL_KEYWORDS.humanizer,
+    TOOL_KEYWORDS.detector,
+    TOOL_KEYWORDS.linkedin,
+    TOOL_KEYWORDS.email,
+    TOOL_KEYWORDS.study
+  ),
   alternates: { canonical: "/" },
 };
 
@@ -33,6 +42,7 @@ export default function HomePage() {
         <WriteEverywhere />
         <WhyUs />
         <BeforeAfter />
+        <SearchIntent />
         <LearningCoach />
         <HowItWorks />
         <UsageLimits />
@@ -58,7 +68,7 @@ function Hero() {
         <div className="mobile-hero-slide mx-auto max-w-3xl text-center animate-fade-up">
           <span className="chip mb-5 !text-[11px]">
             <span className="h-1.5 w-1.5 rounded-full bg-brand-gradient" />
-            Human intelligence with AI intelligence
+            {SITE_TAGLINE}
           </span>
           <h1 className="text-balance text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-5xl md:text-6xl">
             Build your human voice with{" "}
@@ -621,6 +631,59 @@ function BeforeAfter() {
               </p>
             </div>
           </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SearchIntent() {
+  const items = [
+    {
+      title: "AI Humanizer",
+      body: "Humanize AI text, reduce robotic wording, improve rhythm, and keep your original meaning intact.",
+      href: "/ai-humanizer",
+    },
+    {
+      title: "AI Detector Score",
+      body: "Check detector-style AI confidence, review before and after scores, and learn what makes text sound generated.",
+      href: "/ai-detector",
+    },
+    {
+      title: "LinkedIn and Email Rewriter",
+      body: "Rewrite LinkedIn posts, professional emails, follow-ups, and workplace messages into clearer communication.",
+      href: "/tools",
+    },
+    {
+      title: "AI Study Assistant",
+      body: "Explain concepts, organize notes, create quiz testlets, generate flashcards, and build practical study plans.",
+      href: "/study-assistant",
+    },
+  ];
+
+  return (
+    <section className="bg-bg">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+        <div className="mb-10 max-w-2xl">
+          <span className="chip mb-5">What rewrito helps with</span>
+          <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+            One AI writing and study toolkit for high-intent work.
+          </h2>
+          <p className="mt-3 text-base leading-relaxed text-ink-muted">
+            People come to rewrito when they need practical results: clearer writing, lower AI-sounding confidence, stronger professional communication, and study material that is easier to understand.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((item) => (
+            <Link key={item.title} href={item.href} className="card group h-full p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card">
+              <h3 className="text-base font-semibold text-ink">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.body}</p>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand">
+                Open page
+                <ArrowRightIcon size={14} className="transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

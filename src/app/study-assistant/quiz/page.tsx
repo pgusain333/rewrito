@@ -4,21 +4,40 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { StudyQuizWorkspace } from "@/components/study/StudyQuizWorkspace";
 import { ArrowRightIcon, StudyIcon } from "@/components/ui/icons";
+import { breadcrumbJsonLd, pageMetadata, softwareAppJsonLd, TOOL_KEYWORDS } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "AI Quiz Testlet Creator - Rewrito Study",
+export const metadata: Metadata = pageMetadata({
+  title: "AI Quiz Testlet Creator - Practice MCQs and Weak Areas",
   description:
-    "Create AI quiz testlets from study material, answer MCQs, see a scorecard, identify weak areas, and generate targeted practice with Rewrito Study.",
-  alternates: { canonical: "/study-assistant/quiz" },
-  openGraph: {
-    title: "AI Quiz Testlet Creator - Rewrito Study",
-    description:
-      "Create quiz testlets, save scores when logged in, and practice weak areas with Rewrito Study.",
-    url: "/study-assistant/quiz",
-  },
-};
+    "Create AI quiz testlets from study material, answer MCQs, get a scorecard, identify weak areas, and generate targeted practice with Rewrito Study.",
+  path: "/study-assistant/quiz",
+  keywords: ["AI quiz generator", "quiz testlet creator", "MCQ generator", ...TOOL_KEYWORDS.study],
+});
 
 export default function RewritoStudyQuizPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      withoutContext(
+        softwareAppJsonLd({
+          name: "Rewrito Study Quiz Testlet Creator",
+          description:
+            "AI quiz generator for MCQ testlets, scorecards, weak-area practice, and exam preparation.",
+          path: "/study-assistant/quiz",
+          category: "EducationalApplication",
+          keywords: ["AI quiz generator", "MCQ generator", "quiz testlet creator"],
+        })
+      ),
+      withoutContext(
+        breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Rewrito Study", path: "/study-assistant" },
+          { name: "Quiz Testlets", path: "/study-assistant/quiz" },
+        ])
+      ),
+    ],
+  };
+
   return (
     <>
       <Navbar />
@@ -75,8 +94,17 @@ export default function RewritoStudyQuizPage() {
         </section>
       </main>
       <Footer />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     </>
   );
+}
+
+function withoutContext<T extends Record<string, unknown>>(value: T) {
+  const { ["@context"]: _context, ...rest } = value;
+  return rest;
 }
 
 function QuizHeroMockup() {

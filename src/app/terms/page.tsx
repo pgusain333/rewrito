@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms - rewrito",
-  description: "Terms for using rewrito's AI writing tools.",
-  alternates: { canonical: "/terms" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Terms of Use - rewrito AI Writing and Study Tools",
+  description:
+    "Terms of Use for rewrito's AI Humanizer, AI Detector Score, LinkedIn Rewriter, Email Rewriter, and Rewrito Study tools.",
+  path: "/terms",
+  keywords: ["rewrito terms", "AI writing tool terms", "AI study assistant terms"],
+});
 
 export default function TermsPage() {
   return (
