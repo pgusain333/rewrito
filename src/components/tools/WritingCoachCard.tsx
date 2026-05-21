@@ -21,10 +21,10 @@ export function WritingCoachCard({ original, rewritten = "" }: Props) {
           Writing coach
         </p>
         <h4 className="mt-1 text-base font-semibold text-ink">
-          Learn the pattern, not just the rewrite
+          Build human intelligence with AI intelligence
         </h4>
         <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-          rewrito points out what changed so your next draft gets stronger before you use a tool.
+          rewrito points out what changed so your next draft gets stronger before you need the tool.
         </p>
       </div>
       <div className="grid gap-3 p-4 sm:grid-cols-3">

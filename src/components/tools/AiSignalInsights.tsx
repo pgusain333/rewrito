@@ -19,6 +19,8 @@ type SignalReport = {
   avgSentenceLength: number;
 };
 
+type HighlightTone = "risk" | "clean" | "changed";
+
 const AI_SIGNAL_PATTERNS: Array<{
   phrase: string;
   label: string;
@@ -161,6 +163,63 @@ export function AiSignalInsights({
   );
 }
 
+export function AiSignalTextBox({
+  text,
+  compareText = "",
+  mode = "risk",
+  title,
+  description,
+}: {
+  text: string;
+  compareText?: string;
+  mode?: "risk" | "changed";
+  title?: string;
+  description?: string;
+}) {
+  if (!text.trim()) return null;
+  const terms =
+    mode === "changed"
+      ? buildChangedTerms(compareText, text)
+      : analyzeAiSignals(text).matches.map((match) => match.phrase);
+  const hasTerms = terms.length > 0;
+
+  return (
+    <div className="mt-3 rounded-xl border border-line bg-white p-3 shadow-soft">
+      <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+            {title ?? (mode === "changed" ? "Changed wording" : "AI-sounding wording")}
+          </p>
+          <p className="text-xs leading-relaxed text-ink-muted">
+            {description ??
+              (mode === "changed"
+                ? "Green underlines show wording that changed in the humanized output."
+                : "Amber underlines show phrases that can make writing sound AI-generated.")}
+          </p>
+        </div>
+        <span
+          className={`w-fit rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+            mode === "changed"
+              ? "bg-success/10 text-success"
+              : hasTerms
+              ? "bg-warning/10 text-warning"
+              : "bg-success/10 text-success"
+          }`}
+        >
+          {mode === "changed" ? `${terms.length} changes` : hasTerms ? `${terms.length} signals` : "Clean"}
+        </span>
+      </div>
+      <div className="max-h-56 overflow-y-auto rounded-lg bg-bg-soft p-3 text-sm leading-relaxed text-ink whitespace-pre-wrap">
+        {hasTerms ? (
+          <HighlightedText text={text} terms={terms} tone={mode === "changed" ? "changed" : "risk"} />
+        ) : (
+          text
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SignalTextCard({
   title,
   description,
@@ -172,7 +231,7 @@ function SignalTextCard({
   description: string;
   text: string;
   terms: string[];
-  tone: "risk" | "clean";
+  tone: HighlightTone;
 }) {
   const hasTerms = terms.length > 0;
   return (
@@ -204,7 +263,7 @@ function HighlightedText({
 }: {
   text: string;
   terms: string[];
-  tone: "risk" | "clean";
+  tone: HighlightTone;
 }) {
   const parts = buildHighlightedParts(text, terms);
   return (
@@ -215,8 +274,10 @@ function HighlightedText({
             key={`${part.text}-${index}`}
             className={`rounded px-1 py-0.5 ${
               tone === "risk"
-                ? "bg-warning/20 text-ink ring-1 ring-warning/30"
-                : "bg-success/15 text-ink ring-1 ring-success/25"
+                ? "bg-warning/20 text-ink underline decoration-warning decoration-2 underline-offset-4 ring-1 ring-warning/30"
+                : tone === "changed"
+                ? "bg-success/15 text-ink underline decoration-success decoration-2 underline-offset-4 ring-1 ring-success/25"
+                : "bg-success/15 text-ink underline decoration-success decoration-2 underline-offset-4 ring-1 ring-success/25"
             }`}
           >
             {part.text}
@@ -228,6 +289,64 @@ function HighlightedText({
     </>
   );
 }
+
+function buildChangedTerms(original: string, rewritten: string) {
+  if (!original.trim() || !rewritten.trim()) return [];
+  const originalWords = new Set(tokenize(original));
+  const terms: string[] = [];
+  const seen = new Set<string>();
+  for (const rawWord of rewritten.match(/\b[A-Za-z][A-Za-z'-]{3,}\b/g) ?? []) {
+    const normalized = normalizeToken(rawWord);
+    if (
+      !normalized ||
+      originalWords.has(normalized) ||
+      seen.has(normalized) ||
+      COMMON_WORDS.has(normalized)
+    ) {
+      continue;
+    }
+    seen.add(normalized);
+    terms.push(rawWord);
+    if (terms.length >= 28) break;
+  }
+  return terms;
+}
+
+function tokenize(text: string) {
+  return (text.match(/\b[A-Za-z][A-Za-z'-]{3,}\b/g) ?? [])
+    .map(normalizeToken)
+    .filter(Boolean);
+}
+
+function normalizeToken(word: string) {
+  return word.toLowerCase().replace(/^[^a-z]+|[^a-z]+$/g, "");
+}
+
+const COMMON_WORDS = new Set([
+  "about",
+  "after",
+  "also",
+  "because",
+  "been",
+  "before",
+  "being",
+  "between",
+  "could",
+  "does",
+  "from",
+  "have",
+  "into",
+  "more",
+  "that",
+  "their",
+  "there",
+  "these",
+  "this",
+  "through",
+  "with",
+  "would",
+  "your",
+]);
 
 function analyzeAiSignals(text: string): SignalReport {
   const lower = text.toLowerCase();

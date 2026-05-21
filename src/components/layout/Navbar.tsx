@@ -126,7 +126,7 @@ export function Navbar() {
       </nav>
 
       {open && (
-        <div id="mobile-menu" className="border-t border-line bg-white md:hidden">
+        <div id="mobile-menu" className="mobile-menu-panel border-t border-line bg-white md:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
             <MobileLink href="/tools" onClick={() => setOpen(false)}>Tools</MobileLink>
             <MobileLink href="/ai-detector" onClick={() => setOpen(false)}>AI Detector</MobileLink>

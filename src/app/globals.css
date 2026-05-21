@@ -141,6 +141,39 @@ html {
   }
 }
 
+@media (max-width: 767px) {
+  .mobile-menu-panel {
+    transform-origin: left top;
+    animation: mobile-menu-slide 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .mobile-hero-slide {
+    animation: mobile-hero-slide 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes mobile-menu-slide {
+  0% {
+    opacity: 0;
+    transform: translateX(-22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes mobile-hero-slide {
+  0% {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* ---------------------------------------------------------------------------
    Scroll reveal (used by <Reveal />)
    --------------------------------------------------------------------------- */

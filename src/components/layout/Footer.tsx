@@ -9,7 +9,7 @@ export function Footer() {
           <div className="space-y-3">
             <Logo size={36} />
             <p className="max-w-xs text-sm text-ink-muted">
-              AI-powered professional communication. Rough text in, refined out.
+              Human intelligence with AI intelligence. Write, study, and learn better patterns as you work.
             </p>
           </div>
           <FooterCol title="Tools">
@@ -32,7 +32,7 @@ export function Footer() {
         </div>
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-line pt-6 text-xs text-ink-subtle sm:flex-row sm:items-center">
           <p>(c) {new Date().getFullYear()} rewrito. All rights reserved.</p>
-          <p>Built for clear, calm communication.</p>
+          <p>Built for clear communication and stronger thinking.</p>
         </div>
       </div>
     </footer>

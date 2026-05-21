@@ -23,7 +23,7 @@ import { Listbox } from "@/components/ui/Listbox";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { ScoreCard } from "@/components/tools/ScoreCard";
 import { WritingCoachCard } from "@/components/tools/WritingCoachCard";
-import { AiSignalInsights } from "@/components/tools/AiSignalInsights";
+import { AiSignalInsights, AiSignalTextBox } from "@/components/tools/AiSignalInsights";
 import {
   CheckIcon,
   CopyIcon,
@@ -433,6 +433,15 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
             className="input-base resize-y leading-relaxed"
           />
 
+          {tool === "humanizer" && input.trim() && (
+            <AiSignalTextBox
+              text={input}
+              mode="risk"
+              title="AI-sounding text"
+              description="Amber underlines mark phrases to humanize first."
+            />
+          )}
+
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-ink-subtle">
             <span>
               {wordCount} word{wordCount === 1 ? "" : "s"} - {charCount} characters
@@ -580,7 +589,17 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                   onCreateTestlet={handleCreateTestlet}
                 />
               ) : (
-                <FormattedText text={output} />
+                tool === "humanizer" ? (
+                  <AiSignalTextBox
+                    text={output}
+                    compareText={input}
+                    mode="changed"
+                    title="Humanized changes"
+                    description="Green underlines mark wording rewrito changed to make the draft sound more human."
+                  />
+                ) : (
+                  <FormattedText text={output} />
+                )
               )
             ) : (
               <span className="text-ink-subtle">

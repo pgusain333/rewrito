@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/icons";
 
 export const metadata: Metadata = {
-  title: "rewrito - AI-powered professional communication",
+  title: "rewrito - Human intelligence with AI intelligence",
   description:
-    "Humanize AI text, check AI detection scores, rewrite LinkedIn posts, improve professional emails, and study concepts clearly with rewrito.",
+    "Build human intelligence with AI intelligence. Humanize AI text, check AI detection scores, rewrite professional communication, and study concepts clearly with rewrito.",
   alternates: { canonical: "/" },
 };
 
@@ -55,21 +55,21 @@ function Hero() {
         <div className="blob-mid" />
       </div>
       <div className="mx-auto max-w-6xl px-5 pb-16 pt-14 sm:px-8 sm:pb-24 sm:pt-20">
-        <div className="mx-auto max-w-3xl text-center animate-fade-up">
+        <div className="mobile-hero-slide mx-auto max-w-3xl text-center animate-fade-up">
           <span className="chip mb-5 !text-[11px]">
             <span className="h-1.5 w-1.5 rounded-full bg-brand-gradient" />
-            AI-powered professional communication
+            Human intelligence with AI intelligence
           </span>
           <h1 className="text-balance text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-5xl md:text-6xl">
-            Rough text in.{" "}
+            Build your human voice with{" "}
             <span className="block bg-brand-gradient bg-clip-text text-transparent sm:inline">
-              Refined <span className="block sm:inline">communication</span>
+              AI intelligence
             </span>{" "}
-            out.
+            beside you.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
             Humanize AI text, improve LinkedIn posts, rewrite professional emails,
-            check AI detector confidence, and turn confusing study material into clear understanding.
+            check AI detector confidence, and learn the writing and study patterns behind every improvement.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/try" className="btn-primary">
@@ -621,8 +621,8 @@ function LearningCoach() {
               Over time, you write better without the tool.
             </h2>
             <p className="mt-3 text-base leading-relaxed text-ink-muted">
-              rewrito does more than rewrite. It shows what changed, why the draft improved,
-              and which habits to carry into your next message, post, paper, or study note.
+              rewrito does more than rewrite. It pairs AI intelligence with your own judgment,
+              showing what changed, why the draft improved, and which habits to carry into your next message, post, paper, or study note.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">

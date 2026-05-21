@@ -15,11 +15,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: "rewrito",
   title: {
-    default: "rewrito - AI-powered professional communication",
+    default: "rewrito - Human intelligence with AI intelligence",
     template: "%s - rewrito",
   },
   description:
-    "Humanize AI text, check AI detector confidence, rewrite LinkedIn posts, improve professional emails, and study concepts clearly with rewrito.",
+    "Build human intelligence with AI intelligence. Humanize AI text, check detector confidence, rewrite professional communication, and study concepts clearly with rewrito.",
   keywords: [
     "AI humanizer",
     "LinkedIn post rewriter",
@@ -38,18 +38,18 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: siteUrl,
-    title: "rewrito - AI-powered professional communication",
+    title: "rewrito - Human intelligence with AI intelligence",
     description:
-      "Rough text in. Refined communication out. Humanize AI text, polish LinkedIn posts, rewrite emails, and study clearly.",
+      "Human intelligence with AI intelligence. Humanize AI text, polish LinkedIn posts, rewrite emails, study clearly, and learn better patterns as you work.",
     siteName: "rewrito",
     locale: "en_US",
     images: [{ url: "/rewrito-logo.png", width: 1200, height: 320, alt: "rewrito" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "rewrito - AI-powered professional communication",
+    title: "rewrito - Human intelligence with AI intelligence",
     description:
-      "Humanize AI text, check AI detector confidence, rewrite LinkedIn posts, improve professional emails, and study concepts clearly.",
+      "Humanize AI text, check detector confidence, rewrite professional communication, study clearly, and learn better patterns as you work.",
     images: ["/rewrito-logo.png"],
   },
   robots: {

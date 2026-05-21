@@ -6,7 +6,7 @@ import { LoginModal } from "@/components/modals/LoginModal";
 import { UpgradeModal } from "@/components/modals/UpgradeModal";
 import { ScoreCard } from "@/components/tools/ScoreCard";
 import { WritingCoachCard } from "@/components/tools/WritingCoachCard";
-import { AiSignalInsights } from "@/components/tools/AiSignalInsights";
+import { AiSignalInsights, AiSignalTextBox } from "@/components/tools/AiSignalInsights";
 import { CheckIcon, CopyIcon, ShieldCheckIcon, WandIcon } from "@/components/ui/icons";
 import { useAuthAndUsage } from "@/lib/usage/useAuthAndUsage";
 
@@ -139,6 +139,14 @@ export function AiDetectorTool() {
             rows={14}
             className="input-base resize-y leading-relaxed"
           />
+          {input.trim() && (
+            <AiSignalTextBox
+              text={input}
+              mode="risk"
+              title="AI-sounding text"
+              description="Amber underlines show wording that may raise detector-style confidence."
+            />
+          )}
           <button onClick={handleAnalyze} disabled={loading} className="btn-primary mt-4 w-full">
             {loading ? (
               <>
@@ -178,9 +186,13 @@ export function AiDetectorTool() {
                   {copied ? "Copied" : "Copy"}
                 </button>
               </div>
-              <div className="whitespace-pre-wrap rounded-xl bg-bg-soft p-4 text-sm leading-relaxed text-ink">
-                {output}
-              </div>
+              <AiSignalTextBox
+                text={output}
+                compareText={input}
+                mode="changed"
+                title="Humanized changes"
+                description="Green underlines show wording rewrito changed in the output."
+              />
             </div>
           ) : (
             <div className="rounded-xl border border-dashed border-line bg-white p-5 text-sm leading-relaxed text-ink-muted">

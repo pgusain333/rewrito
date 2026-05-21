@@ -130,6 +130,8 @@ const SHARED_GUARDRAILS = [
   "Make the final draft clearly better than the original in clarity, naturalness, conciseness, and overall quality.",
   "Reduce AI-written signals aggressively: remove generic transitions, over-polished symmetry, vague claims, repetitive sentence shape, and padded explanations.",
   "Prefer concrete nouns, specific verbs, human rhythm, and direct wording.",
+  "Use a single hyphen (-) for separators if needed. Never use double hyphens, en dashes, or em dashes.",
+  "Help the user learn the pattern behind the improvement, so the tool builds human intelligence alongside AI intelligence.",
 ].join("\n- ");
 
 export function buildSystemPrompt(
@@ -307,6 +309,8 @@ Strict teaching rules:
 - Use formulas only when useful, and explain each symbol.
 - Do not wrap words in markdown bold markers.
 - Do not include a section named "Final Takeaway".
+- Use a single hyphen (-) when a dash is needed. Never use double hyphens, en dashes, or em dashes.
+- Teach the thinking behind the answer so the student builds human intelligence alongside AI intelligence.
 
 Output format for this mode:
 ${outputContract[studyMode]}`;

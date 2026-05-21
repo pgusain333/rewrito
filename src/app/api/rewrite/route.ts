@@ -236,6 +236,7 @@ export async function POST(req: Request) {
       { status: 502 }
     );
   }
+  output = normalizeVisibleOutput(output);
 
   // ---- Score the rewrite (best-effort; never blocks the response) ----
   let scores: ScorePair | null = null;
@@ -323,6 +324,15 @@ function parseScores(raw: string): ScorePair | null {
   } catch {
     return null;
   }
+}
+
+function normalizeVisibleOutput(value: string): string {
+  return value
+    .replace(/[–—]/g, " - ")
+    .replace(/--+/g, "-")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{4,}/g, "\n\n\n")
+    .trim();
 }
 
 function stabilizeScores(scores: ScorePair | null, tool: ToolType): ScorePair | null {
