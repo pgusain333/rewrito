@@ -118,8 +118,8 @@ export function StudyFlashcardsWorkspace() {
           </div>
         </div>
 
-        <div className="grid gap-0 xl:grid-cols-[0.95fr_1.05fr]">
-          <div className="border-b border-line p-5 xl:border-b-0 xl:border-r xl:p-6">
+        <div>
+          <div className="border-b border-line p-5 xl:p-6">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <label htmlFor="flashcard-material" className="field-label !mb-0">
                 Study material
@@ -175,7 +175,7 @@ export function StudyFlashcardsWorkspace() {
                 )}
                 {loading ? "Creating deck..." : "Create flashcards"}
               </button>
-              <Link href="/rewrito-study/quiz" className="btn-secondary w-full sm:w-auto">
+              <Link href="/study-assistant/quiz" className="btn-secondary w-full sm:w-auto">
                 Open quiz testlets
                 <ArrowRightIcon size={16} />
               </Link>
@@ -238,7 +238,7 @@ function FlashcardDeck({
   setFlipped: Dispatch<SetStateAction<Record<number, boolean>>>;
 }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {cards.map((card, index) => {
         const isFlipped = !!flipped[index];
         return (

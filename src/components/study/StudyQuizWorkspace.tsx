@@ -237,8 +237,8 @@ ${missedQuestions}`;
           </div>
         </div>
 
-        <div className="grid gap-0 xl:grid-cols-[1fr_360px]">
-          <div className="border-b border-line p-5 xl:border-b-0 xl:border-r xl:p-6">
+        <div className="grid gap-0 2xl:grid-cols-[minmax(0,1fr)_380px]">
+          <div className="border-b border-line p-5 2xl:border-b-0 2xl:border-r 2xl:p-6">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
               <label htmlFor="quiz-material" className="field-label !mb-0">
                 Study material
@@ -327,7 +327,7 @@ ${missedQuestions}`;
       </section>
 
       {questions.length > 0 ? (
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <section className="space-y-6">
           <QuizTestletPanel
             kind={testletKind}
             questions={questions}
@@ -382,7 +382,7 @@ function SavedAttemptsPanel({
   onLogin: () => void;
 }) {
   return (
-    <aside className="bg-bg-soft p-5 xl:p-6">
+        <aside className="bg-bg-soft p-5 2xl:p-6">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold text-ink">Saved quiz scores</h3>
@@ -585,7 +585,7 @@ function ScoreReport({
   }
 
   return (
-    <aside className="space-y-4">
+    <aside className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
       <div className="card p-5">
         <p className="text-xs font-semibold uppercase tracking-wide text-brand">Scorecard</p>
         <div className="mt-3 flex items-end gap-3">
@@ -618,10 +618,14 @@ function ScoreReport({
         </div>
       </div>
 
-      <AreaCard title="Strong areas" tone="success" areas={analysis.strongAreas} empty="No strong areas yet. Review the explanations and try again." />
-      <AreaCard title="Important areas" tone="warning" areas={analysis.importantAreas} empty="No middle-risk areas. Your score is clearly split between strong and weak topics." />
-      <AreaCard title="Weak areas" tone="error" areas={analysis.weakAreas} empty="No weak areas found. Create another testlet to confirm retention." />
-      <AreasTable rows={analysis.rows} />
+      <div className="grid gap-4 lg:grid-cols-3 xl:grid-cols-1">
+        <AreaCard title="Strong areas" tone="success" areas={analysis.strongAreas} empty="No strong areas yet. Review the explanations and try again." />
+        <AreaCard title="Important areas" tone="warning" areas={analysis.importantAreas} empty="No middle-risk areas. Your score is clearly split between strong and weak topics." />
+        <AreaCard title="Weak areas" tone="error" areas={analysis.weakAreas} empty="No weak areas found. Create another testlet to confirm retention." />
+      </div>
+      <div className="xl:col-span-2">
+        <AreasTable rows={analysis.rows} />
+      </div>
     </aside>
   );
 }
@@ -712,7 +716,7 @@ function EmptyPracticeState({ loading, rawTestlet }: { loading: boolean; rawTest
           <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-ink-muted">
             Paste study material above, create a testlet, answer the questions, and use the scorecard to decide what to review next.
           </p>
-          <Link href="/rewrito-study/flashcards" className="btn-secondary mt-5">
+          <Link href="/study-assistant/flashcards" className="btn-secondary mt-5">
             Open flashcards
             <ArrowRightIcon size={16} />
           </Link>

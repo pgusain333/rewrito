@@ -30,6 +30,20 @@ export default function Page() {
         "Polite without being apologetic; confident without being curt.",
         "Maintains standard email structure when appropriate.",
       ]}
+      audiences={[
+        {
+          title: "Busy professionals",
+          body: "Turn rough notes into clear, polite emails without overthinking every sentence.",
+        },
+        {
+          title: "Managers",
+          body: "Balance directness and warmth for follow-ups, feedback, requests, and decisions.",
+        },
+        {
+          title: "Students and job seekers",
+          body: "Improve outreach, applications, professor emails, and professional replies.",
+        },
+      ]}
       faq={[
         {
           q: "Will it invent details I didn't write?",

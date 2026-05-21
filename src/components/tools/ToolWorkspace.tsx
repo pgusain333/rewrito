@@ -87,7 +87,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
 
   const isStudy = tool === "study";
   const isPaidUser = user?.plan === "pro";
-  const useWideOutput = isStudy && (studyMode === "quiz" || studyMode === "flashcards");
+  const useWideOutput = isStudy;
   const studyActionLabel =
     studyMode === "quiz"
       ? "Create quiz testlet"
@@ -761,7 +761,7 @@ function StudyControls({
       return (
         <Link
           key={mode.value}
-          href={mode.value === "quiz" ? "/rewrito-study/quiz" : "/rewrito-study/flashcards"}
+          href={mode.value === "quiz" ? "/study-assistant/quiz" : "/study-assistant/flashcards"}
           className={className}
         >
           {content}
@@ -797,7 +797,7 @@ function StudyControls({
           </span>
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-[1.35fr_0.85fr]">
+        <div className="grid gap-4">
           <div className="rounded-xl border border-line bg-bg-soft/70 p-3">
             <div className="mb-3">
               <div className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
@@ -807,7 +807,7 @@ function StudyControls({
                 Best for concepts, notes, worked examples, and revision structure.
               </p>
             </div>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
               {learningModes.map((mode) => modeButton(mode))}
             </div>
           </div>
@@ -826,7 +826,7 @@ function StudyControls({
                 Active recall
               </span>
             </div>
-            <div className="grid gap-2">
+            <div className="grid gap-2 sm:grid-cols-2">
               {practiceModes.map((mode) => modeButton(mode, true))}
             </div>
           </div>

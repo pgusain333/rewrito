@@ -18,8 +18,8 @@ export function Footer() {
             <FooterLink href="/linkedin-rewriter">LinkedIn Rewriter</FooterLink>
             <FooterLink href="/email-rewriter">Email Rewriter</FooterLink>
             <FooterLink href="/study-assistant">Rewrito Study</FooterLink>
-            <FooterLink href="/rewrito-study/quiz">Study Quiz</FooterLink>
-            <FooterLink href="/rewrito-study/flashcards">Study Flashcards</FooterLink>
+            <FooterLink href="/study-assistant/quiz">Study Quiz</FooterLink>
+            <FooterLink href="/study-assistant/flashcards">Study Flashcards</FooterLink>
           </FooterCol>
           <FooterCol title="Product">
             <FooterLink href="/pricing">Pricing</FooterLink>

@@ -30,6 +30,20 @@ export default function Page() {
         "Ends with a genuine thought, not a forced CTA.",
         "Tone presets for professional, natural, or executive voice.",
       ]}
+      audiences={[
+        {
+          title: "Founders and creators",
+          body: "Shape rough ideas into posts with a clear hook and a grounded point of view.",
+        },
+        {
+          title: "Professionals",
+          body: "Rewrite career updates, lessons, wins, and reflections without sounding generic.",
+        },
+        {
+          title: "Marketing teams",
+          body: "Polish thought-leadership drafts while keeping specific examples and credibility.",
+        },
+      ]}
       faq={[
         {
           q: "Will my post sound generic?",

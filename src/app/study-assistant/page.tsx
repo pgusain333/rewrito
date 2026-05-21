@@ -159,13 +159,13 @@ export default function StudyAssistantPage() {
             </div>
             <div className="grid gap-5 md:grid-cols-2">
               <PracticeLinkCard
-                href="/rewrito-study/quiz"
+                href="/study-assistant/quiz"
                 title="Quiz testlets"
                 body="Create MCQs, answer in a focused test view, save scores when logged in, and build weak-area testlets from your results."
                 label="Open quiz workspace"
               />
               <PracticeLinkCard
-                href="/rewrito-study/flashcards"
+                href="/study-assistant/flashcards"
                 title="Flashcards"
                 body="Turn notes, formulas, definitions, and concepts into flip-ready Q/A cards for active recall."
                 label="Open flashcards"
@@ -218,6 +218,44 @@ export default function StudyAssistantPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-bg-section/60">
+          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+            <div className="mb-8 max-w-2xl">
+              <span className="chip mb-5">Who this is for</span>
+              <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                Built for learners who want understanding, not shortcuts.
+              </h2>
+              <p className="mt-3 text-base leading-relaxed text-ink-muted">
+                Rewrito Study helps different learners turn confusing material into clear revision, practice, and planning.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {[
+                {
+                  title: "Students",
+                  body: "Explain textbook paragraphs, revise exam topics, and practice with quizzes and flashcards.",
+                },
+                {
+                  title: "University learners",
+                  body: "Break down finance, law, economics, accounting, statistics, and technical notes.",
+                },
+                {
+                  title: "Professional certification candidates",
+                  body: "Organize study plans, weak areas, formulas, and revision sessions around exam goals.",
+                },
+              ].map((audience, index) => (
+                <article key={audience.title} className="card h-full p-5">
+                  <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-softPurple text-sm font-semibold text-brand">
+                    {index + 1}
+                  </span>
+                  <h3 className="text-base font-semibold text-ink">{audience.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-muted">{audience.body}</p>
+                </article>
+              ))}
             </div>
           </div>
         </section>

@@ -30,6 +30,20 @@ export default function Page() {
         "Offers Light, Medium, and Strong refinement levels.",
         "Supports six tones, from natural to executive.",
       ]}
+      audiences={[
+        {
+          title: "Students",
+          body: "Improve AI-assisted drafts while learning which phrases make writing sound robotic.",
+        },
+        {
+          title: "Professionals",
+          body: "Polish reports, proposals, summaries, and internal notes without losing intent.",
+        },
+        {
+          title: "Content teams",
+          body: "Turn rough AI drafts into clearer brand-safe copy that feels more specific and human.",
+        },
+      ]}
       faq={[
         {
           q: "Will this change what my text actually says?",
