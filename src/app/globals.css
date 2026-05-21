@@ -23,10 +23,26 @@ body {
     repeating-linear-gradient(0deg, rgba(17, 24, 39, 0.018) 0 1px, transparent 1px 72px),
     var(--bg);
   color: var(--ink);
-  font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15.5px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: 0;
+  line-height: 1.12;
+}
+
+.tracking-tight {
+  letter-spacing: 0 !important;
 }
 
 html {
@@ -65,13 +81,13 @@ html {
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-gradient px-5 py-3 text-sm font-medium text-white shadow-soft transition-all duration-200 hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-gradient px-5 py-3 text-sm font-semibold text-white shadow-soft transition-all duration-200 hover:shadow-glow active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-5 py-3 text-sm font-medium text-ink shadow-soft transition-all duration-200 hover:border-ink-subtle hover:bg-bg-soft active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-white px-5 py-3 text-sm font-semibold text-ink shadow-soft transition-all duration-200 hover:border-ink-subtle hover:bg-bg-soft active:scale-[0.98];
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-bg-soft hover:text-ink;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-ink-muted transition-colors hover:bg-bg-soft hover:text-ink;
   }
   .card {
     @apply rounded-2xl border border-line bg-white shadow-soft;
@@ -80,10 +96,10 @@ html {
     @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted;
   }
   .field-label {
-    @apply mb-1.5 block text-xs font-medium uppercase tracking-wide text-ink-muted;
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-muted;
   }
   .input-base {
-    @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-sm text-ink placeholder:text-ink-subtle transition-colors focus:border-brand focus:outline-none;
+    @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-sm font-normal text-ink placeholder:text-ink-subtle transition-colors focus:border-brand focus:outline-none;
   }
 }
 

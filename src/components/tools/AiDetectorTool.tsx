@@ -6,6 +6,7 @@ import { LoginModal } from "@/components/modals/LoginModal";
 import { UpgradeModal } from "@/components/modals/UpgradeModal";
 import { ScoreCard } from "@/components/tools/ScoreCard";
 import { WritingCoachCard } from "@/components/tools/WritingCoachCard";
+import { AiSignalInsights } from "@/components/tools/AiSignalInsights";
 import { CheckIcon, CopyIcon, ShieldCheckIcon, WandIcon } from "@/components/ui/icons";
 import { useAuthAndUsage } from "@/lib/usage/useAuthAndUsage";
 
@@ -192,6 +193,7 @@ export function AiDetectorTool() {
       {scores && (
         <div className="space-y-4 border-t border-line bg-bg-soft p-5 sm:p-6">
           <ScoreCard scores={scores} />
+          <AiSignalInsights original={input} rewritten={output} />
           <WritingCoachCard original={input} rewritten={output} />
         </div>
       )}

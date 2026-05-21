@@ -23,6 +23,7 @@ import { Listbox } from "@/components/ui/Listbox";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { ScoreCard } from "@/components/tools/ScoreCard";
 import { WritingCoachCard } from "@/components/tools/WritingCoachCard";
+import { AiSignalInsights } from "@/components/tools/AiSignalInsights";
 import {
   CheckIcon,
   CopyIcon,
@@ -607,6 +608,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       {scores && tool !== "study" && (
         <div className="space-y-4 border-t border-line bg-bg-soft p-5 sm:p-6 animate-fade-up">
           <ScoreCard scores={scores} />
+          {tool === "humanizer" && <AiSignalInsights original={input} rewritten={output} />}
           <WritingCoachCard original={input} rewritten={output} />
         </div>
       )}
@@ -682,59 +684,110 @@ function StudyControls({
   );
   const modeButton = (mode: (typeof STUDY_MODES)[number], featured = false) => {
     const active = studyMode === mode.value;
+    const outputType: Record<StudyMode, string> = {
+      explain: "Tutor",
+      steps: "Table",
+      quiz: "Testlet",
+      flashcards: "Deck",
+      notes: "Notes",
+      studyplan: "Plan",
+    };
     return (
       <button
         key={mode.value}
         type="button"
         onClick={() => setStudyMode(mode.value)}
-        className={`rounded-xl border p-3 text-left transition-all ${
+        className={`group relative min-h-[92px] rounded-xl border p-3.5 text-left transition-all ${
           active
-            ? "border-brand bg-brand-softPurple text-brand shadow-soft"
+            ? "border-brand bg-white text-ink shadow-card ring-2 ring-brand/10"
             : featured
-            ? "border-line bg-white text-ink hover:border-brand/60 hover:bg-bg-soft"
-            : "border-line bg-white text-ink hover:border-ink-subtle"
+            ? "border-brand-softPurple bg-white text-ink hover:border-brand/60 hover:shadow-soft"
+            : "border-line bg-white text-ink hover:border-brand/40 hover:shadow-soft"
         }`}
       >
-        <span className="flex items-center justify-between gap-2">
-          <span className="text-sm font-semibold">{mode.label}</span>
-          {featured && (
-            <span className="rounded-full bg-brand-softPurple px-2 py-0.5 text-[10px] font-bold text-brand">
-              Practice
+        <span
+          className={`mb-3 inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+            active
+              ? "bg-brand-softPurple text-brand"
+              : featured
+              ? "bg-brand-softPurple/70 text-brand"
+              : "bg-bg-section text-ink-muted"
+          }`}
+        >
+          {outputType[mode.value]}
+        </span>
+        <span className="flex items-start justify-between gap-3">
+          <span>
+            <span className="block text-sm font-semibold leading-snug">{mode.label}</span>
+            <span className="mt-1.5 block text-xs leading-relaxed text-ink-muted">
+              {mode.hint}
             </span>
-          )}
+          </span>
+          <span
+            aria-hidden
+            className={`mt-0.5 h-2.5 w-2.5 rounded-full transition-colors ${
+              active ? "bg-brand" : "bg-line group-hover:bg-brand/50"
+            }`}
+          />
         </span>
-        <span className={`mt-1 block text-[11px] ${active ? "text-brand" : "text-ink-muted"}`}>
-          {mode.hint}
-        </span>
+        {featured && (
+          <span className="mt-3 inline-flex rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-semibold text-success">
+            Interactive
+          </span>
+        )}
+        {active && (
+          <span className="pointer-events-none absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-brand-gradient" />
+        )}
       </button>
     );
   };
 
   return (
     <div className="mt-5 space-y-5">
-      <div>
-        <label className="field-label">Study workspace</label>
-        <div className="space-y-3">
+      <div className="rounded-2xl border border-line bg-white p-4 shadow-soft">
+        <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
           <div>
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-muted">
-              Learn and organize
+            <label className="field-label !mb-1">Study workspace</label>
+            <h4 className="text-base font-semibold text-ink">Choose the output you want</h4>
+            <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+              Learning modes explain and organize. Practice modes create interactive study formats.
+            </p>
+          </div>
+          <span className="inline-flex w-fit rounded-full bg-bg-section px-3 py-1 text-xs font-semibold text-ink-muted">
+            {STUDY_MODES.find((mode) => mode.value === studyMode)?.label}
+          </span>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[1.35fr_0.85fr]">
+          <div className="rounded-xl border border-line bg-bg-soft/70 p-3">
+            <div className="mb-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+                Learn and organize
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+                Best for concepts, notes, worked examples, and revision structure.
+              </p>
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
               {learningModes.map((mode) => modeButton(mode))}
             </div>
           </div>
-          <div className="rounded-2xl border border-brand-softPurple bg-bg-soft p-3">
-            <div className="mb-2 flex items-center justify-between gap-2">
+
+          <div className="rounded-xl border border-brand-softPurple bg-gradient-to-br from-white via-brand-softPurple/35 to-brand-softBlue/40 p-3">
+            <div className="mb-3 flex items-start justify-between gap-2">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-wide text-brand">
                   Practice tools
                 </div>
-                <p className="mt-1 text-[11px] leading-relaxed text-ink-muted">
-                  Quiz and flashcards open as interactive study formats.
+                <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+                  Use these when you want active recall instead of a written explanation.
                 </p>
               </div>
+              <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-brand shadow-soft">
+                Active recall
+              </span>
             </div>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2">
               {practiceModes.map((mode) => modeButton(mode, true))}
             </div>
           </div>

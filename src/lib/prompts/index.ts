@@ -208,7 +208,7 @@ export function buildStudySystemPrompt({
     explain:
       "Explain the material in easy language. Avoid unnecessary jargon. Use analogies only when they make the idea clearer. Focus on understanding, not answer dumping.",
     steps:
-      "Break the material or problem into numbered steps. Explain the reasoning, formulas, and why each step matters. Check arithmetic and logic before answering.",
+      "Break the material or problem into a clear step-by-step table. Explain the reasoning, formulas, and why each step matters. Check arithmetic and logic before answering.",
     quiz:
       `Create an exam-quality testlet with exactly ${quizQuestionCount} multiple-choice questions. Each question must have four plausible options labeled A, B, C, and D, one correct answer, and a brief explanation that teaches the concept.`,
     flashcards:
@@ -228,9 +228,10 @@ export function buildStudySystemPrompt({
 ## Common Mistake
 ## Quick Check`,
     steps: `Return only these markdown sections:
-## Given
-## Goal
-## Step-by-Step Solution
+## Problem Map
+Create a markdown table with columns: Item, Details.
+## Step-by-Step Table
+Create a markdown table with columns: Step, Action, Why It Matters, Result.
 ## Why It Works
 ## Common Mistake
 ## Practice Question`,
