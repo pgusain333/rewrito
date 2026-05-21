@@ -27,6 +27,7 @@ Run `supabase/schema.sql` in your Supabase SQL editor before testing auth, usage
 
 1. Set `NEXT_PUBLIC_SITE_URL=https://rewrito.ai` in Vercel.
 2. Add the rest of `.env.example` values in Vercel Project Settings.
+   - For stronger generation quality with Anthropic, use `AI_PROVIDER=anthropic` and `ANTHROPIC_MODEL=claude-sonnet-4-6`.
 3. In Supabase Auth URL Configuration, set:
    - Site URL: `https://rewrito.ai`
    - Redirect URL: `https://rewrito.ai/auth/callback`

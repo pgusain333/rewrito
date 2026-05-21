@@ -85,7 +85,17 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
 
   const isStudy = tool === "study";
   const isPaidUser = user?.plan === "pro";
-  const useWideOutput = isStudy && studyMode === "quiz";
+  const useWideOutput = isStudy && (studyMode === "quiz" || studyMode === "flashcards");
+  const studyActionLabel =
+    studyMode === "quiz"
+      ? "Create quiz testlet"
+      : studyMode === "flashcards"
+      ? "Create flashcards"
+      : studyMode === "notes"
+      ? "Organize notes"
+      : studyMode === "studyplan"
+      ? "Build study plan"
+      : "Create study guide";
   const wordCount = useMemo(() => countWords(input), [input]);
   const charCount = input.length;
   const outputWords = useMemo(() => countWords(output), [output]);
@@ -496,12 +506,12 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
             {loading ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                {isStudy ? "Building study guide..." : "Rewriting..."}
+                {isStudy ? "Building study output..." : "Rewriting..."}
               </>
             ) : (
               <>
                 <WandIcon size={16} />
-                {isStudy ? "Create study guide" : "Rewrite with rewrito"}
+                {isStudy ? studyActionLabel : "Rewrite with rewrito"}
               </>
             )}
           </button>
@@ -519,7 +529,13 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
         <div className="bg-bg-soft p-5 md:p-6">
           <div className="mb-3 flex items-center justify-between">
             <label className="field-label !mb-0">
-              {isStudy ? "Study guide" : "Rewritten"}
+              {isStudy
+                ? studyMode === "quiz"
+                  ? "Quiz testlet"
+                  : studyMode === "flashcards"
+                  ? "Flashcards"
+                  : "Study guide"
+                : "Rewritten"}
             </label>
             <div className="flex items-center gap-1.5">
               <button
@@ -568,7 +584,11 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
             ) : (
               <span className="text-ink-subtle">
                 {isStudy
-                  ? "Your structured study guide will appear here."
+                  ? studyMode === "quiz"
+                    ? "Your interactive quiz testlet will appear here."
+                    : studyMode === "flashcards"
+                    ? "Your flip-ready flashcards will appear here."
+                    : "Your structured study guide will appear here."
                   : "Your refined version will appear here."}
               </span>
             )}
@@ -654,31 +674,70 @@ function StudyControls({
   prepLevel: string;
   setPrepLevel: (value: string) => void;
 }) {
+  const learningModes = STUDY_MODES.filter(
+    (mode) => mode.value !== "quiz" && mode.value !== "flashcards"
+  );
+  const practiceModes = STUDY_MODES.filter(
+    (mode) => mode.value === "quiz" || mode.value === "flashcards"
+  );
+  const modeButton = (mode: (typeof STUDY_MODES)[number], featured = false) => {
+    const active = studyMode === mode.value;
+    return (
+      <button
+        key={mode.value}
+        type="button"
+        onClick={() => setStudyMode(mode.value)}
+        className={`rounded-xl border p-3 text-left transition-all ${
+          active
+            ? "border-brand bg-brand-softPurple text-brand shadow-soft"
+            : featured
+            ? "border-line bg-white text-ink hover:border-brand/60 hover:bg-bg-soft"
+            : "border-line bg-white text-ink hover:border-ink-subtle"
+        }`}
+      >
+        <span className="flex items-center justify-between gap-2">
+          <span className="text-sm font-semibold">{mode.label}</span>
+          {featured && (
+            <span className="rounded-full bg-brand-softPurple px-2 py-0.5 text-[10px] font-bold text-brand">
+              Practice
+            </span>
+          )}
+        </span>
+        <span className={`mt-1 block text-[11px] ${active ? "text-brand" : "text-ink-muted"}`}>
+          {mode.hint}
+        </span>
+      </button>
+    );
+  };
+
   return (
     <div className="mt-5 space-y-5">
       <div>
-        <label className="field-label">Study mode</label>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {STUDY_MODES.map((mode) => {
-            const active = studyMode === mode.value;
-            return (
-              <button
-                key={mode.value}
-                type="button"
-                onClick={() => setStudyMode(mode.value)}
-                className={`rounded-xl border p-3 text-left transition-all ${
-                  active
-                    ? "border-brand bg-brand-softPurple text-brand shadow-soft"
-                    : "border-line bg-white text-ink hover:border-ink-subtle"
-                }`}
-              >
-                <span className="block text-sm font-semibold">{mode.label}</span>
-                <span className={`mt-1 block text-[11px] ${active ? "text-brand" : "text-ink-muted"}`}>
-                  {mode.hint}
-                </span>
-              </button>
-            );
-          })}
+        <label className="field-label">Study workspace</label>
+        <div className="space-y-3">
+          <div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+              Learn and organize
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {learningModes.map((mode) => modeButton(mode))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-brand-softPurple bg-bg-soft p-3">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-brand">
+                  Practice tools
+                </div>
+                <p className="mt-1 text-[11px] leading-relaxed text-ink-muted">
+                  Quiz and flashcards open as interactive study formats.
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {practiceModes.map((mode) => modeButton(mode, true))}
+            </div>
+          </div>
         </div>
       </div>
 

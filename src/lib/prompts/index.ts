@@ -127,6 +127,9 @@ const SHARED_GUARDRAILS = [
   "Preserve the user's original meaning and intent.",
   "Avoid cliches and filler phrases such as 'in today's world', 'delve into', 'navigate the landscape', 'unlock', 'leverage', 'in conclusion'.",
   "Vary sentence length. Avoid robotic parallel structures.",
+  "Make the final draft clearly better than the original in clarity, naturalness, conciseness, and overall quality.",
+  "Reduce AI-written signals aggressively: remove generic transitions, over-polished symmetry, vague claims, repetitive sentence shape, and padded explanations.",
+  "Prefer concrete nouns, specific verbs, human rhythm, and direct wording.",
 ].join("\n- ");
 
 export function buildSystemPrompt(
@@ -143,21 +146,25 @@ Goals:
 - Reduce robotic wording and AI patterns (e.g. "It is important to note", "Furthermore").
 - Improve flow and rhythm with varied sentence structure.
 - Keep the writing professional and grounded.
-- Preserve all facts and meaning exactly.`,
+- Preserve all facts and meaning exactly.
+- Make the rewritten version feel like a thoughtful person edited it, not like an AI paraphrased it.
+- Remove boilerplate openings, predictable transitions, generic summaries, and over-explaining.`,
     linkedin: `You are a senior content editor for LinkedIn posts.
 Goals:
 - Open with a real, grounded hook (no clickbait, no "Here's what nobody tells you").
 - Use short paragraphs (1-3 lines) and plenty of white space.
 - Keep it human. No motivational fluff, no fake humility, no emoji spam.
 - Preserve the author's specific points and examples.
-- End with a quiet, genuine thought or question - not a generic CTA.`,
+- End with a quiet, genuine thought or question - not a generic CTA.
+- Make the post substantially more scannable, specific, and credible than the original.`,
     email: `You are an executive communication editor.
 Goals:
 - Keep it concise. Remove filler and hedging.
 - Keep it polite and confident.
 - Preserve the original request, intent, and all key details (names, dates, numbers).
 - If a subject line is not provided, do not invent one unless the user asked.
-- Maintain a standard email structure (greeting, body, sign-off) only if appropriate to the input.`,
+- Maintain a standard email structure (greeting, body, sign-off) only if appropriate to the input.
+- Make the final email easier to act on, with cleaner ask, clearer context, and less friction.`,
   };
 
   if (tool === "study") {
@@ -194,17 +201,17 @@ export function buildStudySystemPrompt({
 }): string {
   const modeInstructions: Record<StudyMode, string> = {
     explain:
-      "Explain the material in easy language. Avoid unnecessary jargon. Use analogies only when they make the idea clearer.",
+      "Explain the material in easy language. Avoid unnecessary jargon. Use analogies only when they make the idea clearer. Focus on understanding, not answer dumping.",
     steps:
-      "Break the material or problem into numbered steps. Explain the reasoning, formulas, and why each step matters.",
+      "Break the material or problem into numbered steps. Explain the reasoning, formulas, and why each step matters. Check arithmetic and logic before answering.",
     quiz:
-      `Create an interactive-style testlet with exactly ${quizQuestionCount} multiple-choice questions. Each question must have four options labeled A, B, C, and D, one correct answer, and a brief explanation.`,
+      `Create an exam-quality testlet with exactly ${quizQuestionCount} multiple-choice questions. Each question must have four plausible options labeled A, B, C, and D, one correct answer, and a brief explanation that teaches the concept.`,
     flashcards:
-      "Create memory-friendly flashcards using strict Q: and A: pairs. Focus on definitions, formulas, and exam-ready concepts.",
+      "Create memory-friendly flashcards using strict Q: and A: pairs. Focus on definitions, formulas, distinctions, and exam-ready recall.",
     notes:
       "Organize messy material into clean study notes with headings, bullet points, definitions, formulas, summaries, and important concepts.",
     studyplan:
-      "Create a realistic study plan with a daily schedule, revision blocks, practice tasks, weak area focus, and balanced workload.",
+      "Create a realistic study plan with a daily schedule, revision blocks, practice tasks, weak area focus, and balanced workload. If dates or hours are missing, state practical assumptions.",
   };
 
   const level = EDUCATION_LEVELS.find((item) => item.value === educationLevel);
@@ -227,6 +234,8 @@ Strict teaching rules:
 - Prioritize understanding over short answers.
 - If the input is a question, explain how to think through it.
 - If information is missing, state the assumption briefly instead of inventing facts.
+- For math, accounting, finance, economics, statistics, and law material, verify each step carefully and keep definitions precise.
+- Separate what is given, what is being asked, and how to solve it when the material is a problem.
 - Do not fabricate citations, textbooks, legal authorities, page numbers, or sources.
 - Avoid unnecessary complexity.
 - Keep the response organized and beginner friendly.
@@ -251,7 +260,8 @@ Mode-specific formatting:
   D) Option text
   Answer: A
   Explanation: One brief reason
-- For Flashcards mode, put 6 to 10 flashcards inside "Practice Question" using only Q: and A: pairs.
+- For Quiz Me mode, make questions cover the breadth of the material, avoid repeated stems, and vary correct answer positions.
+- For Flashcards mode, put 8 to 12 flashcards inside "Practice Question" using only Q: and A: pairs.
 - For Organize Notes mode, make "Step-by-Step Breakdown" a clean note outline with headings, bullets, definitions, formulas if relevant, and short summary points.
 - For Study Plan mode, use "Step-by-Step Breakdown" for the daily schedule and "Practice Question" for practice tasks, revision checks, and weak-area drills.`;
 }
@@ -331,6 +341,8 @@ Also produce an "overall" score from 0 to 100 that reflects the writing's overal
 ${lens[tool]}
 
 Be honest. Do not give every text 80+. Mediocre or robotic writing should score in the 40-65 range. Excellent writing scores 85+.
+The rewritten text was produced by a quality-improvement system, so if it follows the instructions, quality metrics should improve and AI-generated confidence should decrease.
+Never score the rewritten version worse than the original unless the rewrite clearly loses facts or meaning.
 
 Return ONLY a single JSON object, no prose, no markdown fences, in this exact shape:
 {

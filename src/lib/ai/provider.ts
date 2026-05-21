@@ -47,7 +47,7 @@ export async function generateCompletion(opts: GenerateOptions): Promise<string>
         content: m.content,
       }));
 
-    const model = process.env.ANTHROPIC_MODEL || "claude-haiku-4-5-20251001";
+    const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
     const response = await anthropic().messages.create({
       model,

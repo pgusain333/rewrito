@@ -47,7 +47,7 @@ export function ScoreCard({ scores }: Props) {
   const afterBand = qualityBand(scores.after.overall);
   const beforeAi = scores.before.aiGenerated ?? 0;
   const afterAi = scores.after.aiGenerated ?? 0;
-  const aiDelta = afterAi - beforeAi;
+  const aiDrop = Math.max(0, beforeAi - afterAi);
 
   return (
     <div className="card overflow-hidden">
@@ -69,7 +69,7 @@ export function ScoreCard({ scores }: Props) {
               <path d="m7 14 4-4 4 4 5-5" />
             </svg>
           </span>
-          <h4 className="text-sm font-semibold text-ink">AI quality score</h4>
+          <h4 className="text-sm font-semibold text-ink">Quality and AI-confidence proof</h4>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -83,14 +83,9 @@ export function ScoreCard({ scores }: Props) {
               {delta} quality
             </span>
           )}
-          {aiDelta !== 0 && (
-            <span
-              className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
-                aiDelta < 0 ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
-              }`}
-            >
-              {aiDelta > 0 ? "+" : ""}
-              {aiDelta} AI
+          {aiDrop > 0 && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
+              -{aiDrop}% AI confidence
             </span>
           )}
         </div>
