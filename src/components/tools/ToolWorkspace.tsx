@@ -579,7 +579,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                   onCreateTestlet={handleCreateTestlet}
                 />
               ) : (
-                output
+                <FormattedText text={output} />
               )
             ) : (
               <span className="text-ink-subtle">
@@ -832,30 +832,229 @@ const STUDY_SECTION_TITLES = [
 ] as const;
 
 function parseStudySections(output: string) {
-  const sections = STUDY_SECTION_TITLES.map((title) => ({ title, content: "" }));
-  let currentIndex = 0;
-  const heading = /^(?:#{1,3}\s*)?(?:\d+\.\s*)?(Simple Explanation|Key Concept|Step-by-Step Breakdown|Example|Common Mistake|Practice Question)\s*:?\s*$/i;
+  const normalized = cleanStudyMarkdown(output);
+  const sections: { title: string; content: string }[] = [];
+  let current: { title: string; content: string } | null = null;
+  const knownHeading = /^(?:\d+\.\s*)?(Simple Explanation|Key Concept|Step-by-Step Breakdown|Example|Common Mistake|Practice Question)\s*:?\s*$/i;
 
-  for (const line of output.split(/\r?\n/)) {
-    const match = cleanStudyMarkdown(line.trim()).match(heading);
-    if (match) {
-      const nextIndex = STUDY_SECTION_TITLES.findIndex(
-        (title) => title.toLowerCase() === match[1].toLowerCase()
-      );
-      if (nextIndex >= 0) currentIndex = nextIndex;
+  for (const line of normalized.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    const markdownHeading = trimmed.match(/^(#{1,3})\s+(.+)$/);
+    const knownMatch = cleanStudyMarkdown(trimmed).match(knownHeading);
+
+    if (markdownHeading || knownMatch) {
+      if (current) sections.push(current);
+      current = {
+        title: cleanStudyLine(markdownHeading ? markdownHeading[2] : knownMatch?.[1] ?? "Output"),
+        content: "",
+      };
       continue;
     }
-    sections[currentIndex].content += `${line}\n`;
+
+    if (!current) current = { title: "Output", content: "" };
+    current.content += `${line}\n`;
   }
 
-  const cleaned = sections.map((section) => ({
-    ...section,
-    content: cleanStudyMarkdown(section.content),
-  }));
+  if (current) sections.push(current);
 
-  return cleaned.some((section) => section.content)
+  const cleaned = sections
+    .map((section) => ({
+      ...section,
+      content: cleanStudyMarkdown(section.content),
+    }))
+    .filter((section) => section.title || section.content);
+
+  return cleaned.length
     ? cleaned
-    : [{ title: "Simple Explanation", content: cleanStudyMarkdown(output) }];
+    : [{ title: "Output", content: cleanStudyMarkdown(output) }];
+}
+
+type RichBlock =
+  | { type: "heading"; text: string; level: number }
+  | { type: "paragraph"; text: string }
+  | { type: "list"; ordered: boolean; items: string[] }
+  | { type: "table"; headers: string[]; rows: string[][] };
+
+function parseTableRow(line: string) {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cleanStudyMarkdown(cell.trim()));
+}
+
+function isTableSeparator(line: string) {
+  return /^\s*\|?[\s:-]+\|[\s|:-]*$/.test(line);
+}
+
+function parseRichBlocks(text: string): RichBlock[] {
+  const lines = cleanStudyMarkdown(text).split(/\r?\n/);
+  const blocks: RichBlock[] = [];
+  let paragraph: string[] = [];
+
+  function flushParagraph() {
+    const value = paragraph.join(" ").trim();
+    if (value) blocks.push({ type: "paragraph", text: value });
+    paragraph = [];
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    if (!line) {
+      flushParagraph();
+      continue;
+    }
+
+    const headingMatch = line.match(/^(#{1,4})\s+(.+)$/);
+    if (headingMatch) {
+      flushParagraph();
+      blocks.push({
+        type: "heading",
+        level: headingMatch[1].length,
+        text: cleanStudyLine(headingMatch[2]),
+      });
+      continue;
+    }
+
+    if (line.includes("|") && i + 1 < lines.length && isTableSeparator(lines[i + 1])) {
+      flushParagraph();
+      const headers = parseTableRow(line);
+      i += 2;
+      const rows: string[][] = [];
+      while (i < lines.length && lines[i].includes("|") && lines[i].trim()) {
+        rows.push(parseTableRow(lines[i]));
+        i++;
+      }
+      i--;
+      blocks.push({ type: "table", headers, rows });
+      continue;
+    }
+
+    const bulletItems: string[] = [];
+    const orderedItems: string[] = [];
+    while (i < lines.length) {
+      const candidate = cleanStudyMarkdown(lines[i].trim());
+      const bullet = candidate.match(/^[-*]\s+(.+)$/);
+      const ordered = candidate.match(/^\d+[.)]\s+(.+)$/);
+      if (bullet) {
+        bulletItems.push(bullet[1]);
+        i++;
+        continue;
+      }
+      if (ordered) {
+        orderedItems.push(ordered[1]);
+        i++;
+        continue;
+      }
+      break;
+    }
+    if (bulletItems.length || orderedItems.length) {
+      flushParagraph();
+      blocks.push({
+        type: "list",
+        ordered: orderedItems.length > 0,
+        items: orderedItems.length ? orderedItems : bulletItems,
+      });
+      i--;
+      continue;
+    }
+
+    paragraph.push(line);
+  }
+
+  flushParagraph();
+  return blocks;
+}
+
+function FormattedText({ text }: { text: string }) {
+  const blocks = parseRichBlocks(text);
+  if (!blocks.length) return null;
+
+  return (
+    <div className="space-y-3">
+      {blocks.map((block, index) => {
+        if (block.type === "heading") {
+          return (
+            <h4
+              key={index}
+              className={`font-semibold text-ink ${
+                block.level <= 2 ? "text-base" : "text-sm"
+              }`}
+            >
+              {block.text}
+            </h4>
+          );
+        }
+
+        if (block.type === "list") {
+          const Tag = block.ordered ? "ol" : "ul";
+          return (
+            <Tag
+              key={index}
+              className={`space-y-1 pl-5 text-sm leading-relaxed text-ink ${
+                block.ordered ? "list-decimal" : "list-disc"
+              }`}
+            >
+              {block.items.map((item, itemIndex) => (
+                <li key={itemIndex}>{item}</li>
+              ))}
+            </Tag>
+          );
+        }
+
+        if (block.type === "table") {
+          return (
+            <div key={index} className="overflow-x-auto rounded-xl border border-line bg-white">
+              <table className="min-w-full divide-y divide-line text-left text-xs">
+                <thead className="bg-bg-section text-ink">
+                  <tr>
+                    {block.headers.map((header, headerIndex) => (
+                      <th key={headerIndex} className="px-3 py-2 font-semibold">
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line text-ink-muted">
+                  {block.rows.map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {block.headers.map((_, cellIndex) => (
+                        <td key={cellIndex} className="px-3 py-2 align-top">
+                          {row[cellIndex] ?? ""}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+
+        return (
+          <p key={index} className="text-sm leading-relaxed text-ink">
+            {block.text}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+function StudyPlanOutput({ output }: { output: string }) {
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-brand-softPurple bg-brand-softPurple/40 p-4">
+        <h4 className="text-sm font-semibold text-brand">Study plan chart</h4>
+        <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+          Follow the schedule below as a working plan and adjust daily blocks when your available time changes.
+        </p>
+      </div>
+      <StudySectionList sections={parseStudySections(output)} defaultOpenCount={4} />
+    </div>
+  );
 }
 
 function StudyOutput({
@@ -876,9 +1075,17 @@ function StudyOutput({
   onCreateTestlet: (questionCount: QuizQuestionCount) => void;
 }) {
   const sections = parseStudySections(output);
-  const practice = sections.find((section) => section.title === "Practice Question")?.content ?? "";
-  const supportingSections = sections.filter((section) => section.title !== "Practice Question");
-  const quizTestlets = [practice || output, ...extraTestlets];
+  const quizContent =
+    sections.find((section) => section.title.toLowerCase().includes("quiz"))?.content || output;
+  const flashcardContent =
+    sections.find((section) => section.title.toLowerCase().includes("flashcard"))?.content || output;
+  const supportingSections = sections.filter(
+    (section) =>
+      !section.title.toLowerCase().includes("practice") &&
+      !section.title.toLowerCase().includes("quiz") &&
+      !section.title.toLowerCase().includes("flashcard")
+  );
+  const quizTestlets = [quizContent, ...extraTestlets];
   const [activeTestletIndex, setActiveTestletIndex] = useState(0);
 
   useEffect(() => {
@@ -890,7 +1097,9 @@ function StudyOutput({
     const activeTestlet = quizTestlets[activeIndex] ?? "";
     return (
       <div className="space-y-4">
-        <StudySectionList sections={supportingSections} defaultOpenCount={2} />
+        {supportingSections.length > 0 && (
+          <StudySectionList sections={supportingSections} defaultOpenCount={1} />
+        )}
         <TestletBuilder
           isPaidUser={isPaidUser}
           createdCount={extraTestlets.length}
@@ -914,13 +1123,19 @@ function StudyOutput({
   }
 
   if (studyMode === "flashcards") {
-    const cards = parseFlashcards(practice || output);
+    const cards = parseFlashcards(flashcardContent);
     return (
       <div className="space-y-4">
-        <StudySectionList sections={supportingSections} defaultOpenCount={2} />
-        <FlashcardDeck key={output} cards={cards} fallback={practice || output} />
+        {supportingSections.length > 0 && (
+          <StudySectionList sections={supportingSections} defaultOpenCount={1} />
+        )}
+        <FlashcardDeck key={output} cards={cards} fallback={flashcardContent} />
       </div>
     );
+  }
+
+  if (studyMode === "studyplan") {
+    return <StudyPlanOutput output={output} />;
   }
 
   return <StudySectionList sections={sections} defaultOpenCount={3} />;
@@ -1004,9 +1219,13 @@ function StudySectionList({
             </span>
           </summary>
           <div className="border-t border-line bg-bg-soft/40 px-4 py-3">
-            <div className="whitespace-pre-wrap text-sm leading-relaxed text-ink">
-              {section.content || "No content returned for this section."}
-            </div>
+            {section.content ? (
+              <FormattedText text={section.content} />
+            ) : (
+              <p className="text-sm leading-relaxed text-ink-muted">
+                No content returned for this section.
+              </p>
+            )}
           </div>
         </details>
       ))}

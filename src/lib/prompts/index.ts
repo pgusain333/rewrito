@@ -181,7 +181,12 @@ Tone: ${baseTone}
 Refinement level: ${baseRefine}
 
 Strict rules:
-- ${SHARED_GUARDRAILS}`;
+- ${SHARED_GUARDRAILS}
+
+Presentation:
+- Use clear paragraphs with blank lines where helpful.
+- If the input naturally contains comparisons, schedules, options, formulas, lists, or before/after items, use a simple markdown table.
+- For emails, keep a readable email shape. For LinkedIn, keep short scannable paragraphs. For humanizer, preserve the user's intended format.`;
 }
 
 export function buildUserPrompt(input: string): string {
@@ -215,6 +220,65 @@ export function buildStudySystemPrompt({
   };
 
   const level = EDUCATION_LEVELS.find((item) => item.value === educationLevel);
+  const outputContract: Record<StudyMode, string> = {
+    explain: `Return only these markdown sections:
+## Simple Explanation
+## Key Concept
+## Example
+## Common Mistake
+## Quick Check`,
+    steps: `Return only these markdown sections:
+## Given
+## Goal
+## Step-by-Step Solution
+## Why It Works
+## Common Mistake
+## Practice Question`,
+    quiz: `Return only a quiz testlet. Do not include Simple Explanation, Key Concept, Step-by-Step Breakdown, Example, or Common Mistake sections.
+
+Use this exact format:
+## Quiz Testlet
+1. Question text
+A) Option text
+B) Option text
+C) Option text
+D) Option text
+Answer: A
+Explanation: One brief teaching reason
+
+Create exactly ${quizQuestionCount} MCQs. Make questions cover the breadth of the material, avoid repeated stems, and vary correct answer positions.`,
+    flashcards: `Return only a flashcard deck. Do not include Simple Explanation, Key Concept, Step-by-Step Breakdown, Example, or Common Mistake sections.
+
+Use this exact format:
+## Flashcards
+Q: Clear question
+A: Concise answer
+
+Create 8 to 12 flashcards using Q: and A: pairs only.`,
+    notes: `Return organized notes only. Do not answer like a general explanation.
+
+Use this structure:
+## Clean Study Notes
+## Key Definitions
+## Formulas and Rules
+## Important Points
+## Summary Table
+## Quick Revision Checklist
+
+Use markdown tables wherever they help compare terms, formulas, categories, dates, steps, or pros and cons.`,
+    studyplan: `Return a proper study plan only. Do not include generic explanation sections.
+
+Use this structure:
+## Study Plan Overview
+## Daily Schedule Chart
+Create a markdown table with columns: Day, Focus Area, Tasks, Practice, Revision Check, Time.
+## Weekly Revision Map
+Create a markdown table with columns: Week, Main Goal, Weak Area Focus, Practice Target.
+## Practice Plan
+## Final Review Checklist
+
+Make the chart practical, balanced, and easy to follow. If exact dates are missing, create a clear Day 1, Day 2 schedule.`,
+  };
 
   return `You are Rewrito Study, an excellent tutor and study coach.
 
@@ -243,27 +307,8 @@ Strict teaching rules:
 - Do not wrap words in markdown bold markers.
 - Do not include a section named "Final Takeaway".
 
-Return the response with exactly these markdown headings, in this order:
-## Simple Explanation
-## Key Concept
-## Step-by-Step Breakdown
-## Example
-## Common Mistake
-## Practice Question
-
-Mode-specific formatting:
-- For Quiz Me mode, put exactly ${quizQuestionCount} MCQs inside "Practice Question" using this strict format for each question:
-  1. Question text
-  A) Option text
-  B) Option text
-  C) Option text
-  D) Option text
-  Answer: A
-  Explanation: One brief reason
-- For Quiz Me mode, make questions cover the breadth of the material, avoid repeated stems, and vary correct answer positions.
-- For Flashcards mode, put 8 to 12 flashcards inside "Practice Question" using only Q: and A: pairs.
-- For Organize Notes mode, make "Step-by-Step Breakdown" a clean note outline with headings, bullets, definitions, formulas if relevant, and short summary points.
-- For Study Plan mode, use "Step-by-Step Breakdown" for the daily schedule and "Practice Question" for practice tasks, revision checks, and weak-area drills.`;
+Output format for this mode:
+${outputContract[studyMode]}`;
 }
 
 export function buildStudyUserPrompt({
