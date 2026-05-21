@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
+import { AudienceShowcase, type AudienceCard } from "@/components/marketing/AudienceShowcase";
 import { ArrowRightIcon } from "@/components/ui/icons";
 import { TOOLS, type ToolType } from "@/lib/prompts";
 
@@ -10,7 +11,7 @@ type Props = {
   intro: { h1: string; lead: string };
   faq: { q: string; a: string }[];
   whatItDoes: string[];
-  audiences?: { title: string; body: string }[];
+  audiences?: AudienceCard[];
 };
 
 export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props) {
@@ -72,30 +73,11 @@ export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props
         </section>
 
         {audiences.length > 0 && (
-          <section className="bg-bg">
-            <div className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
-              <div className="mb-8 max-w-2xl">
-                <span className="chip mb-5">Who this is for</span>
-                <h2 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-                  Built for people who need this specific workflow.
-                </h2>
-                <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-                  Each rewrito tool is focused around a real job, so the output is easier to review and act on.
-                </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {audiences.map((audience, index) => (
-                  <article key={audience.title} className="card h-full p-5">
-                    <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-softPurple text-sm font-semibold text-brand">
-                      {index + 1}
-                    </span>
-                    <h3 className="text-base font-semibold text-ink">{audience.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-ink-muted">{audience.body}</p>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </section>
+          <AudienceShowcase
+            title="Built for people who need this specific workflow."
+            lead="Each rewrito tool is focused around a real job, so the output is easier to review, reuse, and learn from."
+            audiences={audiences}
+          />
         )}
 
         <section className="bg-bg">

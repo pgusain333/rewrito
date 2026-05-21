@@ -9,6 +9,7 @@ type Lesson = {
   label: string;
   title: string;
   body: string;
+  practice: string;
 };
 
 export function WritingCoachCard({ original, rewritten = "" }: Props) {
@@ -27,16 +28,30 @@ export function WritingCoachCard({ original, rewritten = "" }: Props) {
           rewrito points out what changed so your next draft gets stronger before you need the tool.
         </p>
       </div>
-      <div className="grid gap-3 p-4 sm:grid-cols-3">
-        {lessons.map((lesson) => (
-          <div key={lesson.title} className="rounded-xl border border-line bg-white p-4">
-            <span className="mb-3 inline-flex rounded-full bg-brand-softPurple px-2.5 py-1 text-[11px] font-semibold text-brand">
-              {lesson.label}
-            </span>
-            <h5 className="text-sm font-semibold text-ink">{lesson.title}</h5>
-            <p className="mt-2 text-xs leading-relaxed text-ink-muted">{lesson.body}</p>
-          </div>
-        ))}
+      <div className="grid gap-4 p-4 lg:grid-cols-[1fr_280px]">
+        <div className="grid gap-3 sm:grid-cols-3">
+          {lessons.map((lesson) => (
+            <div key={lesson.title} className="rounded-xl border border-line bg-white p-4">
+              <span className="mb-3 inline-flex rounded-full bg-brand-softPurple px-2.5 py-1 text-[11px] font-semibold text-brand">
+                {lesson.label}
+              </span>
+              <h5 className="text-sm font-semibold text-ink">{lesson.title}</h5>
+              <p className="mt-2 text-xs leading-relaxed text-ink-muted">{lesson.body}</p>
+              <p className="mt-3 rounded-lg bg-bg-soft px-3 py-2 text-xs leading-relaxed text-ink">
+                {lesson.practice}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-xl border border-line bg-ink p-4 text-white">
+          <span className="mb-3 inline-flex rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-white">
+            Coach note
+          </span>
+          <h5 className="text-sm font-semibold">Use the rewrite as a lesson, not just an answer.</h5>
+          <p className="mt-2 text-xs leading-relaxed text-white/70">
+            Before sending your next draft, ask: what is the real point, which details prove it, and where did the wording sound too polished? That small review loop is how rewrito builds your writing instincts.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -71,12 +86,14 @@ function buildLessons(original: string, rewritten: string): Lesson[] {
       label: "Pattern",
       title: "Replace generic openers",
       body: "Start with the concrete person, action, or outcome instead of broad setup phrases.",
+      practice: "Next time: write the first sentence using a person, action, or result.",
     });
   } else {
     lessons.push({
       label: "Pattern",
       title: "Lead with the real point",
       body: "A strong draft names the subject quickly, then adds context only where it helps.",
+      practice: "Next time: underline the sentence that contains the actual point and move it earlier.",
     });
   }
 
@@ -85,12 +102,14 @@ function buildLessons(original: string, rewritten: string): Lesson[] {
       label: "Rhythm",
       title: "Break long sentences",
       body: "One idea per sentence makes the writing easier to scan and lowers the robotic feel.",
+      practice: "Next time: split any sentence that carries two actions, reasons, or outcomes.",
     });
   } else {
     lessons.push({
       label: "Rhythm",
       title: "Vary sentence shape",
       body: "Mix short direct lines with fuller explanations so the writing feels more natural.",
+      practice: "Next time: follow one longer explanation with one short plain sentence.",
     });
   }
 
@@ -99,12 +118,14 @@ function buildLessons(original: string, rewritten: string): Lesson[] {
       label: "Habit",
       title: "Cut before polishing",
       body: `This rewrite trimmed about ${trimmedPercent}% of the draft. Remove filler first, then improve tone.`,
+      practice: "Next time: remove one sentence that repeats the same idea before editing style.",
     });
   } else {
     lessons.push({
       label: "Habit",
       title: "Keep useful specifics",
       body: "Names, numbers, examples, and constraints make writing feel credible. Preserve them while smoothing the sentence.",
+      practice: "Next time: add one concrete example before asking AI to improve flow.",
     });
   }
 

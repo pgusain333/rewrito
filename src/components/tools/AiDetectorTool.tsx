@@ -9,6 +9,7 @@ import { WritingCoachCard } from "@/components/tools/WritingCoachCard";
 import { AiSignalInsights, AiSignalTextBox } from "@/components/tools/AiSignalInsights";
 import { CheckIcon, CopyIcon, ShieldCheckIcon, WandIcon } from "@/components/ui/icons";
 import { useAuthAndUsage } from "@/lib/usage/useAuthAndUsage";
+import { ANON_WORD_LIMIT, PRO_WORD_LIMIT, USER_WORD_LIMIT } from "@/lib/usage/limits";
 
 type DetectorEstimate = {
   name: string;
@@ -30,6 +31,10 @@ export function AiDetectorTool() {
     useAuthAndUsage();
 
   const wordCount = useMemo(() => countWords(input), [input]);
+  const isPaidUser = user?.plan === "pro";
+  const wordLimit = isPaidUser ? PRO_WORD_LIMIT : user ? USER_WORD_LIMIT : ANON_WORD_LIMIT;
+  const wordLimitExceeded = wordCount > wordLimit;
+  const wordUsagePercent = Math.min(100, Math.round((wordCount / Math.max(wordLimit, 1)) * 100));
   const displayScores = scores ?? estimatePair(input, output);
   const estimates = detectorEstimates(displayScores);
   const readiness = Math.max(
@@ -45,6 +50,18 @@ export function AiDetectorTool() {
     }
     if (!user && used >= limit) {
       setShowLogin(true);
+      return;
+    }
+    if (wordLimitExceeded) {
+      if (!user) {
+        setError(`Log in to continue with drafts over ${wordLimit.toLocaleString()} words.`);
+        setShowLogin(true);
+      } else if (!isPaidUser) {
+        setError(`Upgrade to continue with drafts over ${wordLimit.toLocaleString()} words.`);
+        setShowUpgrade(true);
+      } else {
+        setError(`Draft is too long. Keep it under ${wordLimit.toLocaleString()} words.`);
+      }
       return;
     }
     if (user && used >= limit) {
@@ -147,6 +164,28 @@ export function AiDetectorTool() {
               description="Amber underlines show wording that may raise detector-style confidence."
             />
           )}
+          <div
+            className={`mt-3 rounded-xl border px-3.5 py-3 ${
+              wordLimitExceeded
+                ? "border-error/30 bg-error/5"
+                : "border-line bg-white"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-2 text-xs">
+              <span className="font-semibold text-ink">Word limit</span>
+              <span className={wordLimitExceeded ? "font-semibold text-error" : "text-ink-muted"}>
+                {wordCount}/{wordLimit.toLocaleString()} words
+              </span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-bg-section">
+              <div
+                className={`h-full rounded-full ${
+                  wordLimitExceeded ? "bg-error" : "bg-brand-gradient"
+                }`}
+                style={{ width: `${wordUsagePercent}%` }}
+              />
+            </div>
+          </div>
           <button onClick={handleAnalyze} disabled={loading} className="btn-primary mt-4 w-full">
             {loading ? (
               <>

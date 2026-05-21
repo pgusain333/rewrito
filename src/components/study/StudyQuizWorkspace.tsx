@@ -10,7 +10,10 @@ import {
 } from "@/lib/study/practice";
 import { EDUCATION_LEVELS, type EducationLevel, type QuizQuestionCount } from "@/lib/prompts";
 import { useAuthAndUsage } from "@/lib/usage/useAuthAndUsage";
+import { ANON_WORD_LIMIT, PRO_WORD_LIMIT, USER_WORD_LIMIT } from "@/lib/usage/limits";
+import { STUDY_SUBJECTS } from "@/lib/study/subjects";
 import { LoginModal } from "@/components/modals/LoginModal";
+import { UpgradeModal } from "@/components/modals/UpgradeModal";
 import {
   ArrowRightIcon,
   CheckIcon,
@@ -45,7 +48,7 @@ function savedKey(userId: string) {
 
 export function StudyQuizWorkspace() {
   const [material, setMaterial] = useState("");
-  const [subject, setSubject] = useState("");
+  const [subject, setSubject] = useState("General study");
   const [educationLevel, setEducationLevel] = useState<EducationLevel>("college");
   const [rawTestlet, setRawTestlet] = useState("");
   const [questions, setQuestions] = useState<StudyQuizQuestion[]>([]);
@@ -57,12 +60,15 @@ export function StudyQuizWorkspace() {
   const [savedAttempts, setSavedAttempts] = useState<SavedQuizAttempt[]>([]);
   const [savedNotice, setSavedNotice] = useState<string | null>(null);
   const [showLogin, setShowLogin] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   const { user, anonId, used, limit, remaining, incrementAnon, setUsageFromServer } =
     useAuthAndUsage();
   const isPaidUser = user?.plan === "pro";
   const questionCount: QuizQuestionCount = isPaidUser ? 20 : 5;
   const wordCount = useMemo(() => countWords(material), [material]);
+  const wordLimit = isPaidUser ? PRO_WORD_LIMIT : user ? USER_WORD_LIMIT : ANON_WORD_LIMIT;
+  const wordLimitExceeded = wordCount > wordLimit;
   const answeredCount = Object.keys(selected).length;
   const analysis = useMemo<QuizAnalysis | null>(
     () => (submitted ? analyzeQuizAttempt(questions, selected) : null),
@@ -92,6 +98,22 @@ export function StudyQuizWorkspace() {
     }
     if (!user && used >= limit) {
       setShowLogin(true);
+      return;
+    }
+    if (user && used >= limit) {
+      setShowUpgrade(true);
+      return;
+    }
+    if (wordLimitExceeded) {
+      if (!user) {
+        setError(`Log in to continue with study material over ${wordLimit.toLocaleString()} words.`);
+        setShowLogin(true);
+      } else if (!isPaidUser) {
+        setError(`Upgrade to continue with study material over ${wordLimit.toLocaleString()} words.`);
+        setShowUpgrade(true);
+      } else {
+        setError(`Study material is too long. Keep it under ${wordLimit.toLocaleString()} words.`);
+      }
       return;
     }
     if (!anonId && !user) {
@@ -127,6 +149,7 @@ export function StudyQuizWorkspace() {
       const data = await res.json();
       if (!res.ok) {
         if (data?.requiresAuth) setShowLogin(true);
+        if (data?.requiresUpgrade) setShowUpgrade(true);
         setError(data?.error ?? "Could not create this quiz testlet.");
         if (typeof data?.used === "number") setUsageFromServer(data.used);
         return;
@@ -244,7 +267,7 @@ ${missedQuestions}`;
                 Study material
               </label>
               <span className="text-xs text-ink-subtle">
-                {wordCount} word{wordCount === 1 ? "" : "s"}
+                {wordCount}/{wordLimit.toLocaleString()} word{wordCount === 1 ? "" : "s"}
               </span>
             </div>
             <textarea
@@ -262,12 +285,17 @@ ${missedQuestions}`;
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <label className="block">
                 <span className="field-label">Subject</span>
-                <input
+                <select
                   value={subject}
                   onChange={(event) => setSubject(event.target.value)}
                   className="input-base"
-                  placeholder="Accounting, economics, law..."
-                />
+                >
+                  {STUDY_SUBJECTS.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label className="block">
                 <span className="field-label">Education level</span>
@@ -357,6 +385,7 @@ ${missedQuestions}`;
         headline="Log in to save quiz scores"
         subline="Log in to keep your quiz scores and continue practicing."
       />
+      <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
     </div>
   );
 }
@@ -597,6 +626,9 @@ function ScoreReport({
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-bg-section">
           <div className="h-full rounded-full bg-brand-gradient" style={{ width: `${analysis.percent}%` }} />
         </div>
+        <div className="mt-4 rounded-xl border border-line bg-bg-soft p-3 text-sm leading-relaxed text-ink">
+          {quizMotivation(analysis.percent)}
+        </div>
         <div className="mt-4 grid grid-cols-3 gap-2 text-center">
           <MiniMetric label="Strong" value={`${analysis.strongAreas.length}`} />
           <MiniMetric label="Important" value={`${analysis.importantAreas.length}`} />
@@ -628,6 +660,16 @@ function ScoreReport({
       </div>
     </aside>
   );
+}
+
+function quizMotivation(percent: number) {
+  if (percent >= 85) {
+    return "Strong work. Now protect that score by testing edge cases and one harder mixed testlet.";
+  }
+  if (percent >= 60) {
+    return "Good progress. You have a real base here, and the weak-area testlet will make the next review much sharper.";
+  }
+  return "This is useful feedback, not a bad result. You just found the exact topics that deserve the next focused round.";
 }
 
 function AreaCard({

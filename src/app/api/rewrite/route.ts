@@ -22,7 +22,13 @@ import {
   type StudyPlanDetails,
   type QuizQuestionCount,
 } from "@/lib/prompts";
-import { ANON_LIMIT, USER_LIMIT } from "@/lib/usage/limits";
+import {
+  ANON_LIMIT,
+  USER_LIMIT,
+  ANON_WORD_LIMIT,
+  USER_WORD_LIMIT,
+  PRO_WORD_LIMIT,
+} from "@/lib/usage/limits";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -55,6 +61,11 @@ function isStudyMode(v: unknown): v is StudyMode {
 }
 function isEducationLevel(v: unknown): v is EducationLevel {
   return typeof v === "string" && EDUCATION_LEVELS.some((l) => l.value === v);
+}
+
+function countWords(value: string): number {
+  const trimmed = value.trim();
+  return trimmed ? trimmed.split(/\s+/).length : 0;
 }
 
 export async function POST(req: Request) {
@@ -109,14 +120,45 @@ export async function POST(req: Request) {
   const svc = createSupabaseServiceClient();
   const rawPlan = user?.app_metadata?.plan ?? user?.user_metadata?.plan;
   const isPaidUser = rawPlan === "pro";
+  let used = 0;
+  let limit = user ? USER_LIMIT : ANON_LIMIT;
+  let usageRowId: string | null = null;
+  const wordCount = countWords(text);
+  const wordLimit = isPaidUser ? PRO_WORD_LIMIT : user ? USER_WORD_LIMIT : ANON_WORD_LIMIT;
+
+  if (wordCount > wordLimit) {
+    return NextResponse.json(
+      {
+        error: isPaidUser
+          ? `Draft is too long. Keep it under ${wordLimit.toLocaleString()} words.`
+          : user
+          ? `Upgrade to continue with drafts over ${wordLimit.toLocaleString()} words.`
+          : `Log in to continue with drafts over ${wordLimit.toLocaleString()} words.`,
+        used,
+        limit,
+        remaining: Math.max(0, limit - used),
+        requiresAuth: !user,
+        requiresUpgrade: !!user && !isPaidUser,
+      },
+      { status: 413 }
+    );
+  }
+
+  const anonymousAllowedTones: Tone[] = ["professional", "natural"];
+  if (!user && (!anonymousAllowedTones.includes(tone) || refinement === "strong")) {
+    return NextResponse.json(
+      {
+        error: "Log in to unlock every tone and Strong refinement.",
+        requiresAuth: true,
+      },
+      { status: 403 }
+    );
+  }
+
   const normalizedQuizQuestionCount: QuizQuestionCount =
     tool === "study" && studyMode === "quiz" && isPaidUser && quizQuestionCount === 20
       ? 20
       : 5;
-
-  let used = 0;
-  let limit = ANON_LIMIT;
-  let usageRowId: string | null = null;
 
   if (user) {
     limit = USER_LIMIT;

@@ -5,7 +5,10 @@ import Link from "next/link";
 import { parseFlashcards, type StudyFlashcard } from "@/lib/study/practice";
 import { EDUCATION_LEVELS, type EducationLevel } from "@/lib/prompts";
 import { useAuthAndUsage } from "@/lib/usage/useAuthAndUsage";
+import { ANON_WORD_LIMIT, PRO_WORD_LIMIT, USER_WORD_LIMIT } from "@/lib/usage/limits";
+import { STUDY_SUBJECTS } from "@/lib/study/subjects";
 import { LoginModal } from "@/components/modals/LoginModal";
+import { UpgradeModal } from "@/components/modals/UpgradeModal";
 import { ArrowRightIcon, StudyIcon, WandIcon } from "@/components/ui/icons";
 
 function countWords(text: string) {
@@ -15,7 +18,7 @@ function countWords(text: string) {
 
 export function StudyFlashcardsWorkspace() {
   const [material, setMaterial] = useState("");
-  const [subject, setSubject] = useState("");
+  const [subject, setSubject] = useState("General study");
   const [educationLevel, setEducationLevel] = useState<EducationLevel>("college");
   const [cards, setCards] = useState<StudyFlashcard[]>([]);
   const [rawDeck, setRawDeck] = useState("");
@@ -23,10 +26,14 @@ export function StudyFlashcardsWorkspace() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showLogin, setShowLogin] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   const { user, anonId, used, limit, remaining, incrementAnon, setUsageFromServer } =
     useAuthAndUsage();
+  const isPaidUser = user?.plan === "pro";
   const wordCount = useMemo(() => countWords(material), [material]);
+  const wordLimit = isPaidUser ? PRO_WORD_LIMIT : user ? USER_WORD_LIMIT : ANON_WORD_LIMIT;
+  const wordLimitExceeded = wordCount > wordLimit;
   const studiedCount = Object.values(flipped).filter(Boolean).length;
 
   async function createDeck() {
@@ -37,6 +44,22 @@ export function StudyFlashcardsWorkspace() {
     }
     if (!user && used >= limit) {
       setShowLogin(true);
+      return;
+    }
+    if (user && used >= limit) {
+      setShowUpgrade(true);
+      return;
+    }
+    if (wordLimitExceeded) {
+      if (!user) {
+        setError(`Log in to continue with study material over ${wordLimit.toLocaleString()} words.`);
+        setShowLogin(true);
+      } else if (!isPaidUser) {
+        setError(`Upgrade to continue with study material over ${wordLimit.toLocaleString()} words.`);
+        setShowUpgrade(true);
+      } else {
+        setError(`Study material is too long. Keep it under ${wordLimit.toLocaleString()} words.`);
+      }
       return;
     }
     if (!anonId && !user) {
@@ -68,6 +91,7 @@ export function StudyFlashcardsWorkspace() {
       const data = await res.json();
       if (!res.ok) {
         if (data?.requiresAuth) setShowLogin(true);
+        if (data?.requiresUpgrade) setShowUpgrade(true);
         setError(data?.error ?? "Could not create flashcards.");
         if (typeof data?.used === "number") setUsageFromServer(data.used);
         return;
@@ -125,7 +149,7 @@ export function StudyFlashcardsWorkspace() {
                 Study material
               </label>
               <span className="text-xs text-ink-subtle">
-                {wordCount} word{wordCount === 1 ? "" : "s"}
+                {wordCount}/{wordLimit.toLocaleString()} word{wordCount === 1 ? "" : "s"}
               </span>
             </div>
             <textarea
@@ -143,12 +167,17 @@ export function StudyFlashcardsWorkspace() {
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <label className="block">
                 <span className="field-label">Subject</span>
-                <input
+                <select
                   value={subject}
                   onChange={(event) => setSubject(event.target.value)}
                   className="input-base"
-                  placeholder="Finance, biology, contract law..."
-                />
+                >
+                  {STUDY_SUBJECTS.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label className="block">
                 <span className="field-label">Education level</span>
@@ -215,6 +244,7 @@ export function StudyFlashcardsWorkspace() {
         headline="Log in to continue studying"
         subline="Log in to keep creating practice material."
       />
+      <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
     </div>
   );
 }

@@ -18,6 +18,7 @@ import {
 } from "@/lib/prompts";
 import { SAMPLES } from "@/lib/prompts/samples";
 import { useAuthAndUsage } from "@/lib/usage/useAuthAndUsage";
+import { ANON_WORD_LIMIT, PRO_WORD_LIMIT, USER_WORD_LIMIT } from "@/lib/usage/limits";
 import { LoginModal } from "@/components/modals/LoginModal";
 import { UpgradeModal } from "@/components/modals/UpgradeModal";
 import { Listbox } from "@/components/ui/Listbox";
@@ -43,6 +44,9 @@ type Props = {
   /** When true, the tool tab row is hidden - used on dedicated tool pages. */
   lockTool?: boolean;
 };
+
+const REOPEN_SESSION_KEY = "rewrito.reopenSession";
+const ANONYMOUS_TONES: Tone[] = ["professional", "natural"];
 
 function countWords(s: string): number {
   const trimmed = s.trim();
@@ -88,6 +92,13 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
   const isStudy = tool === "study";
   const isPaidUser = user?.plan === "pro";
   const useWideOutput = isStudy;
+  const wordCount = useMemo(() => countWords(input), [input]);
+  const wordLimit = isPaidUser ? PRO_WORD_LIMIT : user ? USER_WORD_LIMIT : ANON_WORD_LIMIT;
+  const wordLimitLabel = wordLimit.toLocaleString();
+  const wordLimitExceeded = wordCount > wordLimit;
+  const wordUsagePercent = Math.min(100, Math.round((wordCount / Math.max(wordLimit, 1)) * 100));
+  const anonymousAdvancedControl =
+    !user && (!ANONYMOUS_TONES.includes(tone) || refinement === "strong");
   const studyActionLabel =
     studyMode === "quiz"
       ? "Create quiz testlet"
@@ -98,7 +109,6 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       : studyMode === "studyplan"
       ? "Build study plan"
       : "Create study guide";
-  const wordCount = useMemo(() => countWords(input), [input]);
   const charCount = input.length;
   const outputWords = useMemo(() => countWords(output), [output]);
   const usageText = user
@@ -106,6 +116,45 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       ? `${remaining} uses left`
       : "Limit reached"
     : `${remaining} uses left`;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = window.localStorage.getItem(REOPEN_SESSION_KEY);
+    if (!raw) return;
+
+    try {
+      const saved = JSON.parse(raw) as Partial<{
+        tool: ToolType;
+        input: string;
+        output: string;
+        tone: Tone;
+        refinement: Refinement;
+        studyMode: StudyMode;
+        educationLevel: EducationLevel;
+      }>;
+
+      if (!lockTool && saved.tool && saved.tool in TOOLS) setTool(saved.tool);
+      if (typeof saved.input === "string") setInput(saved.input);
+      if (typeof saved.output === "string") setOutput(saved.output);
+      if (saved.tone && TONES.some((item) => item.value === saved.tone)) setTone(saved.tone);
+      if (saved.refinement && REFINEMENTS.some((item) => item.value === saved.refinement)) {
+        setRefinement(saved.refinement);
+      }
+      if (saved.studyMode && STUDY_MODES.some((item) => item.value === saved.studyMode)) {
+        setStudyMode(saved.studyMode);
+      }
+      if (
+        saved.educationLevel &&
+        EDUCATION_LEVELS.some((item) => item.value === saved.educationLevel)
+      ) {
+        setEducationLevel(saved.educationLevel);
+      }
+    } catch {
+      // Ignore malformed saved sessions and let the workspace start cleanly.
+    } finally {
+      window.localStorage.removeItem(REOPEN_SESSION_KEY);
+    }
+  }, [lockTool]);
 
   function resetResult() {
     setOutput("");
@@ -131,6 +180,23 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       return;
     }
     if (!user && used >= limit) {
+      setShowLogin(true);
+      return;
+    }
+    if (wordLimitExceeded) {
+      if (!user) {
+        setError(`Log in to continue with drafts over ${wordLimitLabel} words.`);
+        setShowLogin(true);
+      } else if (!isPaidUser) {
+        setError(`Upgrade to continue with drafts over ${wordLimitLabel} words.`);
+        setShowUpgrade(true);
+      } else {
+        setError(`Draft is too long. Keep it under ${wordLimitLabel} words.`);
+      }
+      return;
+    }
+    if (anonymousAdvancedControl) {
+      setError("Log in to unlock every tone and Strong refinement.");
       setShowLogin(true);
       return;
     }
@@ -458,6 +524,38 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
             )}
           </div>
 
+          <div
+            className={`mt-3 rounded-xl border px-3.5 py-3 ${
+              wordLimitExceeded
+                ? "border-error/30 bg-error/5"
+                : "border-line bg-white"
+            }`}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span className="font-semibold text-ink">Word limit</span>
+              <span className={wordLimitExceeded ? "font-semibold text-error" : "text-ink-muted"}>
+                {wordCount}/{wordLimitLabel} words
+              </span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-bg-section">
+              <div
+                className={`h-full rounded-full ${
+                  wordLimitExceeded ? "bg-error" : "bg-brand-gradient"
+                }`}
+                style={{ width: `${wordUsagePercent}%` }}
+              />
+            </div>
+            {wordLimitExceeded && (
+              <p className="mt-2 text-xs leading-relaxed text-error">
+                {!user
+                  ? "Log in to continue with longer drafts and save your sessions."
+                  : isPaidUser
+                  ? "Shorten this draft slightly, then try again."
+                  : "Premium unlocks longer drafts for heavier writing sessions."}
+              </p>
+            )}
+          </div>
+
           {isStudy ? (
             <StudyControls
               studyMode={studyMode}
@@ -506,6 +604,13 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                   ariaLabel="Refinement level"
                 />
               </div>
+            </div>
+          )}
+
+          {!user && !isStudy && (
+            <div className="mt-4 rounded-xl border border-line bg-bg-soft p-4 text-sm leading-relaxed text-ink-muted">
+              <span className="font-semibold text-ink">Build human intelligence with AI intelligence.</span>{" "}
+              Log in to unlock longer drafts, all tone controls, saved history, and more personalized coaching.
             </div>
           )}
 
@@ -622,6 +727,21 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
               </>
             )}
           </div>
+          {output && !user && (
+            <div className="mt-4 rounded-xl border border-line bg-white p-4 shadow-soft">
+              <p className="text-sm font-semibold text-ink">Save this session for later</p>
+              <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+                Log in to keep history, reopen useful outputs, and get coaching that learns from your drafts.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowLogin(true)}
+                className="btn-secondary mt-3 w-full"
+              >
+                Log in to save
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

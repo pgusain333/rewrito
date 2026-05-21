@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { AudienceShowcase } from "@/components/marketing/AudienceShowcase";
 import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 import { ArrowRightIcon, CheckIcon, StudyIcon } from "@/components/ui/icons";
 
@@ -222,43 +223,43 @@ export default function StudyAssistantPage() {
           </div>
         </section>
 
-        <section className="bg-bg-section/60">
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
-            <div className="mb-8 max-w-2xl">
-              <span className="chip mb-5">Who this is for</span>
-              <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-                Built for learners who want understanding, not shortcuts.
-              </h2>
-              <p className="mt-3 text-base leading-relaxed text-ink-muted">
-                Rewrito Study helps different learners turn confusing material into clear revision, practice, and planning.
-              </p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {[
-                {
-                  title: "Students",
-                  body: "Explain textbook paragraphs, revise exam topics, and practice with quizzes and flashcards.",
-                },
-                {
-                  title: "University learners",
-                  body: "Break down finance, law, economics, accounting, statistics, and technical notes.",
-                },
-                {
-                  title: "Professional certification candidates",
-                  body: "Organize study plans, weak areas, formulas, and revision sessions around exam goals.",
-                },
-              ].map((audience, index) => (
-                <article key={audience.title} className="card h-full p-5">
-                  <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-softPurple text-sm font-semibold text-brand">
-                    {index + 1}
-                  </span>
-                  <h3 className="text-base font-semibold text-ink">{audience.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-muted">{audience.body}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        <AudienceShowcase
+          className="bg-bg-section/60"
+          title="Built for learners who want understanding, not shortcuts."
+          lead="Rewrito Study helps different learners turn confusing material into clear revision, practice, and planning."
+          audiences={[
+            {
+              title: "School students",
+              body: "Explain textbook paragraphs, revise exam topics, and practice with quizzes and flashcards.",
+              image:
+                "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=900&q=80",
+            },
+            {
+              title: "College learners",
+              body: "Break down finance, law, economics, accounting, statistics, and technical notes.",
+              image:
+                "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80",
+            },
+            {
+              title: "University students",
+              body: "Organize dense lectures, formulas, readings, and revision checklists.",
+              image:
+                "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=900&q=80",
+            },
+            {
+              title: "Certification candidates",
+              body: "Build study plans, weak-area tests, and recall decks around exam goals.",
+              image:
+                "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=900&q=80",
+            },
+            {
+              title: "Working professionals",
+              body: "Turn new concepts, training material, and policy notes into practical learning.",
+              image:
+                "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80",
+            },
+          ]}
+        />
 
         <section className="bg-bg-section/60">
           <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-20">

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CheckIcon, ArrowRightIcon } from "@/components/ui/icons";
+import { ANON_WORD_LIMIT, FREE_HISTORY_LIMIT, PRO_WORD_LIMIT, USER_WORD_LIMIT } from "@/lib/usage/limits";
 
 export const metadata: Metadata = {
   title: "Pricing - rewrito",
@@ -30,7 +31,7 @@ export default function PricingPage() {
 
         <section className="bg-bg">
           <div className="mx-auto max-w-5xl px-5 pb-20 sm:px-8 sm:pb-28">
-            <div className="grid gap-5 md:grid-cols-2">
+            <div className="grid gap-5 lg:grid-cols-3">
               <div className="card flex flex-col p-7">
                 <h2 className="text-xl font-semibold text-ink">Free</h2>
                 <p className="mt-1 text-sm text-ink-muted">
@@ -38,14 +39,15 @@ export default function PricingPage() {
                 </p>
                 <div className="mt-5 flex items-baseline gap-1">
                   <span className="text-4xl font-semibold tracking-tight text-ink">$0</span>
-                  <span className="text-sm text-ink-muted">/ forever</span>
+                  <span className="text-sm text-ink-muted">/ start</span>
                 </div>
                 <ul className="mt-6 space-y-3 text-sm text-ink">
                   <Feat>Start without sign-up</Feat>
-                  <Feat>Sign in to keep rewriting</Feat>
-                  <Feat>All 4 tools (Humanizer, LinkedIn, Email, Study)</Feat>
-                  <Feat>6 tone presets</Feat>
+                  <Feat>All 5 tools</Feat>
+                  <Feat>{ANON_WORD_LIMIT} words per input</Feat>
+                  <Feat>Core tones and Medium refinement</Feat>
                   <Feat>Copy and download output</Feat>
+                  <Locked>Saved history and personalization</Locked>
                 </ul>
                 <Link href="/try" className="btn-secondary mt-7 w-full">
                   Start free
@@ -54,6 +56,27 @@ export default function PricingPage() {
 
               <div className="card relative flex flex-col overflow-hidden p-7">
                 <div className="absolute inset-x-0 top-0 h-[3px] bg-brand-gradient" />
+                <h2 className="text-xl font-semibold text-ink">Signed in</h2>
+                <p className="mt-1 text-sm text-ink-muted">
+                  For longer drafts and saved work.
+                </p>
+                <div className="mt-5 flex items-baseline gap-1">
+                  <span className="text-4xl font-semibold tracking-tight text-ink">$0</span>
+                  <span className="text-sm text-ink-muted">/ account</span>
+                </div>
+                <ul className="mt-6 space-y-3 text-sm text-ink">
+                  <Feat>{USER_WORD_LIMIT.toLocaleString()} words per input</Feat>
+                  <Feat>Saved history up to latest {FREE_HISTORY_LIMIT} sessions</Feat>
+                  <Feat>Reopen previous outputs in the editor</Feat>
+                  <Feat>All tones and refinement controls</Feat>
+                  <Locked>Premium next-step guidance</Locked>
+                </ul>
+                <Link href="/try?login=1" className="btn-primary mt-7 w-full">
+                  Log in free <ArrowRightIcon size={16} />
+                </Link>
+              </div>
+
+              <div className="card relative flex flex-col overflow-hidden p-7">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold text-ink">Pro</h2>
                   <span className="chip !border-brand/30 !bg-brand-softPurple !text-brand">
@@ -66,10 +89,10 @@ export default function PricingPage() {
                   <span className="text-sm text-ink-muted">launching soon</span>
                 </div>
                 <ul className="mt-6 space-y-3 text-sm text-ink">
-                  <Feat>Higher rewrite volume</Feat>
-                  <Feat>Saved history & versions</Feat>
-                  <Feat>Advanced tone & style controls</Feat>
-                  <Feat>Longer input length</Feat>
+                  <Feat>Drafts up to {PRO_WORD_LIMIT.toLocaleString()} words</Feat>
+                  <Feat>Deeper saved history and versions</Feat>
+                  <Feat>Next best LinkedIn post guidance</Feat>
+                  <Feat>Weak-area quiz and flashcard recommendations</Feat>
                   <Feat>Priority performance</Feat>
                 </ul>
                 <Link href="/try" className="btn-primary mt-7 w-full">
@@ -93,6 +116,17 @@ function Feat({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-2.5">
       <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-softPurple text-brand">
+        <CheckIcon size={12} />
+      </span>
+      <span>{children}</span>
+    </li>
+  );
+}
+
+function Locked({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-2.5 text-ink-subtle">
+      <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-bg-section text-ink-subtle">
         <CheckIcon size={12} />
       </span>
       <span>{children}</span>

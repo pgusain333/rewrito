@@ -34,14 +34,32 @@ export default function Page() {
         {
           title: "Founders and creators",
           body: "Shape rough ideas into posts with a clear hook and a grounded point of view.",
+          image:
+            "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=80",
         },
         {
           title: "Professionals",
           body: "Rewrite career updates, lessons, wins, and reflections without sounding generic.",
+          image:
+            "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80",
         },
         {
           title: "Marketing teams",
           body: "Polish thought-leadership drafts while keeping specific examples and credibility.",
+          image:
+            "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=80",
+        },
+        {
+          title: "Consultants",
+          body: "Turn client lessons, frameworks, and market observations into readable posts.",
+          image:
+            "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=900&q=80",
+        },
+        {
+          title: "Job seekers",
+          body: "Share projects, learning notes, and career stories with confidence and clarity.",
+          image:
+            "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=900&q=80",
         },
       ]}
       faq={[

@@ -34,14 +34,32 @@ export default function Page() {
         {
           title: "Students",
           body: "Improve AI-assisted drafts while learning which phrases make writing sound robotic.",
+          image:
+            "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80",
         },
         {
           title: "Professionals",
           body: "Polish reports, proposals, summaries, and internal notes without losing intent.",
+          image:
+            "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80",
         },
         {
           title: "Content teams",
           body: "Turn rough AI drafts into clearer brand-safe copy that feels more specific and human.",
+          image:
+            "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80",
+        },
+        {
+          title: "Founders",
+          body: "Make announcements, product updates, and investor notes sound direct and credible.",
+          image:
+            "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=80",
+        },
+        {
+          title: "Job seekers",
+          body: "Refine cover notes, outreach, and profile copy while keeping your own story intact.",
+          image:
+            "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=900&q=80",
         },
       ]}
       faq={[

@@ -29,8 +29,8 @@ export default function HomePage() {
         <Hero />
         <ToolCards />
         <SuitableFor />
-        <WriteEverywhere />
         <LiveTool />
+        <WriteEverywhere />
         <WhyUs />
         <BeforeAfter />
         <LearningCoach />
@@ -326,6 +326,18 @@ function SuitableFor() {
       image:
         "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80",
     },
+    {
+      title: "Teams",
+      body: "Create clearer updates, handoffs, meeting notes, and shared study resources.",
+      image:
+        "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=80",
+    },
+    {
+      title: "Job seekers",
+      body: "Improve outreach, cover notes, interview follow-ups, and professional profiles.",
+      image:
+        "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=900&q=80",
+    },
   ];
 
   return (
@@ -337,10 +349,10 @@ function SuitableFor() {
             Built for people who write, learn, and review every day.
           </h2>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="no-scrollbar -mx-5 flex snap-x gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:px-0 lg:grid-cols-3 xl:grid-cols-6">
           {audiences.map((audience, index) => (
             <Reveal key={audience.title} delay={index * 80}>
-              <div className="card h-full overflow-hidden">
+              <div className="card h-full min-w-[78vw] snap-start overflow-hidden sm:min-w-0">
                 <img
                   src={audience.image}
                   alt=""
@@ -362,16 +374,16 @@ function SuitableFor() {
 
 function WriteEverywhere() {
   const apps = [
-    { name: "Gmail", icon: "https://cdn.simpleicons.org/gmail/EA4335" },
-    { name: "LinkedIn", icon: "https://cdn.simpleicons.org/linkedin/0A66C2" },
-    { name: "Slack", icon: "https://cdn.simpleicons.org/slack/611F69" },
-    { name: "WhatsApp", icon: "https://cdn.simpleicons.org/whatsapp/25D366" },
-    { name: "Notion", icon: "https://cdn.simpleicons.org/notion/000000" },
-    { name: "Outlook", icon: "https://cdn.simpleicons.org/microsoftoutlook/0078D4" },
-    { name: "Docs", icon: "https://cdn.simpleicons.org/googledocs/4285F4" },
-    { name: "Word", icon: "https://cdn.simpleicons.org/microsoftword/185ABD" },
-    { name: "Discord", icon: "https://cdn.simpleicons.org/discord/5865F2" },
-    { name: "X", icon: "https://cdn.simpleicons.org/x/000000" },
+    { name: "Gmail", domain: "mail.google.com" },
+    { name: "LinkedIn", domain: "linkedin.com" },
+    { name: "Slack", domain: "slack.com" },
+    { name: "WhatsApp", domain: "whatsapp.com" },
+    { name: "Notion", domain: "notion.so" },
+    { name: "Outlook", domain: "outlook.live.com" },
+    { name: "Docs", domain: "docs.google.com" },
+    { name: "Word", domain: "microsoft.com" },
+    { name: "Discord", domain: "discord.com" },
+    { name: "X", domain: "x.com" },
   ];
 
   return (
@@ -390,7 +402,12 @@ function WriteEverywhere() {
             {apps.map((app) => (
               <div key={app.name} className="group text-center">
                 <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white text-lg font-bold shadow-soft transition-transform duration-300 group-hover:-translate-y-1">
-                  <img src={app.icon} alt={`${app.name} logo`} className="h-7 w-7 object-contain" loading="lazy" />
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=64`}
+                    alt={`${app.name} logo`}
+                    className="h-7 w-7 object-contain"
+                    loading="lazy"
+                  />
                 </span>
                 <span className="mt-2 block text-[10px] font-semibold text-ink-muted">{app.name}</span>
               </div>
@@ -611,6 +628,27 @@ function BeforeAfter() {
 }
 
 function LearningCoach() {
+  const coachCards = [
+    {
+      title: "Pattern",
+      body: "Spot generic AI phrasing and replace it with a concrete person, action, or result.",
+      image:
+        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
+    },
+    {
+      title: "Rhythm",
+      body: "Learn how sentence length, pauses, and structure make writing sound more human.",
+      image:
+        "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80",
+    },
+    {
+      title: "Habit",
+      body: "Carry better writing habits into emails, posts, study notes, and reports.",
+      image:
+        "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=900&q=80",
+    },
+  ];
+
   return (
     <section className="bg-bg">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
@@ -626,17 +664,16 @@ function LearningCoach() {
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              ["Pattern", "Replace generic AI phrasing with a concrete subject."],
-              ["Rhythm", "Break long sentences and vary sentence shape."],
-              ["Habit", "Keep names, numbers, and examples while cutting filler."],
-            ].map(([title, body], index) => (
-              <Reveal key={title} delay={index * 90}>
-                <div className="card h-full p-5">
+            {coachCards.map((card, index) => (
+              <Reveal key={card.title} delay={index * 90}>
+                <div className="card h-full overflow-hidden">
+                  <img src={card.image} alt="" className="h-32 w-full object-cover" loading="lazy" />
+                  <div className="p-5">
                   <span className="mb-4 inline-flex rounded-full bg-brand-softPurple px-3 py-1 text-xs font-semibold text-brand">
-                    {title}
+                    {card.title}
                   </span>
-                  <p className="text-sm leading-relaxed text-ink-muted">{body}</p>
+                  <p className="text-sm leading-relaxed text-ink-muted">{card.body}</p>
+                  </div>
                 </div>
               </Reveal>
             ))}
@@ -746,30 +783,57 @@ function StepMiniMockup({ index }: { index: number }) {
 
 function UsageLimits() {
   return (
-    <section className="bg-bg-section/60">
+    <section className="bg-ink text-white">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
-        <div className="grid gap-5 md:grid-cols-2">
-          <div className="card p-7">
-            <span className="chip">Free, no sign-up</span>
-            <h3 className="mt-4 text-2xl font-semibold tracking-tight text-ink">
-              Start without friction
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              Try the toolkit without creating an account. We'll remember your usage
-              on this device and ask you to log in when it is time to continue.
-            </p>
-          </div>
-          <div className="card relative overflow-hidden p-7">
-            <div className="absolute inset-x-0 top-0 h-[3px] bg-brand-gradient" />
-            <span className="chip">After sign-in</span>
-            <h3 className="mt-4 text-2xl font-semibold tracking-tight text-ink">
-              Keep rewriting
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              Sign in with Google or email to continue your work. Premium plans
-              for higher-volume use are coming soon.
-            </p>
-          </div>
+        <div className="mb-10 max-w-2xl">
+          <span className="chip mb-5 !border-white/15 !bg-white/10 !text-white">
+            Free tools with clear upgrade paths
+          </span>
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            Start free. See what unlocks as you grow.
+          </h2>
+          <p className="mt-3 text-base leading-relaxed text-white/70">
+            Every tool is usable from the start, with limits that keep the experience simple and a premium layer for heavier writing and study workflows.
+          </p>
+        </div>
+        <div className="grid gap-5 md:grid-cols-3">
+          {[
+            {
+              name: "Free",
+              body: "Try every tool, refine shorter drafts, and learn the patterns behind better writing.",
+              features: ["500 words per input", "Core tone controls", "Copy and download output"],
+            },
+            {
+              name: "Signed in",
+              body: "Keep working with longer drafts, saved history, and a more personal dashboard.",
+              features: ["1,200 words per input", "Saved recent history", "Reopen previous sessions"],
+            },
+            {
+              name: "Premium",
+              body: "Built for daily creators, students, and teams who want deeper memory and next-step guidance.",
+              features: ["Longer drafts", "More saved history", "Next post and weak-area guidance"],
+            },
+          ].map((tier, index) => (
+            <div
+              key={tier.name}
+              className={`rounded-2xl border p-6 ${
+                index === 2
+                  ? "border-white/25 bg-white/10"
+                  : "border-white/10 bg-white/[0.06]"
+              }`}
+            >
+              <h3 className="text-xl font-semibold">{tier.name}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/70">{tier.body}</p>
+              <ul className="mt-5 space-y-2 text-sm text-white/85">
+                {tier.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-brand-accent" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     </section>

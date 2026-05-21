@@ -34,14 +34,32 @@ export default function Page() {
         {
           title: "Busy professionals",
           body: "Turn rough notes into clear, polite emails without overthinking every sentence.",
+          image:
+            "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80",
         },
         {
           title: "Managers",
           body: "Balance directness and warmth for follow-ups, feedback, requests, and decisions.",
+          image:
+            "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=900&q=80",
         },
         {
           title: "Students and job seekers",
           body: "Improve outreach, applications, professor emails, and professional replies.",
+          image:
+            "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=900&q=80",
+        },
+        {
+          title: "Client-facing teams",
+          body: "Make replies concise, useful, and respectful without losing important context.",
+          image:
+            "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80",
+        },
+        {
+          title: "Founders",
+          body: "Polish investor updates, hiring messages, customer notes, and team announcements.",
+          image:
+            "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=900&q=80",
         },
       ]}
       faq={[

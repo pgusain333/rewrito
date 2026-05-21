@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { AudienceShowcase } from "@/components/marketing/AudienceShowcase";
 import { AiDetectorTool } from "@/components/tools/AiDetectorTool";
 import { ArrowRightIcon, ShieldCheckIcon } from "@/components/ui/icons";
 
@@ -132,43 +133,43 @@ export default function AiDetectorPage() {
           </div>
         </section>
 
-        <section className="bg-bg-section/60">
-          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
-            <div className="mb-8 max-w-2xl">
-              <span className="chip mb-5">Who this is for</span>
-              <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-                Built for people who need confidence before publishing.
-              </h2>
-              <p className="mt-3 text-base leading-relaxed text-ink-muted">
-                Use the detector score as a writing review layer, then improve the draft with clearer human patterns.
-              </p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {[
-                {
-                  title: "Students",
-                  body: "Review AI-assisted study drafts and learn which patterns need a more human edit.",
-                },
-                {
-                  title: "Professionals",
-                  body: "Check reports, emails, posts, and summaries before they are shared.",
-                },
-                {
-                  title: "Content reviewers",
-                  body: "Compare before and after scores and spot wording that still sounds too generated.",
-                },
-              ].map((audience, index) => (
-                <article key={audience.title} className="card h-full p-5">
-                  <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-softPurple text-sm font-semibold text-brand">
-                    {index + 1}
-                  </span>
-                  <h3 className="text-base font-semibold text-ink">{audience.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-muted">{audience.body}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        <AudienceShowcase
+          className="bg-bg-section/60"
+          title="Built for people who need confidence before publishing."
+          lead="Use the detector score as a writing review layer, then improve the draft with clearer human patterns."
+          audiences={[
+            {
+              title: "Students",
+              body: "Review AI-assisted study drafts and learn which patterns need a more human edit.",
+              image:
+                "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80",
+            },
+            {
+              title: "Professionals",
+              body: "Check reports, emails, posts, and summaries before they are shared.",
+              image:
+                "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80",
+            },
+            {
+              title: "Content reviewers",
+              body: "Compare before and after scores and spot wording that still sounds too generated.",
+              image:
+                "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80",
+            },
+            {
+              title: "Academic reviewers",
+              body: "Use detector-style estimates as a careful review signal before submitting or sharing.",
+              image:
+                "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=900&q=80",
+            },
+            {
+              title: "Teams",
+              body: "Create a consistent review habit for AI-assisted drafts across shared work.",
+              image:
+                "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=80",
+            },
+          ]}
+        />
       </main>
       <Footer />
       <script

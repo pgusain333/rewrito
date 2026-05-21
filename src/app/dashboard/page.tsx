@@ -12,7 +12,7 @@ import {
   type StudyMode,
   type ToolType,
 } from "@/lib/prompts";
-import { USER_LIMIT } from "@/lib/usage/limits";
+import { FREE_HISTORY_LIMIT, PRO_WORD_LIMIT, USER_LIMIT, USER_WORD_LIMIT } from "@/lib/usage/limits";
 import {
   ArrowRightIcon,
   LinkedinIcon,
@@ -24,6 +24,7 @@ import {
   WandIcon,
 } from "@/components/ui/icons";
 import { HistoryCopyButton } from "@/components/tools/HistoryCopyButton";
+import { HistoryReopenButton } from "@/components/tools/HistoryReopenButton";
 
 export const dynamic = "force-dynamic";
 
@@ -79,11 +80,19 @@ export default async function DashboardPage() {
       )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
-      .limit(10),
+      .limit(FREE_HISTORY_LIMIT),
   ]);
 
   const used = usage?.request_count ?? 0;
   const rows = (history ?? []) as HistoryRow[];
+  const rawPlan = user.app_metadata?.plan ?? user.user_metadata?.plan;
+  const isPro = rawPlan === "pro";
+  const hasReachedHistoryWindow = !isPro && rows.length >= FREE_HISTORY_LIMIT;
+  const hasLinkedInHistory = rows.some((row) => row.tool_type === "linkedin");
+  const hasQuizHistory = rows.some((row) => row.tool_type === "study" && row.study_mode === "quiz");
+  const hasFlashcardHistory = rows.some(
+    (row) => row.tool_type === "study" && row.study_mode === "flashcards"
+  );
   const scored = rows.filter((row) => row.scores);
   const avgImprovement = scored.length
     ? Math.round(
@@ -169,109 +178,144 @@ export default async function DashboardPage() {
             <div className="card relative overflow-hidden p-6">
               <div className="absolute inset-x-0 top-0 h-[3px] bg-brand-gradient" />
               <h2 className="text-sm font-medium uppercase tracking-wide text-ink-muted">
-                Upgrade
+                Your workspace
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-ink">
-                Premium plans with higher limits, saved history, and longer inputs are coming soon.
+                Signed-in sessions support drafts up to {USER_WORD_LIMIT.toLocaleString()} words and keep your latest {FREE_HISTORY_LIMIT} sessions close by.
               </p>
               <Link href="/pricing" className="btn-secondary mt-4 w-full">
-                Join waitlist
+                Compare plans
               </Link>
             </div>
           </div>
 
+          <PremiumGuidance
+            isPro={isPro}
+            hasLinkedInHistory={hasLinkedInHistory}
+            hasQuizHistory={hasQuizHistory}
+            hasFlashcardHistory={hasFlashcardHistory}
+          />
+
           <section className="mt-10">
-            <h2 className="mb-4 text-lg font-semibold text-ink">Recent sessions</h2>
+            <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+              <div>
+                <h2 className="text-lg font-semibold text-ink">Recent sessions</h2>
+                <p className="mt-1 text-sm text-ink-muted">
+                  Reopen saved work in the editor or copy the final output.
+                </p>
+              </div>
+              {hasReachedHistoryWindow && (
+                <span className="chip w-fit">Showing latest {FREE_HISTORY_LIMIT}</span>
+              )}
+            </div>
             {rows.length === 0 ? (
               <div className="card p-8 text-center text-sm text-ink-muted">
                 Your rewrites and study sessions will show up here.
               </div>
             ) : (
-              <ul className="space-y-3">
-                {rows.map((row) => {
-                  const isStudy = row.tool_type === "study";
-                  const delta = row.scores
-                    ? row.scores.after.overall - row.scores.before.overall
-                    : null;
-                  const aiConfidence = row.scores?.after.aiGenerated;
-                  const modeLabel = row.study_mode
-                    ? STUDY_MODES.find((mode) => mode.value === row.study_mode)?.label ?? row.study_mode
-                    : null;
-                  const educationLabel = row.education_level
-                    ? EDUCATION_LEVELS.find((level) => level.value === row.education_level)?.label ??
-                      row.education_level
-                    : null;
-                  const meta = isStudy
-                    ? [modeLabel, educationLabel].filter(Boolean).join(" - ")
-                    : `${row.tone} - ${row.refinement_level}`;
+              <div className="card overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="min-w-[980px] divide-y divide-line text-left text-sm">
+                    <thead className="bg-bg-section text-xs uppercase tracking-wide text-ink-muted">
+                      <tr>
+                        <th className="px-4 py-3 font-semibold">Tool</th>
+                        <th className="px-4 py-3 font-semibold">Mode</th>
+                        <th className="px-4 py-3 font-semibold">Input</th>
+                        <th className="px-4 py-3 font-semibold">Output</th>
+                        <th className="px-4 py-3 font-semibold">Score</th>
+                        <th className="px-4 py-3 font-semibold">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-line bg-white">
+                      {rows.map((row) => {
+                        const isStudy = row.tool_type === "study";
+                        const delta = row.scores
+                          ? row.scores.after.overall - row.scores.before.overall
+                          : null;
+                        const aiConfidence = row.scores?.after.aiGenerated;
+                        const modeLabel = row.study_mode
+                          ? STUDY_MODES.find((mode) => mode.value === row.study_mode)?.label ??
+                            row.study_mode
+                          : null;
+                        const educationLabel = row.education_level
+                          ? EDUCATION_LEVELS.find((level) => level.value === row.education_level)
+                              ?.label ?? row.education_level
+                          : null;
+                        const meta = isStudy
+                          ? [modeLabel, educationLabel].filter(Boolean).join(" - ")
+                          : `${row.tone} - ${row.refinement_level}`;
 
-                  return (
-                    <li key={row.id} className="card p-5">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="chip !text-[11px]">
-                            {TOOLS[row.tool_type]?.name ?? row.tool_type}
-                          </span>
-                          <span className="text-xs text-ink-subtle">-</span>
-                          <span className="text-xs text-ink-muted">{meta}</span>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <HistoryCopyButton text={row.output_text} />
-                          {row.scores && (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-bg-section px-2.5 py-0.5 text-[11px] font-medium text-ink">
-                              <span className="text-ink-subtle">{row.scores.before.overall}</span>
-                              <svg
-                                width="10"
-                                height="10"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden
-                                className="text-ink-subtle"
-                              >
-                                <path d="M5 12h14" />
-                                <path d="m13 5 7 7-7 7" />
-                              </svg>
-                              <span className="text-ink">{row.scores.after.overall}</span>
-                              {delta !== null && delta !== 0 && (
-                                <span className={delta > 0 ? "text-success" : "text-error"}>
-                                  {delta > 0 ? "+" : ""}
-                                  {delta}
-                                </span>
+                        return (
+                          <tr key={row.id} className="align-top">
+                            <td className="px-4 py-4">
+                              <span className="chip !text-[11px]">
+                                {TOOLS[row.tool_type]?.name ?? row.tool_type}
+                              </span>
+                              <p className="mt-2 text-xs text-ink-subtle">
+                                {new Date(row.created_at).toLocaleDateString()}
+                              </p>
+                            </td>
+                            <td className="px-4 py-4 text-xs leading-relaxed text-ink-muted">
+                              {meta || "Default"}
+                            </td>
+                            <td className="max-w-[230px] px-4 py-4">
+                              <p className="line-clamp-3 text-xs leading-relaxed text-ink-muted">
+                                {row.input_text}
+                              </p>
+                            </td>
+                            <td className="max-w-[260px] px-4 py-4">
+                              <p className="line-clamp-3 text-xs leading-relaxed text-ink">
+                                {row.output_text}
+                              </p>
+                            </td>
+                            <td className="px-4 py-4">
+                              {row.scores ? (
+                                <div className="space-y-1.5 text-xs">
+                                  <span className="inline-flex items-center gap-1.5 rounded-full bg-bg-section px-2.5 py-1 font-medium text-ink">
+                                    {row.scores.before.overall} to {row.scores.after.overall}
+                                    {delta !== null && delta !== 0 && (
+                                      <span className={delta > 0 ? "text-success" : "text-error"}>
+                                        {delta > 0 ? "+" : ""}
+                                        {delta}
+                                      </span>
+                                    )}
+                                  </span>
+                                  {typeof aiConfidence === "number" && (
+                                    <span className="block text-ink-muted">AI {aiConfidence}%</span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-xs text-ink-subtle">Study session</span>
                               )}
-                            </span>
-                          )}
-                          {typeof aiConfidence === "number" && (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-bg-section px-2.5 py-0.5 text-[11px] font-medium text-ink-muted">
-                              AI {aiConfidence}%
-                            </span>
-                          )}
-                          <span className="text-xs text-ink-subtle">
-                            {new Date(row.created_at).toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                        <div>
-                          <div className="field-label">
-                            {isStudy ? "Study material" : "Input"}
-                          </div>
-                          <p className="line-clamp-3 text-sm text-ink-muted">{row.input_text}</p>
-                        </div>
-                        <div>
-                          <div className="field-label">
-                            {isStudy ? "Study response" : "Output"}
-                          </div>
-                          <p className="line-clamp-3 text-sm text-ink">{row.output_text}</p>
-                        </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+                            </td>
+                            <td className="px-4 py-4">
+                              <div className="flex flex-wrap gap-2">
+                                <HistoryCopyButton text={row.output_text} />
+                                <HistoryReopenButton
+                                  session={{
+                                    tool: row.tool_type,
+                                    input: row.input_text,
+                                    output: row.output_text,
+                                    tone: row.tone,
+                                    refinement: row.refinement_level,
+                                    studyMode: row.study_mode,
+                                    educationLevel: row.education_level,
+                                  }}
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                {hasReachedHistoryWindow && (
+                  <div className="border-t border-line bg-bg-soft px-4 py-3 text-sm text-ink-muted">
+                    Premium history will keep more sessions, versions, and smart next-step guidance.
+                  </div>
+                )}
+              </div>
             )}
           </section>
           </div>
@@ -288,6 +332,74 @@ function getDisplayName(user: { email?: string | null; user_metadata?: Record<st
   if (typeof rawName === "string" && rawName.trim()) return rawName.trim().split(/\s+/)[0];
   if (user.email) return user.email.split("@")[0];
   return "there";
+}
+
+function PremiumGuidance({
+  isPro,
+  hasLinkedInHistory,
+  hasQuizHistory,
+  hasFlashcardHistory,
+}: {
+  isPro: boolean;
+  hasLinkedInHistory: boolean;
+  hasQuizHistory: boolean;
+  hasFlashcardHistory: boolean;
+}) {
+  const tips = [
+    hasLinkedInHistory
+      ? "Next LinkedIn post: turn your strongest recent idea into a short follow-up with one concrete example."
+      : "Generate a LinkedIn post, then premium guidance can suggest the next angle from your history.",
+    hasQuizHistory
+      ? "Next quiz testlet: retest the lowest scoring area first, then mix it back into a general practice set."
+      : "Save a quiz score to unlock smarter weak-area practice guidance.",
+    hasFlashcardHistory
+      ? "Next flashcards: convert missed quiz concepts into a compact recall deck."
+      : "Create flashcards from study material so rewrito can recommend the next recall set.",
+  ];
+
+  return (
+    <section
+      className={`mt-6 overflow-hidden rounded-2xl border p-6 ${
+        isPro
+          ? "border-brand/25 bg-white shadow-soft"
+          : "border-line bg-white/70 text-ink-muted"
+      }`}
+    >
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand">
+            Premium guidance
+          </p>
+          <h2 className="mt-1 text-lg font-semibold text-ink">
+            Next best action from your history
+          </h2>
+          <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+            Premium will connect your saved work to smarter next posts, quiz testlets, and flashcard reviews. Longer sessions support drafts up to {PRO_WORD_LIMIT.toLocaleString()} words.
+          </p>
+        </div>
+        {!isPro && (
+          <span className="w-fit rounded-full bg-bg-section px-3 py-1 text-xs font-semibold text-ink-muted">
+            Preview
+          </span>
+        )}
+      </div>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        {tips.map((tip, index) => (
+          <div
+            key={tip}
+            className={`rounded-xl border p-4 ${
+              isPro ? "border-line bg-bg-soft" : "border-line bg-bg-soft opacity-60"
+            }`}
+          >
+            <span className="mb-3 inline-flex h-7 w-7 items-center justify-center rounded-lg bg-brand-softPurple text-xs font-semibold text-brand">
+              {index + 1}
+            </span>
+            <p className="text-sm leading-relaxed text-ink">{tip}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function DashboardSidebar({
