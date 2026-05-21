@@ -337,6 +337,16 @@ ${missedQuestions}`;
                 <ArrowRightIcon size={16} />
               </button>
             </div>
+            <p className="mt-3 text-center text-xs leading-relaxed text-ink-subtle sm:text-left">
+              By using rewrito, you agree to our{" "}
+              <Link href="/terms" className="font-medium text-brand hover:underline">
+                Terms of Use
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="font-medium text-brand hover:underline">
+                Privacy Policy
+              </Link>.
+            </p>
 
             {error && (
               <div className="mt-4 rounded-xl border border-error/30 bg-error/5 px-3.5 py-2.5 text-sm text-error">
@@ -510,9 +520,12 @@ function QuizTestletPanel({
         </span>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-7">
         {questions.map((question, index) => (
-          <article key={`${question.prompt}-${index}`} className="rounded-2xl border border-line bg-bg-soft p-4">
+          <article
+            key={`${question.prompt}-${index}`}
+            className="rounded-2xl border border-line bg-bg-soft p-5 shadow-soft"
+          >
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <p className="text-sm font-semibold leading-relaxed text-ink">
                 {index + 1}. {question.prompt}
@@ -652,11 +665,14 @@ function ScoreReport({
 
       <div className="grid gap-4 lg:grid-cols-3 xl:grid-cols-1">
         <AreaCard title="Strong areas" tone="success" areas={analysis.strongAreas} empty="No strong areas yet. Review the explanations and try again." />
-        <AreaCard title="Important areas" tone="warning" areas={analysis.importantAreas} empty="No middle-risk areas. Your score is clearly split between strong and weak topics." />
+        <AreaCard title="Important areas" tone="warning" areas={analysis.importantAreas} empty="The testlet did not return clear topic labels. Try generating again with clearer material." />
         <AreaCard title="Weak areas" tone="error" areas={analysis.weakAreas} empty="No weak areas found. Create another testlet to confirm retention." />
       </div>
       <div className="xl:col-span-2">
         <AreasTable rows={analysis.rows} />
+      </div>
+      <div className="xl:col-span-2">
+        <BriefStudyPlan analysis={analysis} />
       </div>
     </aside>
   );
@@ -696,7 +712,9 @@ function AreaCard({
         <div className="mt-3 flex flex-wrap gap-2">
           {areas.map((area) => (
             <span key={`${title}-${area.topic}`} className={`rounded-full px-3 py-1 text-xs font-semibold ${toneClass}`}>
-              {area.topic} - {area.accuracy}%
+              {title === "Important areas"
+                ? area.topic
+                : `${area.topic} - ${area.accuracy}%`}
             </span>
           ))}
         </div>
@@ -705,6 +723,84 @@ function AreaCard({
       )}
     </div>
   );
+}
+
+function BriefStudyPlan({ analysis }: { analysis: QuizAnalysis }) {
+  const rows = buildStudyPlanRows(analysis);
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-soft">
+      <div className="flex flex-col justify-between gap-3 border-b border-line bg-bg-soft px-4 py-3 sm:flex-row sm:items-center">
+        <div>
+          <h4 className="text-sm font-semibold text-ink">Brief study plan</h4>
+          <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+            Use this as a quick next step, then open the full Study Plan tool for a complete schedule.
+          </p>
+        </div>
+        <Link href="/study-assistant?mode=studyplan#study-tool" className="btn-secondary !px-3 !py-1.5 text-xs">
+          Open Study Plan
+          <ArrowRightIcon size={13} />
+        </Link>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-line text-left text-xs">
+          <thead className="bg-white text-ink">
+            <tr>
+              <th className="px-3 py-2 font-semibold">Priority</th>
+              <th className="px-3 py-2 font-semibold">Area</th>
+              <th className="px-3 py-2 font-semibold">What to do next</th>
+              <th className="px-3 py-2 font-semibold">Practice task</th>
+              <th className="px-3 py-2 font-semibold">Time</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-line text-ink-muted">
+            {rows.map((row) => (
+              <tr key={`${row.priority}-${row.area}`}>
+                <td className="px-3 py-2 font-medium text-ink">{row.priority}</td>
+                <td className="px-3 py-2 font-medium text-ink">{row.area}</td>
+                <td className="px-3 py-2">{row.next}</td>
+                <td className="px-3 py-2">{row.practice}</td>
+                <td className="px-3 py-2">{row.time}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function buildStudyPlanRows(analysis: QuizAnalysis) {
+  const weakRows = analysis.weakAreas.slice(0, 3).map((area) => ({
+    priority: "Focus first",
+    area: area.topic,
+    next: "Review the core explanation and write the rule in your own words.",
+    practice: "Create a weak-area testlet and redo missed question types.",
+    time: "25 min",
+  }));
+  const importantRows = analysis.importantAreas
+    .filter((area) => !analysis.weakAreas.some((weak) => weak.topic === area.topic))
+    .slice(0, 3)
+    .map((area) => ({
+      priority: area.accuracy >= 80 ? "Maintain" : "Review next",
+      area: area.topic,
+      next: area.accuracy >= 80 ? "Keep this fresh with quick recall." : "Review examples and clarify the main distinction.",
+      practice: area.accuracy >= 80 ? "Answer one mixed question later today." : "Make two flashcards and one practice question.",
+      time: area.accuracy >= 80 ? "10 min" : "15 min",
+    }));
+
+  const rows = [...weakRows, ...importantRows].slice(0, 5);
+  return rows.length
+    ? rows
+    : [
+        {
+          priority: "Maintain",
+          area: "Core concepts",
+          next: "Review the answer explanations and keep practicing mixed questions.",
+          practice: "Create a fresh quiz testlet to confirm retention.",
+          time: "15 min",
+        },
+      ];
 }
 
 function AreasTable({ rows }: { rows: QuizAnalysis["rows"] }) {

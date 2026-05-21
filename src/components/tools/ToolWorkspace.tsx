@@ -156,6 +156,15 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
     }
   }, [lockTool]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mode = new URLSearchParams(window.location.search).get("mode");
+    if (!mode || initialTool !== "study") return;
+    if (STUDY_MODES.some((item) => item.value === mode)) {
+      setStudyMode(mode as StudyMode);
+    }
+  }, [initialTool]);
+
   function resetResult() {
     setOutput("");
     setExtraTestlets([]);
@@ -631,6 +640,16 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
               </>
             )}
           </button>
+          <p className="mt-3 text-center text-xs leading-relaxed text-ink-subtle">
+            By using rewrito, you agree to our{" "}
+            <Link href="/terms" className="font-medium text-brand hover:underline">
+              Terms of Use
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="font-medium text-brand hover:underline">
+              Privacy Policy
+            </Link>.
+          </p>
 
           {error && (
             <div

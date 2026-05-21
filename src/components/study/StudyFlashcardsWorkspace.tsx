@@ -209,6 +209,16 @@ export function StudyFlashcardsWorkspace() {
                 <ArrowRightIcon size={16} />
               </Link>
             </div>
+            <p className="mt-3 text-center text-xs leading-relaxed text-ink-subtle sm:text-left">
+              By using rewrito, you agree to our{" "}
+              <Link href="/terms" className="font-medium text-brand hover:underline">
+                Terms of Use
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="font-medium text-brand hover:underline">
+                Privacy Policy
+              </Link>.
+            </p>
 
             {error && (
               <div className="mt-4 rounded-xl border border-error/30 bg-error/5 px-3.5 py-2.5 text-sm text-error">

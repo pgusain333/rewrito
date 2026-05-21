@@ -1,52 +1,203 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "Privacy Policy - rewrito",
-  description: "Privacy policy for rewrito, including how anonymous trials and signed-in rewrite history are handled.",
+  description:
+    "Privacy policy for rewrito, including accounts, AI processing, analytics, saved history, and user choices.",
   alternates: { canonical: "/privacy" },
 };
+
+const lastUpdated = "May 21, 2026";
 
 export default function PrivacyPage() {
   return (
     <>
       <Navbar />
       <main className="bg-bg">
-        <section className="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
-          <span className="chip mb-5">Privacy</span>
-          <h1 className="text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-            Privacy Policy
-          </h1>
-          <div className="mt-8 space-y-6 text-sm leading-relaxed text-ink-muted">
-            <p>
-              rewrito is designed to help people improve professional writing while keeping data
-              handling simple and clear.
+        <section className="relative overflow-hidden bg-bg">
+          <div aria-hidden className="hero-abstract opacity-70">
+            <div className="grid-overlay" />
+            <div className="blob-mid" />
+          </div>
+          <div className="mx-auto max-w-5xl px-5 pb-10 pt-14 sm:px-8 sm:pb-14 sm:pt-20">
+            <span className="chip mb-5">Privacy</span>
+            <h1 className="text-balance text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+              Privacy Policy
+            </h1>
+            <p className="mt-4 max-w-3xl text-base leading-relaxed text-ink-muted sm:text-lg">
+              rewrito is built to help people write, learn, and review more clearly. This policy explains what we collect, how we use it, and the choices you have.
             </p>
-            <section>
-              <h2 className="mb-2 text-lg font-semibold text-ink">Anonymous use</h2>
-              <p>
-                Anonymous trial usage is tracked with a local browser identifier and a usage count.
-                Anonymous rewrite text is not saved to rewrite history.
-              </p>
-            </section>
-            <section>
-              <h2 className="mb-2 text-lg font-semibold text-ink">Signed-in use</h2>
-              <p>
-                When you sign in, rewrites may be saved to your dashboard so you can revisit recent
-                drafts. Account authentication is handled by Supabase.
-              </p>
-            </section>
-            <section>
-              <h2 className="mb-2 text-lg font-semibold text-ink">Contact</h2>
-              <p>
-                For privacy questions, email <a className="text-brand hover:underline" href="mailto:hello@rewrito.ai">hello@rewrito.ai</a>.
-              </p>
-            </section>
+            <p className="mt-4 text-sm font-medium text-ink-muted">Last updated: {lastUpdated}</p>
+          </div>
+        </section>
+
+        <section className="bg-bg">
+          <div className="mx-auto grid max-w-6xl gap-6 px-5 pb-16 sm:px-8 sm:pb-24 lg:grid-cols-[280px_minmax(0,1fr)]">
+            <aside className="lg:sticky lg:top-24 lg:self-start">
+              <div className="card p-5">
+                <h2 className="text-sm font-semibold text-ink">Quick summary</h2>
+                <ul className="mt-4 space-y-3 text-sm leading-relaxed text-ink-muted">
+                  <li>Anonymous history is not saved.</li>
+                  <li>Signed-in history is saved so you can reopen work.</li>
+                  <li>AI providers process text to generate outputs.</li>
+                  <li>You can contact us to request account or data help.</li>
+                </ul>
+              </div>
+            </aside>
+
+            <div className="space-y-5">
+              <PolicySection title="1. Information we collect">
+                <p>
+                  We collect information you choose to provide, such as your email address, name, password-based login details, and any text or study material you submit to rewrito tools.
+                </p>
+                <p>
+                  For anonymous use, we may store a local browser identifier and usage count so the free experience works correctly. Anonymous rewrite text is not saved to your dashboard history.
+                </p>
+                <p>
+                  For signed-in use, we save recent sessions, including input, output, selected tool, tone, refinement level, study mode, scores, and timestamps, so you can revisit and reopen useful work.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="2. How we use information">
+                <p>
+                  We use your information to provide AI rewriting, AI detector-style scoring, study tools, quiz and flashcard workflows, account access, saved history, usage limits, product support, and service improvement.
+                </p>
+                <p>
+                  We also use usage and analytics data to understand which pages and tools are working well, troubleshoot issues, prevent abuse, and improve rewrito over time.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="3. AI processing">
+                <p>
+                  Text you submit may be sent to AI infrastructure providers to generate rewrites, study explanations, quiz testlets, flashcards, summaries, scores, and related outputs.
+                </p>
+                <p>
+                  Avoid submitting highly sensitive personal, financial, medical, legal, or confidential business information unless you are comfortable with it being processed to provide the service.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="4. Service providers">
+                <p>
+                  We use trusted service providers to run rewrito, including hosting, authentication, database storage, email delivery, analytics, and AI generation providers. These providers process information only as needed to support the service.
+                </p>
+                <div className="mt-4 overflow-x-auto rounded-xl border border-line">
+                  <table className="min-w-full divide-y divide-line text-left text-sm">
+                    <thead className="bg-bg-section text-ink">
+                      <tr>
+                        <th className="px-4 py-3 font-semibold">Provider type</th>
+                        <th className="px-4 py-3 font-semibold">Purpose</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-line text-ink-muted">
+                      <tr>
+                        <td className="px-4 py-3 font-medium text-ink">Supabase</td>
+                        <td className="px-4 py-3">Authentication, account data, usage limits, and saved history.</td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 font-medium text-ink">Resend</td>
+                        <td className="px-4 py-3">Transactional emails, including welcome and account-related emails.</td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 font-medium text-ink">AI providers</td>
+                        <td className="px-4 py-3">Generating rewrites, study outputs, scoring, quizzes, and flashcards.</td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 font-medium text-ink">Analytics and hosting</td>
+                        <td className="px-4 py-3">Site performance, reliability, analytics, and deployment.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </PolicySection>
+
+              <PolicySection title="5. Cookies, local storage, and analytics">
+                <p>
+                  rewrito may use cookies, local storage, and similar technologies for login sessions, anonymous usage limits, saved preferences, and analytics.
+                </p>
+                <p>
+                  We use analytics tools, including Google Analytics, to understand traffic and product usage. You can control cookies and tracking through your browser settings and available platform controls.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="6. Data retention">
+                <p>
+                  Anonymous usage identifiers remain in your browser unless cleared. Signed-in history is retained so you can access it from your dashboard, subject to account settings, technical limits, and future plan limits.
+                </p>
+                <p>
+                  We may retain limited logs and records where needed for security, abuse prevention, legal compliance, dispute resolution, or service operations.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="7. Security">
+                <p>
+                  We use reasonable technical and organizational measures designed to protect rewrito accounts and data. No internet service can guarantee absolute security, so please use strong account credentials and avoid submitting sensitive information that is not needed for the tool.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="8. Your choices">
+                <p>
+                  You can use rewrito without signing in for limited anonymous access. If you create an account, you can access saved history in your dashboard and contact us for help with account or data requests.
+                </p>
+                <p>
+                  Depending on your location, you may have rights to access, correct, delete, restrict, or object to certain processing of personal information. To make a request, email us at{" "}
+                  <a className="text-brand hover:underline" href="mailto:hello@rewrito.ai">
+                    hello@rewrito.ai
+                  </a>.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="9. Children">
+                <p>
+                  rewrito is not intended for children under 13. If you believe a child has provided personal information to us, please contact us so we can review and take appropriate action.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="10. International users">
+                <p>
+                  rewrito may process and store information in countries other than where you live. By using the service, you understand that your information may be processed where our providers operate.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="11. Changes to this policy">
+                <p>
+                  We may update this Privacy Policy as rewrito evolves. If we make material changes, we will update the date above and may provide additional notice where appropriate.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="12. Contact">
+                <p>
+                  For privacy questions or requests, email{" "}
+                  <a className="text-brand hover:underline" href="mailto:hello@rewrito.ai">
+                    hello@rewrito.ai
+                  </a>.
+                </p>
+                <p>
+                  Please also review our <Link href="/terms" className="text-brand hover:underline">Terms of Use</Link>.
+                </p>
+              </PolicySection>
+            </div>
           </div>
         </section>
       </main>
       <Footer />
     </>
+  );
+}
+
+function PolicySection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="card p-6 sm:p-7">
+      <h2 className="text-xl font-semibold tracking-tight text-ink">{title}</h2>
+      <div className="mt-4 space-y-3 text-sm leading-relaxed text-ink-muted">{children}</div>
+    </section>
   );
 }

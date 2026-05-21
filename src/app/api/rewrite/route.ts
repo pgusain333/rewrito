@@ -279,6 +279,7 @@ export async function POST(req: Request) {
     );
   }
   output = normalizeVisibleOutput(output);
+  if (tool === "linkedin") output = formatLinkedInPost(output);
 
   // ---- Score the rewrite (best-effort; never blocks the response) ----
   let scores: ScorePair | null = null;
@@ -375,6 +376,25 @@ function normalizeVisibleOutput(value: string): string {
     .replace(/[ \t]+\n/g, "\n")
     .replace(/\n{4,}/g, "\n\n\n")
     .trim();
+}
+
+function formatLinkedInPost(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.includes("\n\n") || trimmed.length < 180) return trimmed;
+
+  const sentences = trimmed
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+
+  if (sentences.length < 3) return trimmed;
+
+  const paragraphs: string[] = [sentences[0]];
+  for (let index = 1; index < sentences.length; index += 2) {
+    paragraphs.push(sentences.slice(index, index + 2).join(" "));
+  }
+
+  return paragraphs.join("\n\n");
 }
 
 function stabilizeScores(scores: ScorePair | null, tool: ToolType): ScorePair | null {

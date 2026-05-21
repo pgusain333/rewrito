@@ -158,7 +158,11 @@ Goals:
 - Keep it human. No motivational fluff, no fake humility, no emoji spam.
 - Preserve the author's specific points and examples.
 - End with a quiet, genuine thought or question - not a generic CTA.
-- Make the post substantially more scannable, specific, and credible than the original.`,
+- Make the post substantially more scannable, specific, and credible than the original.
+- Return a polished LinkedIn post with separate paragraphs. Never return the entire post as one block.
+- Use a strong first line, then short body paragraphs with blank lines between them.
+- If useful, use a compact bullet list, but only when it improves readability.
+- Remove weak LinkedIn patterns: vague lessons, forced inspiration, overdone hooks, hashtag clutter, and generic calls to action.`,
     email: `You are an executive communication editor.
 Goals:
 - Keep it concise. Remove filler and hedging.
@@ -188,7 +192,9 @@ Strict rules:
 Presentation:
 - Use clear paragraphs with blank lines where helpful.
 - If the input naturally contains comparisons, schedules, options, formulas, lists, or before/after items, use a simple markdown table.
-- For emails, keep a readable email shape. For LinkedIn, keep short scannable paragraphs. For humanizer, preserve the user's intended format.`;
+- For emails, keep a readable email shape.
+- For LinkedIn, output a finished post with blank lines between short paragraphs, a concrete hook, a clear middle, and a natural final line.
+- For humanizer, preserve the user's intended format.`;
 }
 
 export function buildUserPrompt(input: string): string {

@@ -347,7 +347,14 @@ export function LoginModal({
         </button>
 
         <p className="mt-4 text-center text-xs text-ink-subtle">
-          By continuing, you agree to our terms and privacy policy.
+          By continuing, you agree to our{" "}
+          <a href="/terms" className="font-medium text-brand hover:underline">
+            Terms of Use
+          </a>{" "}
+          and{" "}
+          <a href="/privacy" className="font-medium text-brand hover:underline">
+            Privacy Policy
+          </a>.
         </p>
       </div>
     </Modal>

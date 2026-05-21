@@ -203,6 +203,9 @@ export function analyzeQuizAttempt(
       accuracy: Math.round((row.correct / Math.max(row.total, 1)) * 100),
     }))
     .sort((a, b) => a.accuracy - b.accuracy || b.total - a.total);
+  const importantAreas = [...rows].sort(
+    (a, b) => b.total - a.total || a.accuracy - b.accuracy || a.topic.localeCompare(b.topic)
+  );
 
   return {
     correct,
@@ -210,7 +213,7 @@ export function analyzeQuizAttempt(
     percent: total ? Math.round((correct / total) * 100) : 0,
     rows,
     strongAreas: rows.filter((row) => row.accuracy >= 80),
-    importantAreas: rows.filter((row) => row.accuracy >= 50 && row.accuracy < 80),
+    importantAreas,
     weakAreas: rows.filter((row) => row.accuracy < 50),
   };
 }
