@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import {
   TOOLS,
   TONES,
@@ -711,19 +712,15 @@ function StudyControls({
       notes: "Notes",
       studyplan: "Plan",
     };
-    return (
-      <button
-        key={mode.value}
-        type="button"
-        onClick={() => setStudyMode(mode.value)}
-        className={`group relative min-h-[92px] rounded-xl border p-3.5 text-left transition-all ${
+    const className = `group relative min-h-[92px] rounded-xl border p-3.5 text-left transition-all ${
           active
             ? "border-brand bg-white text-ink shadow-card ring-2 ring-brand/10"
             : featured
             ? "border-brand-softPurple bg-white text-ink hover:border-brand/60 hover:shadow-soft"
             : "border-line bg-white text-ink hover:border-brand/40 hover:shadow-soft"
-        }`}
-      >
+        }`;
+    const content = (
+      <>
         <span
           className={`mb-3 inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
             active
@@ -757,6 +754,29 @@ function StudyControls({
         {active && (
           <span className="pointer-events-none absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-brand-gradient" />
         )}
+      </>
+    );
+
+    if (featured) {
+      return (
+        <Link
+          key={mode.value}
+          href={mode.value === "quiz" ? "/rewrito-study/quiz" : "/rewrito-study/flashcards"}
+          className={className}
+        >
+          {content}
+        </Link>
+      );
+    }
+
+    return (
+      <button
+        key={mode.value}
+        type="button"
+        onClick={() => setStudyMode(mode.value)}
+        className={className}
+      >
+        {content}
       </button>
     );
   };
@@ -1347,10 +1367,11 @@ function parseQuizQuestions(text: string): QuizQuestion[] {
 
     const questionMatch = line.match(/^(?:Q(?:uestion)?\s*)?(\d+)[.)]\s+(.+)$/i);
     const optionMatch = line.match(/^([A-D])[\).:-]\s+(.+)$/i);
+    const topicMatch = line.match(/^(?:topic|area|concept)\s*[:\-]\s*(.+)$/i);
     const answerMatch = line.match(/^(?:correct\s*)?answer\s*[:\-]\s*([A-D])(?:[\).:\s-]*(.*))?$/i);
     const explanationMatch = line.match(/^explanation\s*[:\-]\s*(.+)$/i);
 
-    if (questionMatch && !/^(answer|explanation)\b/i.test(questionMatch[2])) {
+    if (questionMatch && !/^(answer|explanation|topic|area|concept)\b/i.test(questionMatch[2])) {
       pushCurrent();
       current = {
         prompt: questionMatch[2].trim(),
@@ -1358,6 +1379,10 @@ function parseQuizQuestions(text: string): QuizQuestion[] {
         answerKey: "",
         explanation: "",
       };
+      continue;
+    }
+
+    if (current && topicMatch) {
       continue;
     }
 

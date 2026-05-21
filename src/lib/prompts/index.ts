@@ -242,6 +242,7 @@ Create a markdown table with columns: Step, Action, Why It Matters, Result.
 Use this exact format:
 ## Quiz Testlet
 1. Question text
+Topic: Specific concept or skill tested
 A) Option text
 B) Option text
 C) Option text
@@ -249,7 +250,7 @@ D) Option text
 Answer: A
 Explanation: One brief teaching reason
 
-Create exactly ${quizQuestionCount} MCQs. Make questions cover the breadth of the material, avoid repeated stems, and vary correct answer positions.`,
+Create exactly ${quizQuestionCount} MCQs. Make questions cover the breadth of the material, avoid repeated stems, label a clear topic for each question, and vary correct answer positions.`,
     flashcards: `Return only a flashcard deck. Do not include Simple Explanation, Key Concept, Step-by-Step Breakdown, Example, or Common Mistake sections.
 
 Use this exact format:

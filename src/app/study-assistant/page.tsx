@@ -149,6 +149,34 @@ export default function StudyAssistantPage() {
         <section className="bg-bg-section/60">
           <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
             <div className="mb-10 max-w-2xl">
+              <span className="chip mb-5">Dedicated practice</span>
+              <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                Quiz and flashcards now have their own workspace.
+              </h2>
+              <p className="mt-3 text-base leading-relaxed text-ink-muted">
+                Use the main Study assistant for explanations, notes, steps, and plans. Open practice tools when you want active recall, scoring, and revision.
+              </p>
+            </div>
+            <div className="grid gap-5 md:grid-cols-2">
+              <PracticeLinkCard
+                href="/rewrito-study/quiz"
+                title="Quiz testlets"
+                body="Create MCQs, answer in a focused test view, save scores when logged in, and build weak-area testlets from your results."
+                label="Open quiz workspace"
+              />
+              <PracticeLinkCard
+                href="/rewrito-study/flashcards"
+                title="Flashcards"
+                body="Turn notes, formulas, definitions, and concepts into flip-ready Q/A cards for active recall."
+                label="Open flashcards"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-bg-section/60">
+          <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
+            <div className="mb-10 max-w-2xl">
               <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
                 Choose how you want to learn.
               </h2>
@@ -298,5 +326,31 @@ function InfoCard({
       <h3 className="text-base font-semibold text-ink">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-ink-muted">{children}</p>
     </article>
+  );
+}
+
+function PracticeLinkCard({
+  href,
+  title,
+  body,
+  label,
+}: {
+  href: string;
+  title: string;
+  body: string;
+  label: string;
+}) {
+  return (
+    <Link href={href} className="group card block h-full p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card">
+      <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-softPurple text-brand transition-transform duration-300 group-hover:-translate-y-0.5">
+        <StudyIcon size={21} />
+      </span>
+      <h3 className="text-xl font-semibold text-ink">{title}</h3>
+      <p className="mt-3 text-sm leading-relaxed text-ink-muted">{body}</p>
+      <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand">
+        {label}
+        <ArrowRightIcon size={16} />
+      </span>
+    </Link>
   );
 }

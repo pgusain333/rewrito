@@ -15,6 +15,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/linkedin-rewriter",
     "/email-rewriter",
     "/study-assistant",
+    "/rewrito-study/quiz",
+    "/rewrito-study/flashcards",
     "/pricing",
   ];
   return routes.map((path) => ({
