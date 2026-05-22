@@ -682,23 +682,29 @@ function SearchIntent() {
   ];
 
   return (
-    <section className="bg-bg">
+    <section className="bg-ink text-white">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
         <div className="mb-10 max-w-2xl">
-          <span className="chip mb-5">What rewrito helps with</span>
-          <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+          <span className="chip mb-5 !border-white/15 !bg-white/10 !text-white">
+            What rewrito helps with
+          </span>
+          <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             One AI writing and study toolkit for high-intent work.
           </h2>
-          <p className="mt-3 text-base leading-relaxed text-ink-muted">
+          <p className="mt-3 text-base leading-relaxed text-white/70">
             People come to rewrito when they need practical results: clearer writing, lower AI-sounding confidence, stronger professional communication, and study material that is easier to understand.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {items.map((item) => (
-            <Link key={item.title} href={item.href} className="card group h-full p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card">
-              <h3 className="text-base font-semibold text-ink">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.body}</p>
-              <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand">
+            <Link
+              key={item.title}
+              href={item.href}
+              className="group h-full rounded-2xl border border-white/10 bg-white/[0.06] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.1]"
+            >
+              <h3 className="text-base font-semibold text-white">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/70">{item.body}</p>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-accent">
                 Open page
                 <ArrowRightIcon size={14} className="transition-transform group-hover:translate-x-0.5" />
               </span>
@@ -746,9 +752,9 @@ function LearningCoach() {
               showing what changed, why the draft improved, and which habits to carry into your next message, post, paper, or study note.
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:px-0 sm:pb-0">
             {coachCards.map((card, index) => (
-              <Reveal key={card.title} delay={index * 90}>
+              <Reveal key={card.title} delay={index * 90} className="min-w-[78vw] snap-start sm:min-w-0">
                 <div className="card h-full overflow-hidden">
                   <img src={card.image} alt="" className="h-32 w-full object-cover" loading="lazy" />
                   <div className="p-5">

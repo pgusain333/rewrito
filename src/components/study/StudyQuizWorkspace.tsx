@@ -61,6 +61,10 @@ export function StudyQuizWorkspace() {
   const [savedNotice, setSavedNotice] = useState<string | null>(null);
   const [showLogin, setShowLogin] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [loginCopy, setLoginCopy] = useState({
+    headline: "Log in to save quiz scores",
+    subline: "Log in to keep your quiz scores and continue practicing.",
+  });
 
   const { user, anonId, incrementAnon, setUsageFromServer } =
     useAuthAndUsage();
@@ -99,6 +103,11 @@ export function StudyQuizWorkspace() {
     if (wordLimitExceeded) {
       if (!user) {
         setError(`Log in to continue with study material over ${wordLimit.toLocaleString()} words.`);
+        setLoginCopy({
+          headline: "This is a premium feature",
+          subline:
+            "Longer quiz testlets are a premium feature. Sign up or log in to unlock longer study material and saved scorecards.",
+        });
         setShowLogin(true);
       } else if (!isPaidUser) {
         setError(`Upgrade to continue with study material over ${wordLimit.toLocaleString()} words.`);
@@ -140,7 +149,14 @@ export function StudyQuizWorkspace() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data?.requiresAuth) setShowLogin(true);
+        if (data?.requiresAuth) {
+          setLoginCopy({
+            headline: "This is a premium feature",
+            subline:
+              "This quiz workflow is a premium feature. Sign up or log in to continue with longer study material.",
+          });
+          setShowLogin(true);
+        }
         if (data?.requiresUpgrade) setShowUpgrade(true);
         setError(data?.error ?? "Could not create this quiz testlet.");
         if (typeof data?.used === "number") setUsageFromServer(data.used);
@@ -195,6 +211,11 @@ ${missedQuestions}`;
 
   function saveScore() {
     if (!user) {
+      setLoginCopy({
+        headline: "This is a premium feature",
+        subline:
+          "Saving quiz scores is a premium feature. Sign up or log in to keep scorecards, weak areas, and study progress.",
+      });
       setShowLogin(true);
       return;
     }
@@ -351,7 +372,14 @@ ${missedQuestions}`;
             userName={user?.name ?? user?.email ?? null}
             attempts={savedAttempts}
             onDelete={deleteSavedAttempt}
-            onLogin={() => setShowLogin(true)}
+            onLogin={() => {
+              setLoginCopy({
+                headline: "This is a premium feature",
+                subline:
+                  "Saved quiz history is a premium feature. Sign up or log in to keep scorecards and weak-area practice.",
+              });
+              setShowLogin(true);
+            }}
           />
         </div>
       </section>
@@ -384,8 +412,8 @@ ${missedQuestions}`;
       <LoginModal
         open={showLogin}
         onClose={() => setShowLogin(false)}
-        headline="Log in to save quiz scores"
-        subline="Log in to keep your quiz scores and continue practicing."
+        headline={loginCopy.headline}
+        subline={loginCopy.subline}
       />
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
     </div>

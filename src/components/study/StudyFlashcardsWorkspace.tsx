@@ -27,6 +27,10 @@ export function StudyFlashcardsWorkspace() {
   const [error, setError] = useState<string | null>(null);
   const [showLogin, setShowLogin] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [loginCopy, setLoginCopy] = useState({
+    headline: "Log in to continue studying",
+    subline: "Log in to keep creating practice material.",
+  });
 
   const { user, anonId, incrementAnon, setUsageFromServer } =
     useAuthAndUsage();
@@ -45,6 +49,11 @@ export function StudyFlashcardsWorkspace() {
     if (wordLimitExceeded) {
       if (!user) {
         setError(`Log in to continue with study material over ${wordLimit.toLocaleString()} words.`);
+        setLoginCopy({
+          headline: "This is a premium feature",
+          subline:
+            "Longer flashcard decks are a premium feature. Sign up or log in to unlock longer study material and saved progress.",
+        });
         setShowLogin(true);
       } else if (!isPaidUser) {
         setError(`Upgrade to continue with study material over ${wordLimit.toLocaleString()} words.`);
@@ -82,7 +91,14 @@ export function StudyFlashcardsWorkspace() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data?.requiresAuth) setShowLogin(true);
+        if (data?.requiresAuth) {
+          setLoginCopy({
+            headline: "This is a premium feature",
+            subline:
+              "This flashcard workflow is a premium feature. Sign up or log in to continue with longer study material.",
+          });
+          setShowLogin(true);
+        }
         if (data?.requiresUpgrade) setShowUpgrade(true);
         setError(data?.error ?? "Could not create flashcards.");
         if (typeof data?.used === "number") setUsageFromServer(data.used);
@@ -243,8 +259,8 @@ export function StudyFlashcardsWorkspace() {
       <LoginModal
         open={showLogin}
         onClose={() => setShowLogin(false)}
-        headline="Log in to continue studying"
-        subline="Log in to keep creating practice material."
+        headline={loginCopy.headline}
+        subline={loginCopy.subline}
       />
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
     </div>

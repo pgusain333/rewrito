@@ -28,6 +28,10 @@ export function AiDetectorTool() {
   const [copied, setCopied] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [loginCopy, setLoginCopy] = useState({
+    headline: "Log in to continue checking",
+    subline: "Log in to keep analyzing and improving your drafts.",
+  });
   const { user, anonId, incrementAnon, setUsageFromServer } =
     useAuthAndUsage();
 
@@ -52,6 +56,11 @@ export function AiDetectorTool() {
     if (wordLimitExceeded) {
       if (!user) {
         setError(`Log in to continue with drafts over ${wordLimit.toLocaleString()} words.`);
+        setLoginCopy({
+          headline: "This is a premium feature",
+          subline:
+            "Longer detector checks are a premium feature. Sign up or log in to unlock longer inputs, saved history, and coaching.",
+        });
         setShowLogin(true);
       } else if (!isPaidUser) {
         setError(`Upgrade to continue with drafts over ${wordLimit.toLocaleString()} words.`);
@@ -78,7 +87,14 @@ export function AiDetectorTool() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data?.requiresAuth) setShowLogin(true);
+        if (data?.requiresAuth) {
+          setLoginCopy({
+            headline: "This is a premium feature",
+            subline:
+              "This detector workflow is a premium feature. Sign up or log in to continue checking longer drafts.",
+          });
+          setShowLogin(true);
+        }
         if (data?.requiresUpgrade) setShowUpgrade(true);
         setError(data?.error ?? "Could not analyze this text.");
         if (typeof data?.used === "number") setUsageFromServer(data.used);
@@ -254,8 +270,8 @@ export function AiDetectorTool() {
       <LoginModal
         open={showLogin}
         onClose={() => setShowLogin(false)}
-        headline="Log in to continue checking"
-        subline="Log in to keep analyzing and improving your drafts."
+        headline={loginCopy.headline}
+        subline={loginCopy.subline}
       />
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
     </div>

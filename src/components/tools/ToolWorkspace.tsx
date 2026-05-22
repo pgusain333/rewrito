@@ -79,6 +79,10 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
 
   const [showLogin, setShowLogin] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [loginCopy, setLoginCopy] = useState({
+    headline: "Log in to continue working",
+    subline: "Log in to keep rewriting.",
+  });
 
   const {
     user,
@@ -178,6 +182,34 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
     resetResult();
   }
 
+  function openLogin(headline = "Log in to continue working", subline = "Log in to keep rewriting.") {
+    setLoginCopy({ headline, subline });
+    setShowLogin(true);
+  }
+
+  function openPremiumFeatureLogin(feature: string) {
+    openLogin(
+      "This is a premium feature",
+      `${feature} is a premium feature. Sign up or log in to unlock longer inputs, saved history, and advanced controls.`
+    );
+  }
+
+  function handleToneChange(nextTone: Tone) {
+    if (!user && !ANONYMOUS_TONES.includes(nextTone)) {
+      openPremiumFeatureLogin(`${TONES.find((item) => item.value === nextTone)?.label ?? "This tone"} tone`);
+      return;
+    }
+    setTone(nextTone);
+  }
+
+  function handleRefinementChange(nextRefinement: Refinement) {
+    if (!user && nextRefinement === "strong") {
+      openPremiumFeatureLogin("Strong refinement");
+      return;
+    }
+    setRefinement(nextRefinement);
+  }
+
   async function handleSubmit() {
     setError(null);
     if (input.trim().length < 5) {
@@ -191,7 +223,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
     if (wordLimitExceeded) {
       if (!user) {
         setError(`Log in to continue with drafts over ${wordLimitLabel} words.`);
-        setShowLogin(true);
+        openPremiumFeatureLogin("Longer inputs");
       } else if (!isPaidUser) {
         setError(`Upgrade to continue with drafts over ${wordLimitLabel} words.`);
         setShowUpgrade(true);
@@ -202,7 +234,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
     }
     if (anonymousAdvancedControl) {
       setError("Log in to unlock every tone and Strong refinement.");
-      setShowLogin(true);
+      openPremiumFeatureLogin("Advanced tone and refinement controls");
       return;
     }
     setLoading(true);
@@ -234,7 +266,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       const data = await res.json();
       if (!res.ok) {
         if (data?.requiresAuth) {
-          setShowLogin(true);
+          openPremiumFeatureLogin("This workflow");
         } else if (data?.requiresUpgrade) {
           setShowUpgrade(true);
         }
@@ -292,7 +324,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       const data = await res.json();
       if (!res.ok) {
         if (data?.requiresAuth) {
-          setShowLogin(true);
+          openPremiumFeatureLogin("Another quiz testlet");
         } else if (data?.requiresUpgrade) {
           setShowUpgrade(true);
         }
@@ -561,7 +593,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                 resetResult();
               }}
               tone={tone}
-              setTone={setTone}
+              setTone={handleToneChange}
               educationLevel={educationLevel}
               setEducationLevel={setEducationLevel}
               subject={studySubject}
@@ -579,7 +611,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                 <label className="field-label">Tone</label>
                 <Listbox<Tone>
                   value={tone}
-                  onChange={setTone}
+                  onChange={handleToneChange}
                   options={TONES.map((t) => ({
                     value: t.value,
                     label: t.label,
@@ -592,7 +624,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                 <label className="field-label">Refinement</label>
                 <SegmentedControl<Refinement>
                   value={refinement}
-                  onChange={setRefinement}
+                  onChange={handleRefinementChange}
                   options={REFINEMENTS.map((r) => ({
                     value: r.value,
                     label: r.label,
@@ -715,7 +747,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                     description="Green underlines mark wording rewrito changed to make the draft sound more human."
                   />
                 ) : tool === "plagiarism" ? (
-                  <FormattedText text={output} />
+                  <PlagiarismOutput output={output} />
                 ) : (
                   <FormattedText text={output} />
                 )
@@ -750,7 +782,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
               </p>
               <button
                 type="button"
-                onClick={() => setShowLogin(true)}
+                onClick={() => openPremiumFeatureLogin("Saved history")}
                 className="btn-secondary mt-3 w-full"
               >
                 Log in to save
@@ -781,8 +813,8 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
       <LoginModal
         open={showLogin}
         onClose={() => setShowLogin(false)}
-        headline="Log in to continue working"
-        subline="Log in to keep rewriting."
+        headline={loginCopy.headline}
+        subline={loginCopy.subline}
       />
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
     </div>
@@ -1280,6 +1312,74 @@ function FormattedText({ text }: { text: string }) {
           </p>
         );
       })}
+    </div>
+  );
+}
+
+function PlagiarismOutput({ output }: { output: string }) {
+  const sections = parseStudySections(output);
+  const findSection = (needle: string) =>
+    sections.find((section) => section.title.toLowerCase().includes(needle));
+  const revised = findSection("revised") ?? sections[0];
+  const report = findSection("originality");
+  const citations = findSection("citation");
+  const otherSections = sections.filter(
+    (section) => section !== revised && section !== report && section !== citations
+  );
+
+  return (
+    <div className="space-y-4">
+      {revised && (
+        <section className="rounded-xl border border-line bg-white p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h4 className="text-sm font-semibold text-ink">{revised.title}</h4>
+            <span className="rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-semibold text-success">
+              Revised
+            </span>
+          </div>
+          <FormattedText text={revised.content} />
+        </section>
+      )}
+
+      {report && (
+        <section className="overflow-hidden rounded-xl border border-brand/20 bg-white shadow-soft">
+          <div className="border-b border-line bg-ink px-4 py-3 text-white">
+            <h4 className="text-sm font-semibold">Originality report</h4>
+            <p className="mt-1 text-xs leading-relaxed text-white/70">
+              Table view of the main risk areas and what changed.
+            </p>
+          </div>
+          <div className="p-4">
+            <FormattedText text={report.content} />
+          </div>
+        </section>
+      )}
+
+      {citations && (
+        <section className="overflow-hidden rounded-xl border border-warning/30 bg-white shadow-soft">
+          <div className="border-b border-warning/20 bg-warning/10 px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <h4 className="text-sm font-semibold text-ink">Citation checks</h4>
+              <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-warning shadow-soft">
+                Review
+              </span>
+            </div>
+            <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+              Claims that may need a source are separated from the revised draft.
+            </p>
+          </div>
+          <div className="p-4">
+            <FormattedText text={citations.content} />
+          </div>
+        </section>
+      )}
+
+      {otherSections.map((section) => (
+        <section key={section.title} className="rounded-xl border border-line bg-white p-4">
+          <h4 className="mb-3 text-sm font-semibold text-ink">{section.title}</h4>
+          <FormattedText text={section.content} />
+        </section>
+      ))}
     </div>
   );
 }

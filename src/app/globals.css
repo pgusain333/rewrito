@@ -128,12 +128,12 @@ html {
    Page transition (used by src/app/template.tsx)
    --------------------------------------------------------------------------- */
 .page-enter {
-  animation: page-enter 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: page-enter 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @keyframes page-enter {
   0% {
-    opacity: 0;
-    transform: translateY(6px);
+    opacity: 0.98;
+    transform: translateY(3px);
   }
   100% {
     opacity: 1;
@@ -143,7 +143,7 @@ html {
 
 @media (max-width: 767px) {
   .mobile-menu-panel {
-    transform-origin: left top;
+    transform-origin: right top;
     animation: mobile-menu-slide 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
@@ -155,7 +155,7 @@ html {
 @keyframes mobile-menu-slide {
   0% {
     opacity: 0;
-    transform: translateX(-22px);
+    transform: translateX(22px);
   }
   100% {
     opacity: 1;
@@ -165,8 +165,8 @@ html {
 
 @keyframes mobile-hero-slide {
   0% {
-    opacity: 0;
-    transform: translateX(-18px);
+    opacity: 0.96;
+    transform: translateX(18px);
   }
   100% {
     opacity: 1;

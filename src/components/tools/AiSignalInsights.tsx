@@ -98,8 +98,8 @@ export function AiSignalInsights({
 }) {
   const before = analyzeAiSignals(original);
   const after = rewritten ? analyzeAiSignals(rewritten) : null;
-  const terms = before.matches.map((match) => match.phrase);
-  const afterTerms = after?.matches.map((match) => match.phrase) ?? [];
+  const terms = buildRiskTerms(original);
+  const afterTerms = rewritten ? buildRiskTerms(rewritten) : [];
   const factors = before.factors.slice(0, 5);
 
   return (
@@ -188,7 +188,7 @@ export function AiSignalTextBox({
   const terms =
     mode === "changed"
       ? buildChangedTerms(compareText, text)
-      : analyzeAiSignals(text).matches.map((match) => match.phrase);
+      : buildRiskTerms(text);
   const hasTerms = terms.length > 0;
 
   return (
@@ -300,9 +300,22 @@ function HighlightedText({
 
 function buildChangedTerms(original: string, rewritten: string) {
   if (!original.trim() || !rewritten.trim()) return [];
-  const originalWords = new Set(tokenize(original));
+  const originalComparable = normalizeComparable(original);
+  const sentenceTerms = splitSentences(rewritten)
+    .filter((sentence) => sentence.length >= 24 && sentence.length <= 220)
+    .filter((sentence) => !originalComparable.includes(normalizeComparable(sentence)))
+    .slice(0, 8);
+
   const terms: string[] = [];
   const seen = new Set<string>();
+  for (const sentence of sentenceTerms) {
+    const key = normalizeComparable(sentence);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    terms.push(sentence);
+  }
+
+  const originalWords = new Set(tokenize(original));
   for (const rawWord of rewritten.match(/\b[A-Za-z][A-Za-z'-]{3,}\b/g) ?? []) {
     const normalized = normalizeToken(rawWord);
     if (
@@ -318,6 +331,43 @@ function buildChangedTerms(original: string, rewritten: string) {
     if (terms.length >= 28) break;
   }
   return terms;
+}
+
+function buildRiskTerms(text: string) {
+  const report = analyzeAiSignals(text);
+  const terms = report.matches.map((match) => match.phrase);
+  const seen = new Set(terms.map((term) => term.toLowerCase()));
+
+  for (const sentence of splitSentences(text)) {
+    const words = getWords(sentence);
+    if (words.length < 28) continue;
+    const compact = sentence.trim();
+    if (compact.length < 45) continue;
+    const clipped = compact.length > 180 ? compact.slice(0, 180).replace(/\s+\S*$/, "") : compact;
+    const key = clipped.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    terms.push(clipped);
+    if (terms.length >= 24) break;
+  }
+
+  return terms;
+}
+
+function splitSentences(text: string) {
+  return text
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+}
+
+function normalizeComparable(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function tokenize(text: string) {
@@ -432,19 +482,19 @@ function buildHighlightedParts(text: string, terms: string[]) {
   if (!text || !terms.length) return [{ text, highlight: false }];
   const intervals: Array<{ start: number; end: number }> = [];
   const sortedTerms = [...new Set(terms)].sort((a, b) => b.length - a.length);
-  const lower = text.toLowerCase();
 
   for (const term of sortedTerms) {
-    let searchFrom = 0;
-    const needle = term.toLowerCase();
-    while (searchFrom < lower.length) {
-      const index = lower.indexOf(needle, searchFrom);
-      if (index === -1) break;
-      const end = index + needle.length;
+    const matcher = flexibleTermRegex(term);
+    if (!matcher) continue;
+    for (const match of text.matchAll(matcher)) {
+      const index = match.index ?? -1;
+      if (index < 0) continue;
+      const matchedText = match[0] ?? "";
+      if (!matchedText.trim()) continue;
+      const end = index + matchedText.length;
       if (!intervals.some((item) => index < item.end && end > item.start)) {
         intervals.push({ start: index, end });
       }
-      searchFrom = end;
     }
   }
 
@@ -460,6 +510,20 @@ function buildHighlightedParts(text: string, terms: string[]) {
   }
   if (cursor < text.length) parts.push({ text: text.slice(cursor), highlight: false });
   return parts;
+}
+
+function flexibleTermRegex(term: string) {
+  const cleaned = term.trim().replace(/\s+/g, " ");
+  if (!cleaned) return null;
+  const escaped = cleaned
+    .split(" ")
+    .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("\\s+");
+  const startsWithWord = /^[A-Za-z0-9]/.test(cleaned);
+  const endsWithWord = /[A-Za-z0-9]$/.test(cleaned);
+  const prefix = startsWithWord ? "\\b" : "";
+  const suffix = endsWithWord ? "\\b" : "";
+  return new RegExp(`${prefix}${escaped}${suffix}`, "gi");
 }
 
 function excerptForSignals(text: string, terms: string[]) {

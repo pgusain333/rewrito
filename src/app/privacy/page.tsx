@@ -7,12 +7,18 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy - rewrito AI Writing and Study Tools",
   description:
-    "Privacy policy for rewrito, including accounts, AI processing, analytics, saved history, data retention, service providers, and user choices.",
+    "Privacy policy for rewrito, including accounts, AI processing, analytics, plagiarism checking, detector scores, saved history, data retention, service providers, and user choices.",
   path: "/privacy",
-  keywords: ["rewrito privacy", "AI writing tool privacy", "AI study assistant privacy"],
+  keywords: [
+    "rewrito privacy",
+    "AI writing tool privacy",
+    "AI study assistant privacy",
+    "AI detector privacy",
+    "plagiarism checker privacy",
+  ],
 });
 
-const lastUpdated = "May 21, 2026";
+const lastUpdated = "May 22, 2026";
 
 export default function PrivacyPage() {
   return (
@@ -45,6 +51,8 @@ export default function PrivacyPage() {
                   <li>Anonymous history is not saved.</li>
                   <li>Signed-in history is saved so you can reopen work.</li>
                   <li>AI providers process text to generate outputs.</li>
+                  <li>Detector and plagiarism scores are review aids.</li>
+                  <li>We do not sell your personal information.</li>
                   <li>You can contact us to request account or data help.</li>
                 </ul>
               </div>
@@ -53,13 +61,16 @@ export default function PrivacyPage() {
             <div className="space-y-5">
               <PolicySection title="1. Information we collect">
                 <p>
-                  We collect information you choose to provide, such as your email address, name, password-based login details, and any text or study material you submit to rewrito tools.
+                  We collect information you choose to provide, such as your email address, name, password-based login details, Google login details shared with us by Supabase, and any text, files, questions, notes, or study material you submit to rewrito tools.
                 </p>
                 <p>
-                  For anonymous use, we may store a local browser identifier and usage count so the free experience works correctly. Anonymous rewrite text is not saved to your dashboard history.
+                  Your submitted content may include writing drafts, LinkedIn posts, emails, study notes, quiz material, flashcard topics, plagiarism-checker text, AI detector text, and uploaded PDFs used for study extraction.
                 </p>
                 <p>
-                  For signed-in use, we save recent sessions, including input, output, selected tool, tone, refinement level, study mode, scores, and timestamps, so you can revisit and reopen useful work.
+                  For anonymous use, we may store a local browser identifier and basic usage data so the free experience works correctly. Anonymous rewrite text is not saved to your dashboard history.
+                </p>
+                <p>
+                  For signed-in use, we save recent sessions, including input, output, selected tool, tone, refinement level, study mode, scores, quiz results, and timestamps, so you can revisit and reopen useful work.
                 </p>
               </PolicySection>
 
@@ -81,7 +92,16 @@ export default function PrivacyPage() {
                 </p>
               </PolicySection>
 
-              <PolicySection title="4. Service providers">
+              <PolicySection title="4. Detector, plagiarism, and citation review">
+                <p>
+                  AI detector scores, originality scores, plagiarism-risk signals, underlined wording, and citation checks are generated as practical review aids. They are not official reports from universities, publishers, search engines, Turnitin, GPTZero, Originality.ai, or any academic database.
+                </p>
+                <p>
+                  These tools may be wrong or incomplete. You should verify important claims, sources, citations, originality, and submission requirements before relying on any output.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="5. Service providers">
                 <p>
                   We use trusted service providers to run rewrito, including hosting, authentication, database storage, email delivery, analytics, and AI generation providers. These providers process information only as needed to support the service.
                 </p>
@@ -115,7 +135,7 @@ export default function PrivacyPage() {
                 </div>
               </PolicySection>
 
-              <PolicySection title="5. Cookies, local storage, and analytics">
+              <PolicySection title="6. Cookies, local storage, and analytics">
                 <p>
                   rewrito may use cookies, local storage, and similar technologies for login sessions, anonymous usage limits, saved preferences, and analytics.
                 </p>
@@ -124,7 +144,7 @@ export default function PrivacyPage() {
                 </p>
               </PolicySection>
 
-              <PolicySection title="6. Data retention">
+              <PolicySection title="7. Data retention">
                 <p>
                   Anonymous usage identifiers remain in your browser unless cleared. Signed-in history is retained so you can access it from your dashboard, subject to account settings, technical limits, and future plan limits.
                 </p>
@@ -133,13 +153,28 @@ export default function PrivacyPage() {
                 </p>
               </PolicySection>
 
-              <PolicySection title="7. Security">
+              <PolicySection title="8. How we share information">
+                <p>
+                  We do not sell your personal information. We share information only with service providers that help us operate rewrito, when you direct us to do so, when needed for security or abuse prevention, or when required by law.
+                </p>
+                <p>
+                  If rewrito is involved in a merger, acquisition, financing, or asset transfer, information may be transferred as part of that transaction, subject to appropriate protections.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="9. Email and product communications">
+                <p>
+                  We may send transactional emails such as sign-up confirmation, password reset, welcome emails, account notices, and important service updates. If marketing emails are introduced, you will be able to unsubscribe from those messages.
+                </p>
+              </PolicySection>
+
+              <PolicySection title="10. Security">
                 <p>
                   We use reasonable technical and organizational measures designed to protect rewrito accounts and data. No internet service can guarantee absolute security, so please use strong account credentials and avoid submitting sensitive information that is not needed for the tool.
                 </p>
               </PolicySection>
 
-              <PolicySection title="8. Your choices">
+              <PolicySection title="11. Your choices">
                 <p>
                   You can use rewrito without signing in for limited anonymous access. If you create an account, you can access saved history in your dashboard and contact us for help with account or data requests.
                 </p>
@@ -151,25 +186,25 @@ export default function PrivacyPage() {
                 </p>
               </PolicySection>
 
-              <PolicySection title="9. Children">
+              <PolicySection title="12. Children">
                 <p>
                   rewrito is not intended for children under 13. If you believe a child has provided personal information to us, please contact us so we can review and take appropriate action.
                 </p>
               </PolicySection>
 
-              <PolicySection title="10. International users">
+              <PolicySection title="13. International users">
                 <p>
                   rewrito may process and store information in countries other than where you live. By using the service, you understand that your information may be processed where our providers operate.
                 </p>
               </PolicySection>
 
-              <PolicySection title="11. Changes to this policy">
+              <PolicySection title="14. Changes to this policy">
                 <p>
                   We may update this Privacy Policy as rewrito evolves. If we make material changes, we will update the date above and may provide additional notice where appropriate.
                 </p>
               </PolicySection>
 
-              <PolicySection title="12. Contact">
+              <PolicySection title="15. Contact">
                 <p>
                   For privacy questions or requests, email{" "}
                   <a className="text-brand hover:underline" href="mailto:hello@rewrito.ai">

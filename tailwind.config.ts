@@ -15,8 +15,8 @@ const config: Config = {
         },
         ink: {
           DEFAULT: "#111827",
-          muted: "#6B7280",
-          subtle: "#9CA3AF",
+          muted: "#4B5563",
+          subtle: "#6B7280",
         },
         brand: {
           DEFAULT: "#7C3AED",
@@ -49,11 +49,11 @@ const config: Config = {
       },
       keyframes: {
         fadeIn: {
-          "0%": { opacity: "0" },
+          "0%": { opacity: "0.98" },
           "100%": { opacity: "1" },
         },
         fadeUp: {
-          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "0%": { opacity: "0.98", transform: "translateY(4px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         shimmer: {
