@@ -129,7 +129,7 @@ export default function StudyAssistantPage() {
           </div>
           <div className="mx-auto max-w-6xl px-5 pb-10 pt-14 sm:px-8 sm:pb-14 sm:pt-20">
             <nav className="mb-5 text-sm text-ink-muted">
-              <Link href="/" className="hover:text-ink">
+              <Link href="/" prefetch={false} className="hover:text-ink">
                 Home
               </Link>
               <span className="mx-2 text-ink-subtle">/</span>
@@ -149,11 +149,11 @@ export default function StudyAssistantPage() {
                   breakdowns, quizzes, flashcards, organized notes, and practical study plans.
                 </p>
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                  <Link href="#study-tool" className="btn-primary">
+                  <Link href="#study-tool" prefetch={false} className="btn-primary">
                     Start studying
                     <ArrowRightIcon size={16} />
                   </Link>
-                  <Link href="/tools" className="btn-secondary">
+                  <Link href="/tools" prefetch={false} className="btn-secondary">
                     See all tools
                   </Link>
                 </div>
@@ -397,7 +397,7 @@ function PracticeLinkCard({
   label: string;
 }) {
   return (
-    <Link href={href} className="group card block h-full p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card">
+    <Link href={href} prefetch={false} className="group card block h-full p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card">
       <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-softPurple text-brand transition-transform duration-300 group-hover:-translate-y-0.5">
         <StudyIcon size={21} />
       </span>

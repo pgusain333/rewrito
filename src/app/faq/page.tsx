@@ -6,9 +6,9 @@ import { ArrowRightIcon } from "@/components/ui/icons";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "rewrito FAQ - AI Humanizer, Detector, Plagiarism, and Study Questions",
+  title: "rewrito FAQ - AI Humanizer, Grammar, Detector, Plagiarism, and Study Questions",
   description:
-    "Answers to common questions about rewrito, free access, saved history, AI humanizing, detector scores, plagiarism checking, Rewrito Study, privacy, and mobile support.",
+    "Answers to common questions about rewrito, free access, saved history, AI humanizing, grammar checking, detector scores, plagiarism checking, Rewrito Study, privacy, and mobile support.",
   path: "/faq",
   keywords: ["rewrito FAQ", "AI humanizer questions", "AI detector score questions", "plagiarism checker questions", "AI study assistant questions"],
 });
@@ -28,7 +28,7 @@ const faqs = [
   },
   {
     q: "Which tools are included?",
-    a: "rewrito includes an AI Humanizer, AI Detector Score, Plagiarism Checker, LinkedIn Post Rewriter, Professional Email Rewriter, and Rewrito Study.",
+    a: "rewrito includes an AI Humanizer, AI Detector Score, Grammar Checker, Plagiarism Checker, LinkedIn Post Rewriter, Professional Email Rewriter, and Rewrito Study.",
   },
   {
     q: "Does the Plagiarism Checker scan databases?",
@@ -114,7 +114,7 @@ export default function FAQPage() {
                   Open the toolkit and try your first rewrite or study session.
                 </p>
               </div>
-              <Link href="/tools" className="btn-primary">
+              <Link href="/tools" prefetch={false} className="btn-primary">
                 Explore tools <ArrowRightIcon size={16} />
               </Link>
             </div>

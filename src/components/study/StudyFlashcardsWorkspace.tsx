@@ -212,18 +212,18 @@ export function StudyFlashcardsWorkspace() {
                 )}
                 {loading ? "Creating deck..." : "Create flashcards"}
               </button>
-              <Link href="/study-assistant/quiz" className="btn-secondary w-full sm:w-auto">
+              <Link href="/study-assistant/quiz" prefetch={false} className="btn-secondary w-full sm:w-auto">
                 Open quiz testlets
                 <ArrowRightIcon size={16} />
               </Link>
             </div>
             <p className="mt-3 text-center text-xs leading-relaxed text-ink-subtle sm:text-left">
               By using rewrito, you agree to our{" "}
-              <Link href="/terms" className="font-medium text-brand hover:underline">
+              <Link href="/terms" prefetch={false} className="font-medium text-brand hover:underline">
                 Terms of Use
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="font-medium text-brand hover:underline">
+              <Link href="/privacy" prefetch={false} className="font-medium text-brand hover:underline">
                 Privacy Policy
               </Link>.
             </p>

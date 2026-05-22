@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/tools", priority: 0.95, changeFrequency: "weekly" },
     { path: "/ai-humanizer", priority: 0.95, changeFrequency: "weekly" },
     { path: "/ai-detector", priority: 0.95, changeFrequency: "weekly" },
+    { path: "/grammar-checker", priority: 0.94, changeFrequency: "weekly" },
     { path: "/plagiarism-checker", priority: 0.94, changeFrequency: "weekly" },
     { path: "/linkedin-rewriter", priority: 0.9, changeFrequency: "weekly" },
     { path: "/email-rewriter", priority: 0.9, changeFrequency: "weekly" },

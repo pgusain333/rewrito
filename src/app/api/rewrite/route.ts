@@ -387,6 +387,8 @@ function stabilizeScores(scores: ScorePair | null, tool: ToolType): ScorePair | 
       ? { clarity: 18, naturalness: 24, conciseness: 14, overall: 22 }
       : tool === "plagiarism"
       ? { clarity: 18, naturalness: 26, conciseness: 12, overall: 24 }
+      : tool === "grammar"
+      ? { clarity: 20, naturalness: 18, conciseness: 14, overall: 22 }
       : tool === "linkedin"
       ? { clarity: 16, naturalness: 18, conciseness: 12, overall: 18 }
       : { clarity: 18, naturalness: 14, conciseness: 18, overall: 18 };
@@ -395,6 +397,8 @@ function stabilizeScores(scores: ScorePair | null, tool: ToolType): ScorePair | 
       ? 38
       : tool === "plagiarism"
       ? 42
+      : tool === "grammar"
+      ? 34
       : tool === "linkedin"
       ? 28
       : 24;
@@ -405,7 +409,7 @@ function stabilizeScores(scores: ScorePair | null, tool: ToolType): ScorePair | 
     conciseness: clamp(Math.min(scores.before.conciseness, 72)),
     overall: clamp(Math.min(scores.before.overall, 70)),
     aiGenerated: clamp(
-      Math.max(scores.before.aiGenerated ?? 0, tool === "humanizer" || tool === "detector" ? 72 : tool === "plagiarism" ? 68 : 58)
+      Math.max(scores.before.aiGenerated ?? 0, tool === "humanizer" || tool === "detector" ? 72 : tool === "plagiarism" ? 68 : tool === "grammar" ? 62 : 58)
     ),
   };
 
@@ -418,10 +422,10 @@ function stabilizeScores(scores: ScorePair | null, tool: ToolType): ScorePair | 
   };
 
   after.clarity = clamp(Math.max(after.clarity, 88));
-  after.naturalness = clamp(Math.max(after.naturalness, tool === "humanizer" || tool === "detector" || tool === "plagiarism" ? 92 : 88));
+  after.naturalness = clamp(Math.max(after.naturalness, tool === "humanizer" || tool === "detector" || tool === "plagiarism" || tool === "grammar" ? 92 : 88));
   after.conciseness = clamp(Math.max(after.conciseness, 86));
   after.overall = clamp(Math.max(after.overall, 90));
-  after.aiGenerated = clamp(Math.min(after.aiGenerated, tool === "humanizer" || tool === "detector" ? 18 : tool === "plagiarism" ? 16 : 26));
+  after.aiGenerated = clamp(Math.min(after.aiGenerated, tool === "humanizer" || tool === "detector" ? 18 : tool === "plagiarism" ? 16 : tool === "grammar" ? 12 : 26));
 
   return { before, after };
 }
@@ -443,6 +447,12 @@ function fallbackScores(tool: ToolType): ScorePair {
     return {
       before: { clarity: 61, naturalness: 52, conciseness: 58, aiGenerated: 76, overall: 57 },
       after: { clarity: 92, naturalness: 94, conciseness: 86, aiGenerated: 12, overall: 93 },
+    };
+  }
+  if (tool === "grammar") {
+    return {
+      before: { clarity: 60, naturalness: 56, conciseness: 62, aiGenerated: 68, overall: 58 },
+      after: { clarity: 93, naturalness: 92, conciseness: 88, aiGenerated: 10, overall: 94 },
     };
   }
   if (tool === "linkedin") {

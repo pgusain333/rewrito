@@ -6,6 +6,7 @@ import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 import { absoluteUrl, pageMetadata, TOOL_KEYWORDS, uniqueKeywords } from "@/lib/seo";
 import {
   ArrowRightIcon,
+  GrammarIcon,
   LinkedinIcon,
   MailIcon,
   ShieldCheckIcon,
@@ -14,13 +15,14 @@ import {
 } from "@/components/ui/icons";
 
 export const metadata: Metadata = pageMetadata({
-  title: "AI Writing Tools - Humanizer, Detector, Plagiarism, Study",
+  title: "AI Writing Tools - Humanizer, Detector, Grammar, Plagiarism, Study",
   description:
-    "Explore rewrito's AI Humanizer, AI Detector Score, Plagiarism Checker, LinkedIn Post Rewriter, Professional Email Rewriter, and AI Study Assistant in one toolkit.",
+    "Explore rewrito's AI Humanizer, AI Detector Score, Grammar Checker, Plagiarism Checker, LinkedIn Post Rewriter, Professional Email Rewriter, and AI Study Assistant in one toolkit.",
   path: "/tools",
   keywords: uniqueKeywords(
     TOOL_KEYWORDS.humanizer,
     TOOL_KEYWORDS.detector,
+    TOOL_KEYWORDS.grammar,
     TOOL_KEYWORDS.plagiarism,
     TOOL_KEYWORDS.linkedin,
     TOOL_KEYWORDS.email,
@@ -44,6 +46,14 @@ const tools = [
     description:
       "Turn rough notes into a clean LinkedIn post with a grounded hook, short paragraphs, and a real voice.",
     points: ["Shapes rough drafts", "Avoids fake hype", "Improves post structure"],
+  },
+  {
+    icon: GrammarIcon,
+    name: "Grammar Checker",
+    href: "/grammar-checker",
+    description:
+      "Correct grammar, punctuation, spelling, clarity, and flow while keeping your voice and meaning intact.",
+    points: ["Fixes grammar issues", "Explains changes", "Improves readability"],
   },
   {
     icon: MailIcon,
@@ -85,7 +95,7 @@ export default function ToolsPage() {
     "@type": "CollectionPage",
     name: "rewrito AI Writing Tools",
     description:
-      "AI tools for humanizing AI text, checking AI detector confidence, reviewing plagiarism risk, rewriting LinkedIn posts, improving professional emails, and learning concepts clearly.",
+      "AI tools for humanizing AI text, checking AI detector confidence, correcting grammar, reviewing plagiarism risk, rewriting LinkedIn posts, improving professional emails, and learning concepts clearly.",
     mainEntity: tools.map((tool) => ({
       "@type": "SoftwareApplication",
       name: tool.name,
@@ -112,13 +122,13 @@ export default function ToolsPage() {
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
               Choose a focused workspace for AI-generated copy, detector-style checks,
-              LinkedIn posts, email drafts, or study material. Each tool improves clarity while keeping the purpose intact.
+              LinkedIn posts, grammar edits, email drafts, plagiarism checks, or study material. Each tool improves clarity while keeping the purpose intact.
             </p>
           </div>
         </section>
 
         <section className="bg-bg-section/60">
-          <div className="mx-auto grid max-w-6xl gap-5 px-5 py-14 sm:grid-cols-2 sm:px-8 sm:py-20 lg:grid-cols-3 xl:grid-cols-6">
+          <div className="mx-auto grid max-w-6xl gap-5 px-5 py-14 sm:grid-cols-2 sm:px-8 sm:py-20 lg:grid-cols-3 xl:grid-cols-4">
             {tools.map((tool) => (
               <article key={tool.name} className="card flex h-full flex-col p-6">
                 <span className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-softPurple text-brand">
@@ -134,7 +144,7 @@ export default function ToolsPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href={tool.href} className="btn-secondary mt-6 w-full">
+                <Link href={tool.href} prefetch={false} className="btn-secondary mt-6 w-full">
                   Open tool <ArrowRightIcon size={16} />
                 </Link>
               </article>

@@ -7,13 +7,14 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy - rewrito AI Writing and Study Tools",
   description:
-    "Privacy policy for rewrito, including accounts, AI processing, analytics, plagiarism checking, detector scores, saved history, data retention, service providers, and user choices.",
+    "Privacy policy for rewrito, including accounts, AI processing, analytics, grammar checking, plagiarism checking, detector scores, saved history, data retention, service providers, and user choices.",
   path: "/privacy",
   keywords: [
     "rewrito privacy",
     "AI writing tool privacy",
     "AI study assistant privacy",
     "AI detector privacy",
+    "AI grammar checker privacy",
     "plagiarism checker privacy",
   ],
 });
@@ -51,7 +52,7 @@ export default function PrivacyPage() {
                   <li>Anonymous history is not saved.</li>
                   <li>Signed-in history is saved so you can reopen work.</li>
                   <li>AI providers process text to generate outputs.</li>
-                  <li>Detector and plagiarism scores are review aids.</li>
+                  <li>Grammar, detector, and plagiarism scores are review aids.</li>
                   <li>We do not sell your personal information.</li>
                   <li>You can contact us to request account or data help.</li>
                 </ul>
@@ -64,7 +65,7 @@ export default function PrivacyPage() {
                   We collect information you choose to provide, such as your email address, name, password-based login details, Google login details shared with us by Supabase, and any text, files, questions, notes, or study material you submit to rewrito tools.
                 </p>
                 <p>
-                  Your submitted content may include writing drafts, LinkedIn posts, emails, study notes, quiz material, flashcard topics, plagiarism-checker text, AI detector text, and uploaded PDFs used for study extraction.
+                  Your submitted content may include writing drafts, LinkedIn posts, emails, grammar-checker text, study notes, quiz material, flashcard topics, plagiarism-checker text, AI detector text, and uploaded PDFs used for study extraction.
                 </p>
                 <p>
                   For anonymous use, we may store a local browser identifier and basic usage data so the free experience works correctly. Anonymous rewrite text is not saved to your dashboard history.
@@ -76,7 +77,7 @@ export default function PrivacyPage() {
 
               <PolicySection title="2. How we use information">
                 <p>
-                  We use your information to provide AI rewriting, AI detector-style scoring, study tools, quiz and flashcard workflows, account access, saved history, usage limits, product support, and service improvement.
+                  We use your information to provide AI rewriting, grammar checking, AI detector-style scoring, study tools, quiz and flashcard workflows, account access, saved history, usage limits, product support, and service improvement.
                 </p>
                 <p>
                   We also use usage and analytics data to understand which pages and tools are working well, troubleshoot issues, prevent abuse, and improve rewrito over time.
@@ -212,7 +213,7 @@ export default function PrivacyPage() {
                   </a>.
                 </p>
                 <p>
-                  Please also review our <Link href="/terms" className="text-brand hover:underline">Terms of Use</Link>.
+                  Please also review our <Link href="/terms" prefetch={false} className="text-brand hover:underline">Terms of Use</Link>.
                 </p>
               </PolicySection>
             </div>

@@ -63,13 +63,14 @@ export function Navbar() {
         aria-label="Primary"
         className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-5 sm:px-8"
       >
-        <Link href="/" aria-label="rewrito home" className="-ml-1 rounded-lg p-1">
+        <Link href="/" prefetch={false} aria-label="rewrito home" className="-ml-1 rounded-lg p-1">
           <Logo size={44} />
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
           <NavLink href="/tools">Tools</NavLink>
           <NavLink href="/ai-detector">AI Detector</NavLink>
+          <NavLink href="/grammar-checker">Grammar</NavLink>
           <NavLink href="/plagiarism-checker">Plagiarism</NavLink>
           <NavLink href="/study-assistant">Study</NavLink>
           <NavLink href="/pricing">Pricing</NavLink>
@@ -82,7 +83,7 @@ export function Navbar() {
               <span className="max-w-[140px] truncate rounded-full bg-bg-soft px-3 py-2 text-sm font-semibold text-ink">
                 {displayName(user)}
               </span>
-              <Link href="/dashboard" className="btn-ghost">
+              <Link href="/dashboard" prefetch={false} className="btn-ghost">
                 Dashboard
               </Link>
               <button onClick={signOut} className="btn-secondary !py-2 !px-4">
@@ -94,7 +95,7 @@ export function Navbar() {
               <button onClick={() => setShowLogin(true)} className="btn-ghost">
                 Log in
               </button>
-              <Link href="/try" className="btn-primary !py-2 !px-4">
+              <Link href="/try" prefetch={false} className="btn-primary !py-2 !px-4">
                 Try free
               </Link>
             </>
@@ -131,6 +132,7 @@ export function Navbar() {
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
             <MobileLink href="/tools" onClick={() => setOpen(false)}>Tools</MobileLink>
             <MobileLink href="/ai-detector" onClick={() => setOpen(false)}>AI Detector</MobileLink>
+            <MobileLink href="/grammar-checker" onClick={() => setOpen(false)}>Grammar</MobileLink>
             <MobileLink href="/plagiarism-checker" onClick={() => setOpen(false)}>Plagiarism</MobileLink>
             <MobileLink href="/study-assistant" onClick={() => setOpen(false)}>Study</MobileLink>
             <MobileLink href="/pricing" onClick={() => setOpen(false)}>Pricing</MobileLink>
@@ -141,7 +143,7 @@ export function Navbar() {
                   <div className="rounded-xl bg-bg-soft px-3 py-2 text-sm font-semibold text-ink">
                     {displayName(user)}
                   </div>
-                  <Link href="/dashboard" onClick={() => setOpen(false)} className="btn-secondary w-full">
+                  <Link href="/dashboard" prefetch={false} onClick={() => setOpen(false)} className="btn-secondary w-full">
                     Dashboard
                   </Link>
                   <button onClick={() => { signOut(); setOpen(false); }} className="btn-ghost w-full">
@@ -153,7 +155,7 @@ export function Navbar() {
                   <button onClick={() => { setShowLogin(true); setOpen(false); }} className="btn-secondary w-full">
                     Log in
                   </button>
-                  <Link href="/try" onClick={() => setOpen(false)} className="btn-primary w-full">
+                  <Link href="/try" prefetch={false} onClick={() => setOpen(false)} className="btn-primary w-full">
                     Try free
                   </Link>
                 </>
@@ -173,6 +175,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
+      prefetch={false}
       className="rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-bg-soft hover:text-ink"
     >
       {children}
@@ -192,6 +195,7 @@ function MobileLink({
   return (
     <Link
       href={href}
+      prefetch={false}
       onClick={onClick}
       className="rounded-lg px-3 py-3 text-base font-medium text-ink hover:bg-bg-soft"
     >

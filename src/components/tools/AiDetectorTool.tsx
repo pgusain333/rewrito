@@ -209,11 +209,11 @@ export function AiDetectorTool() {
           </button>
           <p className="mt-3 text-center text-xs leading-relaxed text-ink-subtle">
             By using rewrito, you agree to our{" "}
-            <Link href="/terms" className="font-medium text-brand hover:underline">
+            <Link href="/terms" prefetch={false} className="font-medium text-brand hover:underline">
               Terms of Use
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="font-medium text-brand hover:underline">
+            <Link href="/privacy" prefetch={false} className="font-medium text-brand hover:underline">
               Privacy Policy
             </Link>.
           </p>

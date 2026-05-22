@@ -9,9 +9,9 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "rewrito Pricing - Free AI Writing and Study Tools",
   description:
-    "Compare rewrito free, signed-in, and premium-ready limits for AI humanizing, detector scores, plagiarism checking, LinkedIn rewriting, email rewriting, quizzes, flashcards, and study plans.",
+    "Compare rewrito free, signed-in, and premium-ready limits for AI humanizing, detector scores, grammar checking, plagiarism checking, LinkedIn rewriting, email rewriting, quizzes, flashcards, and study plans.",
   path: "/pricing",
-  keywords: ["rewrito pricing", "free AI humanizer", "free AI writing tools", "AI study tool pricing", "plagiarism checker pricing"],
+  keywords: ["rewrito pricing", "free AI humanizer", "free AI writing tools", "AI grammar checker", "AI study tool pricing", "plagiarism checker pricing"],
 });
 
 export default function PricingPage() {
@@ -46,13 +46,13 @@ export default function PricingPage() {
                 </div>
                 <ul className="mt-6 space-y-3 text-sm text-ink">
                   <Feat>Start without sign-up</Feat>
-                  <Feat>All 6 tools</Feat>
+                  <Feat>All 7 tools</Feat>
                   <Feat>{ANON_WORD_LIMIT} words per input</Feat>
                   <Feat>Core tones and Medium refinement</Feat>
                   <Feat>Copy and download output</Feat>
                   <Locked>Saved history and personalization</Locked>
                 </ul>
-                <Link href="/try" className="btn-secondary mt-7 w-full">
+                <Link href="/try" prefetch={false} className="btn-secondary mt-7 w-full">
                   Start free
                 </Link>
               </div>
@@ -74,7 +74,7 @@ export default function PricingPage() {
                   <Feat>All tones and refinement controls</Feat>
                   <Locked>Premium next-step guidance</Locked>
                 </ul>
-                <Link href="/try?login=1" className="btn-primary mt-7 w-full">
+                <Link href="/try?login=1" prefetch={false} className="btn-primary mt-7 w-full">
                   Log in free <ArrowRightIcon size={16} />
                 </Link>
               </div>
@@ -98,7 +98,7 @@ export default function PricingPage() {
                   <Feat>Weak-area quiz and flashcard recommendations</Feat>
                   <Feat>Priority performance</Feat>
                 </ul>
-                <Link href="/try" className="btn-primary mt-7 w-full">
+                <Link href="/try" prefetch={false} className="btn-primary mt-7 w-full">
                   Join the waitlist <ArrowRightIcon size={16} />
                 </Link>
               </div>

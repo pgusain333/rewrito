@@ -1,4 +1,11 @@
-export type ToolType = "humanizer" | "detector" | "linkedin" | "email" | "plagiarism" | "study";
+export type ToolType =
+  | "humanizer"
+  | "detector"
+  | "grammar"
+  | "linkedin"
+  | "email"
+  | "plagiarism"
+  | "study";
 export type Tone =
   | "professional"
   | "natural"
@@ -42,6 +49,13 @@ export const TOOLS: Record<
     tagline: "Check AI confidence before you publish",
     description:
       "Estimate AI-writing confidence, highlight AI-sounding phrases, humanize risky wording, and learn better writing patterns.",
+  },
+  grammar: {
+    slug: "grammar-checker",
+    name: "Grammar Checker",
+    tagline: "Fix grammar, clarity, and style with confidence",
+    description:
+      "Correct grammar, punctuation, spelling, tense, agreement, and clarity issues while preserving your voice and meaning.",
   },
   linkedin: {
     slug: "linkedin-rewriter",
@@ -192,6 +206,19 @@ Goals:
 - Preserve all facts, names, dates, numbers, and intent exactly.
 - Keep the output professional, useful, and ready to review.
 - Teach by example through the improved draft itself, not through a separate explanation.`,
+    grammar: `You are Rewrito Grammar Checker, a senior copy editor trusted by professionals, students, and teams.
+Goals:
+- Correct grammar, spelling, punctuation, tense, agreement, sentence fragments, comma issues, and awkward phrasing.
+- Improve clarity and readability without flattening the user's voice.
+- Preserve all facts, names, dates, numbers, formatting intent, and meaning.
+- Make only useful changes. Do not over-polish simple human writing.
+- If a sentence is ambiguous, keep the safest correction and note the ambiguity.
+- Help the user learn the pattern behind recurring mistakes.
+
+Output:
+- First provide "## Corrected draft" with the improved text.
+- Then provide "## Grammar report" with a compact markdown table: Issue, Original, Correction, Why it matters.
+- Then provide "## Writing coach" with 2 to 4 short bullets that teach the main patterns to watch next time.`,
     plagiarism: `You are an originality and plagiarism-risk editor.
 Goals:
 - Review the input for copied-sounding, source-dependent, generic, or insufficiently attributed phrasing.
@@ -202,9 +229,9 @@ Goals:
 - Keep the result as a usable revised draft, followed by a short originality report.
 
 Output:
-- First provide "Revised draft" with the improved text.
-- Then provide "Originality report" with a compact table: Risk area, Why it matters, What changed.
-- Then provide "Citation checks" with bullets only for claims that may need a source.
+- First provide "## Revised draft" with the improved text.
+- Then provide "## Originality report" with a compact table: Risk area, Why it matters, What changed.
+- Then provide "## Citation checks" with bullets only for claims that may need a source.
 - Be transparent that this is a similarity-risk review, not a database scan.`,
   };
 
@@ -416,6 +443,8 @@ export function buildScoringSystemPrompt(tool: ToolType): string {
       "Score with a focus on professional clarity, politeness, and conciseness.",
     detector:
       "Score with a focus on detector-style AI confidence, human rhythm, specificity, and natural writing.",
+    grammar:
+      "Score with a focus on grammar correctness, punctuation, sentence clarity, readability, and low editing risk. For this tool, use the naturalness field as readability.",
     plagiarism:
       "Score with a focus on originality, citation readiness, low similarity risk, clarity, and responsible paraphrasing. For this tool, use the naturalness field as the originality score.",
     study:
@@ -426,6 +455,10 @@ export function buildScoringSystemPrompt(tool: ToolType): string {
       ? `Also score "aiGenerated" from 0 to 100 as plagiarism-style similarity risk:
 - 0 means very original, well-paraphrased, and citation-ready
 - 100 means high similarity risk, source-dependent wording, or uncited copied-sounding claims`
+      : tool === "grammar"
+      ? `Also score "aiGenerated" from 0 to 100 as grammar and clarity issue risk:
+- 0 means polished, grammatically clean, and ready to send
+- 100 means many grammar, punctuation, clarity, or sentence-quality issues`
       : `Also score "aiGenerated" from 0 to 100:
 - 0 means very likely human-written
 - 100 means very likely AI-generated`;

@@ -64,7 +64,7 @@ create unique index if not exists usage_limits_anon_uniq
 create table if not exists public.rewrite_history (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
-  tool_type text not null check (tool_type in ('humanizer', 'detector', 'linkedin', 'email', 'plagiarism', 'study')),
+  tool_type text not null check (tool_type in ('humanizer', 'detector', 'grammar', 'linkedin', 'email', 'plagiarism', 'study')),
   input_text text not null,
   output_text text not null,
   tone text not null,
@@ -85,7 +85,7 @@ alter table public.rewrite_history
 
 alter table public.rewrite_history
   add constraint rewrite_history_tool_type_check
-  check (tool_type in ('humanizer', 'detector', 'linkedin', 'email', 'plagiarism', 'study'));
+  check (tool_type in ('humanizer', 'detector', 'grammar', 'linkedin', 'email', 'plagiarism', 'study'));
 
 create index if not exists rewrite_history_user_created
   on public.rewrite_history(user_id, created_at desc);

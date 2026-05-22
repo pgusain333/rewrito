@@ -30,6 +30,7 @@ import {
   CheckIcon,
   CopyIcon,
   DownloadIcon,
+  GrammarIcon,
   LinkedinIcon,
   MailIcon,
   ShieldCheckIcon,
@@ -114,6 +115,8 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
   const primaryActionLabel =
     tool === "plagiarism"
       ? "Check originality"
+      : tool === "grammar"
+      ? "Check grammar"
       : tool === "detector"
       ? "Analyze and humanize"
       : "Rewrite with rewrito";
@@ -421,6 +424,8 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
   const ToolIcon =
     tool === "humanizer"
       ? SparkleIcon
+      : tool === "grammar"
+      ? GrammarIcon
       : tool === "detector" || tool === "plagiarism"
       ? ShieldCheckIcon
       : tool === "linkedin"
@@ -525,14 +530,22 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
             className="input-base resize-y leading-relaxed"
           />
 
-          {(tool === "humanizer" || tool === "detector" || tool === "plagiarism") && input.trim() && (
+          {(tool === "humanizer" || tool === "detector" || tool === "plagiarism" || tool === "grammar") && input.trim() && (
             <AiSignalTextBox
               text={input}
               mode="risk"
-              title={tool === "plagiarism" ? "Originality-risk text" : "AI-sounding text"}
+              title={
+                tool === "plagiarism"
+                  ? "Originality-risk text"
+                  : tool === "grammar"
+                  ? "Grammar and clarity risks"
+                  : "AI-sounding text"
+              }
               description={
                 tool === "plagiarism"
                   ? "Amber underlines mark phrases that may need original wording, specificity, or citation."
+                  : tool === "grammar"
+                  ? "Amber underlines mark long, generic, or awkward wording to review for grammar and clarity."
                   : "Amber underlines mark phrases to humanize first."
               }
             />
@@ -662,11 +675,11 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
           </button>
           <p className="mt-3 text-center text-xs leading-relaxed text-ink-subtle">
             By using rewrito, you agree to our{" "}
-            <Link href="/terms" className="font-medium text-brand hover:underline">
+            <Link href="/terms" prefetch={false} className="font-medium text-brand hover:underline">
               Terms of Use
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="font-medium text-brand hover:underline">
+            <Link href="/privacy" prefetch={false} className="font-medium text-brand hover:underline">
               Privacy Policy
             </Link>.
           </p>
@@ -692,6 +705,8 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                   : "Study guide"
                 : tool === "plagiarism"
                 ? "Originality report"
+                : tool === "grammar"
+                ? "Grammar report"
                 : tool === "detector"
                 ? "Humanized output"
                 : "Rewritten"}
@@ -748,6 +763,8 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                   />
                 ) : tool === "plagiarism" ? (
                   <PlagiarismOutput output={output} />
+                ) : tool === "grammar" ? (
+                  <GrammarOutput output={output} />
                 ) : (
                   <FormattedText text={output} />
                 )
@@ -762,6 +779,8 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
                   : "Your structured study guide will appear here."
                   : tool === "plagiarism"
                   ? "Your originality score, underlined-risk review, and revised draft will appear here."
+                  : tool === "grammar"
+                  ? "Your corrected draft, grammar report, and writing coach notes will appear here."
                   : "Your refined version will appear here."}
               </span>
             )}
@@ -794,7 +813,7 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
 
       {scores && tool !== "study" && (
         <div className="space-y-4 border-t border-line bg-bg-soft p-5 sm:p-6 animate-fade-up">
-          <ScoreCard scores={scores} variant={tool === "plagiarism" ? "plagiarism" : tool === "detector" ? "detector" : "ai"} />
+          <ScoreCard scores={scores} variant={tool === "plagiarism" ? "plagiarism" : tool === "detector" ? "detector" : tool === "grammar" ? "grammar" : "ai"} />
           {(tool === "humanizer" || tool === "detector") && (
             <AiSignalInsights original={input} rewritten={output} />
           )}
@@ -804,6 +823,15 @@ export function ToolWorkspace({ initialTool = "humanizer", lockTool = false }: P
               mode="risk"
               title="Underlined originality risks"
               description="Amber underlines show phrases that may need more original wording, more specificity, or a citation check."
+            />
+          )}
+          {tool === "grammar" && (
+            <AiSignalTextBox
+              text={output}
+              compareText={input}
+              mode="changed"
+              title="Corrected wording"
+              description="Green underlines show wording rewrito changed for grammar, clarity, or flow."
             />
           )}
           <WritingCoachCard original={input} rewritten={output} />
@@ -829,6 +857,8 @@ function placeholderFor(tool: ToolType): string {
       return "Paste rough notes for your LinkedIn post...";
     case "detector":
       return "Paste text you want to check for detector-style AI confidence...";
+    case "grammar":
+      return "Paste text you want checked for grammar, punctuation, clarity, and flow...";
     case "plagiarism":
       return "Paste a paragraph, essay section, report, or draft you want checked for originality risk and citation needs...";
     case "study":
@@ -943,6 +973,7 @@ function StudyControls({
         <Link
           key={mode.value}
           href={mode.value === "quiz" ? "/study-assistant/quiz" : "/study-assistant/flashcards"}
+          prefetch={false}
           className={className}
         >
           {content}
@@ -1371,6 +1402,62 @@ function PlagiarismOutput({ output }: { output: string }) {
           <div className="p-4">
             <FormattedText text={citations.content} />
           </div>
+        </section>
+      )}
+
+      {otherSections.map((section) => (
+        <section key={section.title} className="rounded-xl border border-line bg-white p-4">
+          <h4 className="mb-3 text-sm font-semibold text-ink">{section.title}</h4>
+          <FormattedText text={section.content} />
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function GrammarOutput({ output }: { output: string }) {
+  const sections = parseStudySections(output);
+  const findSection = (needle: string) =>
+    sections.find((section) => section.title.toLowerCase().includes(needle));
+  const corrected = findSection("corrected") ?? sections[0];
+  const report = findSection("grammar report");
+  const coach = findSection("coach") ?? findSection("writing");
+  const otherSections = sections.filter(
+    (section) => section !== corrected && section !== report && section !== coach
+  );
+
+  return (
+    <div className="space-y-4">
+      {corrected && (
+        <section className="rounded-xl border border-line bg-white p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h4 className="text-sm font-semibold text-ink">{corrected.title}</h4>
+            <span className="rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-semibold text-success">
+              Corrected
+            </span>
+          </div>
+          <FormattedText text={corrected.content} />
+        </section>
+      )}
+
+      {report && (
+        <section className="overflow-hidden rounded-xl border border-brand/20 bg-white shadow-soft">
+          <div className="border-b border-line bg-ink px-4 py-3 text-white">
+            <h4 className="text-sm font-semibold">Grammar report</h4>
+            <p className="mt-1 text-xs leading-relaxed text-white/70">
+              A clean view of what changed and why it improves readability.
+            </p>
+          </div>
+          <div className="p-4">
+            <FormattedText text={report.content} />
+          </div>
+        </section>
+      )}
+
+      {coach && (
+        <section className="rounded-xl border border-success/20 bg-success/5 p-4">
+          <h4 className="mb-3 text-sm font-semibold text-ink">Writing coach</h4>
+          <FormattedText text={coach.content} />
         </section>
       )}
 

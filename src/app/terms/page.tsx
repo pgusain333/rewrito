@@ -7,7 +7,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata: Metadata = pageMetadata({
   title: "Terms of Use - rewrito AI Writing and Study Tools",
   description:
-    "Terms of Use for rewrito's AI Humanizer, AI Detector Score, Plagiarism Checker, LinkedIn Rewriter, Email Rewriter, and Rewrito Study tools.",
+    "Terms of Use for rewrito's AI Humanizer, AI Detector Score, Grammar Checker, Plagiarism Checker, LinkedIn Rewriter, Email Rewriter, and Rewrito Study tools.",
   path: "/terms",
   keywords: ["rewrito terms", "AI writing tool terms", "AI study assistant terms", "plagiarism checker terms"],
 });
@@ -54,13 +54,13 @@ export default function TermsPage() {
               <TermsSection title="1. Agreement to these terms">
                 <p>
                   By accessing or using rewrito, you agree to these Terms of Use and our{" "}
-                  <Link href="/privacy" className="text-brand hover:underline">
+                  <Link href="/privacy" prefetch={false} className="text-brand hover:underline">
                     Privacy Policy
                   </Link>
                   . If you do not agree, do not use the service.
                 </p>
                 <p>
-                  These terms apply to all rewrito tools, including AI Humanizer, AI Detector Score, Plagiarism Checker, LinkedIn Post Rewriter, Professional Email Rewriter, Rewrito Study, quiz testlets, flashcards, dashboards, saved history, and related features.
+                  These terms apply to all rewrito tools, including AI Humanizer, AI Detector Score, Grammar Checker, Plagiarism Checker, LinkedIn Post Rewriter, Professional Email Rewriter, Rewrito Study, quiz testlets, flashcards, dashboards, saved history, and related features.
                 </p>
               </TermsSection>
 

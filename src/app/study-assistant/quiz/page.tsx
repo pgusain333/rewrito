@@ -55,11 +55,11 @@ export default function RewritoStudyQuizPage() {
           </div>
           <div className="mx-auto max-w-7xl px-5 pb-10 pt-14 sm:px-8 sm:pb-14 sm:pt-20">
             <nav className="mb-5 text-sm text-ink-muted">
-              <Link href="/" className="hover:text-ink">
+              <Link href="/" prefetch={false} className="hover:text-ink">
                 Home
               </Link>
               <span className="mx-2 text-ink-subtle">/</span>
-              <Link href="/study-assistant" className="hover:text-ink">
+              <Link href="/study-assistant" prefetch={false} className="hover:text-ink">
                 Rewrito Study
               </Link>
               <span className="mx-2 text-ink-subtle">/</span>
@@ -79,11 +79,11 @@ export default function RewritoStudyQuizPage() {
                   Create MCQs, submit answers, review your scorecard, save scores when logged in, and generate a new quiz for weak areas only.
                 </p>
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                  <Link href="#quiz-workspace" className="btn-primary">
+                  <Link href="#quiz-workspace" prefetch={false} className="btn-primary">
                     Create a testlet
                     <ArrowRightIcon size={16} />
                   </Link>
-                  <Link href="/study-assistant/flashcards" className="btn-secondary">
+                  <Link href="/study-assistant/flashcards" prefetch={false} className="btn-secondary">
                     Open flashcards
                   </Link>
                 </div>

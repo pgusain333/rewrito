@@ -90,11 +90,11 @@ export default function AiDetectorPage() {
                   Paste a draft, see detector-style before and after scores, humanize the text, and learn the writing habits that make future drafts sound more natural.
                 </p>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                  <Link href="#detector" className="btn-primary">
+                  <Link href="#detector" prefetch={false} className="btn-primary">
                     Check my text
                     <ArrowRightIcon size={16} />
                   </Link>
-                  <Link href="/ai-humanizer" className="btn-secondary">
+                  <Link href="/ai-humanizer" prefetch={false} className="btn-secondary">
                     Open AI Humanizer
                   </Link>
                 </div>

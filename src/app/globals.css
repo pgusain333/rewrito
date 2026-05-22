@@ -90,7 +90,9 @@ html {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-ink-muted transition-colors hover:bg-bg-soft hover:text-ink;
   }
   .card {
-    @apply rounded-2xl border border-line bg-white shadow-soft;
+    @apply rounded-2xl border bg-white shadow-soft;
+    border-color: rgba(148, 163, 184, 0.28);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 34px rgba(15, 23, 42, 0.065);
   }
   .chip {
     @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1 text-xs font-medium text-ink-muted;
@@ -99,7 +101,8 @@ html {
     @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-muted;
   }
   .input-base {
-    @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-sm font-normal text-ink placeholder:text-ink-subtle transition-colors focus:border-brand focus:outline-none;
+    @apply w-full rounded-xl border bg-white px-4 py-3 text-sm font-normal text-ink placeholder:text-ink-subtle transition-colors focus:border-brand focus:outline-none;
+    border-color: rgba(148, 163, 184, 0.34);
   }
 }
 
@@ -143,7 +146,7 @@ html {
 
 @media (max-width: 767px) {
   .mobile-menu-panel {
-    transform-origin: right top;
+    transform-origin: top center;
     animation: mobile-menu-slide 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
@@ -155,22 +158,22 @@ html {
 @keyframes mobile-menu-slide {
   0% {
     opacity: 0;
-    transform: translateX(22px);
+    transform: translateY(-8px) scale(0.985);
   }
   100% {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 @keyframes mobile-hero-slide {
   0% {
-    opacity: 0.96;
-    transform: translateX(18px);
+    opacity: 0;
+    transform: translateY(8px);
   }
   100% {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 

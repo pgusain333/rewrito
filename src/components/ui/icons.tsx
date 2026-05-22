@@ -69,6 +69,16 @@ export const CheckIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const GrammarIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5 5h14" />
+    <path d="M5 9h10" />
+    <path d="M5 13h7" />
+    <path d="m15 17 2 2 4-5" />
+    <path d="M5 17h6" />
+  </Icon>
+);
+
 export const ArrowRightIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M5 12h14" />

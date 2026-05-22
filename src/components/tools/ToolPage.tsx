@@ -20,6 +20,7 @@ export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props
   const toolKeywordMap: Record<ToolType, readonly string[]> = {
     humanizer: TOOL_KEYWORDS.humanizer,
     detector: TOOL_KEYWORDS.detector,
+    grammar: TOOL_KEYWORDS.grammar,
     linkedin: TOOL_KEYWORDS.linkedin,
     email: TOOL_KEYWORDS.email,
     plagiarism: TOOL_KEYWORDS.plagiarism,
@@ -71,7 +72,7 @@ export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props
         <section className="bg-bg">
           <div className="mx-auto max-w-5xl px-5 pb-10 pt-4 sm:px-8 sm:pb-14 sm:pt-8">
             <nav className="mb-5 text-sm text-ink-muted">
-              <Link href="/" className="hover:text-ink">Home</Link>
+              <Link href="/" prefetch={false} className="hover:text-ink">Home</Link>
               <span className="mx-2 text-ink-subtle">/</span>
               <span className="text-ink">{meta.name}</span>
             </nav>
@@ -172,7 +173,7 @@ export function ToolPage({ tool, intro, faq, whatItDoes, audiences = [] }: Props
                   One toolkit for the writing that matters.
                 </p>
               </div>
-              <Link href="/tools" className="btn-primary">
+              <Link href="/tools" prefetch={false} className="btn-primary">
                 See all tools <ArrowRightIcon size={16} />
               </Link>
             </div>
@@ -209,6 +210,9 @@ function seoIntentCopy(tool: ToolType) {
   }
   if (tool === "detector") {
     return "Use it when you need detector-style AI confidence scoring, humanized improvements, and clearer writing lessons before publishing.";
+  }
+  if (tool === "grammar") {
+    return "Use it when you need a grammar checker that fixes mistakes, improves clarity, preserves your meaning, and explains the main writing patterns.";
   }
   if (tool === "linkedin") {
     return "Use it when you need a LinkedIn post rewriter that creates a clear hook, short paragraphs, stronger structure, and a professional voice.";

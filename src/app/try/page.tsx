@@ -5,13 +5,14 @@ import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 import { pageMetadata, TOOL_KEYWORDS, uniqueKeywords } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Try rewrito Free - AI Humanizer, Detector, Plagiarism, Study",
+  title: "Try rewrito Free - AI Humanizer, Grammar, Detector, Plagiarism, Study",
   description:
-    "Try rewrito free. Humanize AI text, check AI detector confidence, review plagiarism risk, rewrite LinkedIn posts and emails, and study concepts clearly in one workspace.",
+    "Try rewrito free. Humanize AI text, fix grammar, check AI detector confidence, review plagiarism risk, rewrite LinkedIn posts and emails, and study concepts clearly in one workspace.",
   path: "/try",
   keywords: uniqueKeywords(
     TOOL_KEYWORDS.humanizer,
     TOOL_KEYWORDS.detector,
+    TOOL_KEYWORDS.grammar,
     TOOL_KEYWORDS.plagiarism,
     TOOL_KEYWORDS.linkedin,
     TOOL_KEYWORDS.email,
@@ -38,7 +39,7 @@ export default function TryPage() {
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-muted sm:text-lg">
               Use the workspace to humanize AI text, polish a LinkedIn draft, tighten a
-              professional email, or understand study material clearly.
+              professional email, check grammar, review originality, or understand study material clearly.
             </p>
           </div>
         </section>

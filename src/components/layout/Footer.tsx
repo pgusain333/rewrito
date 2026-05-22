@@ -15,6 +15,7 @@ export function Footer() {
           <FooterCol title="Tools">
             <FooterLink href="/ai-humanizer">AI Humanizer</FooterLink>
             <FooterLink href="/ai-detector">AI Detector</FooterLink>
+            <FooterLink href="/grammar-checker">Grammar Checker</FooterLink>
             <FooterLink href="/plagiarism-checker">Plagiarism Checker</FooterLink>
             <FooterLink href="/linkedin-rewriter">LinkedIn Rewriter</FooterLink>
             <FooterLink href="/email-rewriter">Email Rewriter</FooterLink>
@@ -52,9 +53,10 @@ function FooterCol({ title, children }: { title: string; children: React.ReactNo
 }
 
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const internal = href.startsWith("/");
   return (
     <li>
-      <Link href={href} className="text-sm text-ink-muted hover:text-ink">
+      <Link href={href} prefetch={internal ? false : undefined} className="text-sm text-ink-muted hover:text-ink">
         {children}
       </Link>
     </li>

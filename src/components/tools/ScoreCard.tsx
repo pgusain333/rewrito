@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { ScorePair } from "@/lib/prompts";
 
-type ScoreVariant = "ai" | "detector" | "plagiarism";
+type ScoreVariant = "ai" | "detector" | "grammar" | "plagiarism";
 
 type Props = {
   scores: ScorePair;
@@ -217,6 +217,14 @@ function variantCopy(variant: ScoreVariant) {
       riskMetric: "AI-generated confidence",
       dropLabel: "AI confidence",
       middleMetric: "Naturalness",
+    };
+  }
+  if (variant === "grammar") {
+    return {
+      heading: "Grammar and clarity score",
+      riskMetric: "Grammar issue risk",
+      dropLabel: "issue risk",
+      middleMetric: "Readability",
     };
   }
   return {

@@ -15,7 +15,7 @@ export default function NotFound() {
           <p className="mt-3 text-sm text-ink-muted">
             The link may be old, or the page may have moved.
           </p>
-          <Link href="/" className="btn-primary mt-7">
+          <Link href="/" prefetch={false} className="btn-primary mt-7">
             Back to home
           </Link>
         </div>

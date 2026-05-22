@@ -15,6 +15,7 @@ import {
 import { FREE_HISTORY_LIMIT, PRO_WORD_LIMIT, USER_WORD_LIMIT } from "@/lib/usage/limits";
 import {
   ArrowRightIcon,
+  GrammarIcon,
   LinkedinIcon,
   MailIcon,
   ShieldCheckIcon,
@@ -121,7 +122,7 @@ export default async function DashboardPage() {
               </h1>
               <p className="mt-1 text-sm text-ink-muted">{user.email}</p>
             </div>
-            <Link href="/try" className="btn-primary">
+            <Link href="/try" prefetch={false} className="btn-primary">
               New session <ArrowRightIcon size={16} />
             </Link>
           </div>
@@ -183,7 +184,7 @@ export default async function DashboardPage() {
               <p className="mt-2 text-sm leading-relaxed text-ink">
                 Signed-in sessions support drafts up to {USER_WORD_LIMIT.toLocaleString()} words and keep your latest {FREE_HISTORY_LIMIT} sessions close by.
               </p>
-              <Link href="/pricing" className="btn-secondary mt-4 w-full">
+              <Link href="/pricing" prefetch={false} className="btn-secondary mt-4 w-full">
                 Compare plans
               </Link>
             </div>
@@ -234,7 +235,11 @@ export default async function DashboardPage() {
                           : null;
                         const aiConfidence = row.scores?.after.aiGenerated;
                         const riskLabel =
-                          row.tool_type === "plagiarism" ? "Similarity risk" : "AI confidence";
+                          row.tool_type === "plagiarism"
+                            ? "Similarity risk"
+                            : row.tool_type === "grammar"
+                            ? "Grammar issue risk"
+                            : "AI confidence";
                         const modeLabel = row.study_mode
                           ? STUDY_MODES.find((mode) => mode.value === row.study_mode)?.label ??
                             row.study_mode
@@ -419,6 +424,7 @@ function DashboardSidebar({
     { href: "/try", label: "New session", Icon: WandIcon, active: true },
     { href: "/ai-humanizer", label: "AI Humanizer", Icon: SparkleIcon },
     { href: "/ai-detector", label: "AI Detector", Icon: ShieldCheckIcon },
+    { href: "/grammar-checker", label: "Grammar Checker", Icon: GrammarIcon },
     { href: "/plagiarism-checker", label: "Plagiarism Checker", Icon: ShieldCheckIcon },
     { href: "/linkedin-rewriter", label: "LinkedIn Rewriter", Icon: LinkedinIcon },
     { href: "/email-rewriter", label: "Email Rewriter", Icon: MailIcon },
@@ -441,6 +447,7 @@ function DashboardSidebar({
             <Link
               key={href}
               href={href}
+              prefetch={false}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
                 active
                   ? "bg-brand-softPurple text-brand"
@@ -470,6 +477,7 @@ function DashboardSidebar({
           </p>
           <Link
             href="/pricing"
+            prefetch={false}
             className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-brand"
           >
             Upgrade for more

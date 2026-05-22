@@ -5,6 +5,8 @@ export const SAMPLES: Record<ToolType, string> = {
 
   detector: `In today's rapidly evolving workplace, it is important to note that artificial intelligence is transforming how professionals communicate. By leveraging these tools, individuals can unlock productivity, enhance clarity, and navigate complex business environments more effectively.`,
 
+  grammar: `Me and my team has been working on the report since last week, but there are still few section that needs to be checked before we send it to the client. I want the message to sounds professional but not too formal.`,
+
   linkedin: `so I just shipped a side project and honestly I almost didn't. spent 3 weekends on it, kept finding reasons it wasn't ready. finally just put it out yesterday. 12 signups overnight. not a lot but it taught me something - the version I was afraid to ship would have been fine. perfectionism is just a polite word for fear. anyway, build the thing and ship it.`,
 
   email: `hey, just wanted to check in on the proposal i sent over last tuesday. wasn't sure if you had a chance to look at it yet. no rush at all but if there's anything you need me to clarify or change happy to do that. also let me know if you want to hop on a quick call this week. thanks!`,

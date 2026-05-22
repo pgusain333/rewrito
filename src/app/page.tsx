@@ -1,13 +1,14 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
+import { HomepageToolLoader } from "@/components/tools/HomepageToolLoader";
 import { Reveal } from "@/components/ui/Reveal";
 import { CORE_KEYWORDS, SITE_TAGLINE, TOOL_KEYWORDS, uniqueKeywords } from "@/lib/seo";
 import {
   ArrowRightIcon,
+  GrammarIcon,
   LinkedinIcon,
   MailIcon,
   ShieldCheckIcon,
@@ -16,13 +17,14 @@ import {
 } from "@/components/ui/icons";
 
 export const metadata: Metadata = {
-  title: "rewrito - AI Humanizer, Detector, Plagiarism Checker, and Study Assistant",
+  title: "rewrito - AI Humanizer, Grammar Checker, Detector, Plagiarism Checker, and Study Assistant",
   description:
     "Build human intelligence with AI intelligence. Use rewrito to humanize AI text, check AI detector scores, review plagiarism risk, rewrite LinkedIn posts and emails, create quizzes, flashcards, and study plans.",
   keywords: uniqueKeywords(
     CORE_KEYWORDS,
     TOOL_KEYWORDS.humanizer,
     TOOL_KEYWORDS.detector,
+    TOOL_KEYWORDS.grammar,
     TOOL_KEYWORDS.plagiarism,
     TOOL_KEYWORDS.linkedin,
     TOOL_KEYWORDS.email,
@@ -80,14 +82,14 @@ function Hero() {
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
             Humanize AI text, improve LinkedIn posts, rewrite professional emails,
-            check AI detector confidence, review originality risk, and learn the writing and study patterns behind every improvement.
+            check AI detector confidence, fix grammar, review originality risk, and learn the writing and study patterns behind every improvement.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/try" className="btn-primary">
+            <Link href="/try" prefetch={false} className="btn-primary">
               Try rewrito free
               <ArrowRightIcon size={16} />
             </Link>
-            <Link href="/tools" className="btn-secondary">
+            <Link href="/tools" prefetch={false} className="btn-secondary">
               See tools
             </Link>
           </div>
@@ -138,6 +140,13 @@ const TOOL_CARDS = [
     accent: "bg-warning/10 text-warning",
   },
   {
+    icon: GrammarIcon,
+    name: "Grammar Checker",
+    href: "/grammar-checker",
+    desc: "Fix grammar, punctuation, clarity, and flow while keeping your voice intact.",
+    accent: "bg-brand-softPurple text-brand",
+  },
+  {
     icon: ShieldCheckIcon,
     name: "Plagiarism Checker",
     href: "/plagiarism-checker",
@@ -173,17 +182,18 @@ function ToolCards() {
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Six tools. One toolkit.
+            Seven tools. One toolkit.
           </h2>
           <p className="mt-3 text-base text-ink-muted">
             Built for people who care how their writing lands and how clearly they learn.
           </p>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {TOOL_CARDS.map((t, idx) => (
             <Reveal key={t.name} delay={idx * 90}>
               <Link
                 href={t.href}
+                prefetch={false}
                 className="card group flex h-full flex-col overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card"
               >
                 <ToolChatMockup tool={t.name} accent={t.accent} Icon={t.icon} delay={idx * 1.05} />
@@ -296,6 +306,13 @@ function toolMockupCopy(tool: string) {
       lines: ["Before", "After", "Coach"],
     };
   }
+  if (tool === "Grammar Checker") {
+    return {
+      prompt: "Fix grammar without changing my voice.",
+      output: "Corrected draft, grammar report, and simple coaching notes.",
+      lines: ["Grammar", "Clarity", "Coach"],
+    };
+  }
   if (tool === "Plagiarism Checker") {
     return {
       prompt: "Check this draft for originality risk.",
@@ -374,10 +391,10 @@ function SuitableFor() {
             Built for people who write, learn, and review every day.
           </h2>
         </div>
-        <div className="no-scrollbar -mx-5 flex snap-x gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:px-0 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-3 sm:mx-0 sm:px-0">
           {audiences.map((audience, index) => (
-            <Reveal key={audience.title} delay={index * 80}>
-              <div className="card h-full min-w-[78vw] snap-start overflow-hidden sm:min-w-0">
+            <Reveal key={audience.title} delay={index * 80} className="min-w-[78vw] snap-start sm:min-w-[310px] lg:min-w-[340px]">
+              <div className="card h-full overflow-hidden">
                 <img
                   src={audience.image}
                   alt=""
@@ -500,7 +517,7 @@ function LiveTool() {
             No sign-up. Paste writing or study material, pick a mode, and see the difference.
           </p>
         </div>
-        <ToolWorkspace />
+        <HomepageToolLoader />
       </div>
     </section>
   );
@@ -525,35 +542,40 @@ function WhyUs() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-bg-section/60">
-      <div aria-hidden className="hero-abstract opacity-60">
-        <div className="grid-overlay" />
-        <div className="blob-mid" />
-      </div>
-      <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
-        <div className="grid gap-10 lg:grid-cols-[0.85fr_1fr] lg:items-center">
+    <section className="bg-bg-section/60">
+      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20">
+        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div>
             <span className="chip mb-5">Why people trust rewrito</span>
             <h2 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-              Why choose rewrito?
+              Clear output. Reviewable changes. Better habits.
             </h2>
             <p className="mt-3 text-base leading-relaxed text-ink-muted">
-              rewrito is designed around focused workflows, not a blank chatbot box. The result is
-              easier to scan, easier to trust, and easier to act on.
+              rewrito is designed around focused workflows, not a blank chatbot box. Every tool shows
+              a cleaner result, the signals behind the improvement, and a practical next step.
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-3">
             {reasons.map((reason, index) => (
               <Reveal key={reason.title} delay={index * 110}>
                 <div className="card relative h-full overflow-hidden p-5">
-                  <ReasonMiniMockup index={index} />
+                  <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-brand/20 bg-brand-softPurple text-sm font-semibold text-brand">
+                    {index + 1}
+                  </span>
                   <h3 className="text-base font-semibold text-ink">{reason.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-ink-muted">{reason.body}</p>
-                  <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-bg-section">
+                  <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-bg-section">
                     <div
                       className="h-full rounded-full bg-brand-gradient"
-                      style={{ width: `${64 + index * 12}%` }}
+                      style={{ width: `${72 + index * 8}%` }}
                     />
+                  </div>
+                  <div className="mt-3 rounded-xl border border-line bg-bg-soft px-3 py-2 text-xs font-semibold text-ink-muted">
+                    {index === 0
+                      ? "Focused workspace"
+                      : index === 1
+                      ? "Meaning-first prompts"
+                      : "Review-ready output"}
                   </div>
                 </div>
               </Reveal>
@@ -562,38 +584,6 @@ function WhyUs() {
         </div>
       </div>
     </section>
-  );
-}
-
-function ReasonMiniMockup({ index }: { index: number }) {
-  const labelSets = [
-    ["Mode", "Purpose", "Output"],
-    ["Facts", "Meaning", "Voice"],
-    ["Score", "Copy", "Review"],
-  ];
-  const labels = labelSets[index] ?? labelSets[0];
-
-  return (
-    <div className="mb-5 rounded-xl border border-line bg-bg-soft p-3">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-brand-softPurple text-xs font-semibold text-brand">
-          {index + 1}
-        </span>
-        <span className="h-2 w-12 rounded-full bg-line" />
-      </div>
-      <div className="space-y-2">
-        {labels.map((label, itemIndex) => (
-          <div key={label} className="flex items-center gap-2 rounded-lg bg-white px-2 py-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-            <span className="text-[10px] font-medium text-ink-muted">{label}</span>
-            <span
-              className="ml-auto h-1.5 rounded-full bg-brand-softBlue"
-              style={{ width: `${32 + itemIndex * 16}%` }}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -665,6 +655,11 @@ function SearchIntent() {
       href: "/ai-detector",
     },
     {
+      title: "Grammar Checker",
+      body: "Fix grammar, punctuation, sentence clarity, and flow while preserving the writer's meaning and voice.",
+      href: "/grammar-checker",
+    },
+    {
       title: "Plagiarism Checker",
       body: "Review originality risk, underline copied-sounding text, and spot claims that may need citation before submitting.",
       href: "/plagiarism-checker",
@@ -695,11 +690,12 @@ function SearchIntent() {
             People come to rewrito when they need practical results: clearer writing, lower AI-sounding confidence, stronger professional communication, and study material that is easier to understand.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {items.map((item) => (
             <Link
               key={item.title}
               href={item.href}
+              prefetch={false}
               className="group h-full rounded-2xl border border-white/10 bg-white/[0.06] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.1]"
             >
               <h3 className="text-base font-semibold text-white">{item.title}</h3>
@@ -794,77 +790,29 @@ function HowItWorks() {
           {steps.map((s, idx) => (
             <Reveal key={s.n} delay={idx * 100} as="li">
               <div className="card h-full p-6">
-                <StepMiniMockup index={idx} />
-                <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-softPurple text-sm font-semibold text-brand">
+                <span className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-brand/20 bg-brand-softPurple text-sm font-semibold text-brand">
                   {s.n}
                 </span>
                 <h3 className="mb-1.5 text-base font-semibold text-ink">{s.title}</h3>
                 <p className="text-sm leading-relaxed text-ink-muted">{s.body}</p>
+                <div className="mt-5 border-t border-line pt-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+                    {idx === 0 ? "Input stays yours" : idx === 1 ? "Mode shapes the output" : "Review before using"}
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-ink-muted">
+                    {idx === 0
+                      ? "Paste only what you want rewrito to improve."
+                      : idx === 1
+                      ? "Each tool has a focused prompt and scoring lens."
+                      : "Copy, revise, save, or turn results into a learning habit."}
+                  </p>
+                </div>
               </div>
             </Reveal>
           ))}
         </ol>
       </div>
     </section>
-  );
-}
-
-function StepMiniMockup({ index }: { index: number }) {
-  const steps =
-    [
-      {
-        prompt: "Paste rough text here...",
-        output: "rewrito reads the goal and context.",
-        chips: ["Draft", "Intent"],
-      },
-      {
-        prompt: "Choose LinkedIn, email, study, or detector.",
-        output: "The workspace adjusts prompts and scoring.",
-        chips: ["Mode", "Tone"],
-      },
-      {
-        prompt: "Generate a cleaner version.",
-        output: "Get output, scores, and writing lessons.",
-        chips: ["Output", "Coach"],
-      },
-    ][index] ?? {
-      prompt: "Paste rough text here...",
-      output: "rewrito reads the goal and context.",
-      chips: ["Draft", "Intent"],
-    };
-
-  return (
-    <div className="mb-5 rounded-xl border border-line bg-bg-soft p-3">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="text-[10px] font-semibold text-ink-muted">rewrito chat</span>
-        <span className="h-2 w-8 rounded-full bg-line" />
-      </div>
-      <div className="space-y-2">
-        <div className="ml-auto max-w-[88%] rounded-xl rounded-tr-sm bg-brand-softPurple px-3 py-2 text-[10px] font-medium leading-relaxed text-brand">
-          <span className="typing-reveal">{steps.prompt}</span>
-        </div>
-        <div className="rounded-xl rounded-tl-sm border border-line bg-white px-3 py-2">
-          <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-ink">
-            <span className="inline-flex h-4 w-4 items-center justify-center rounded bg-brand-softPurple text-brand">r</span>
-            rewrito
-          </div>
-          <p className="text-[10px] leading-relaxed text-ink-muted">{steps.output}</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {steps.chips.map((chip) => (
-              <span key={chip} className="rounded-full bg-bg-section px-2 py-0.5 text-[9px] font-semibold text-ink-muted">
-                {chip}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5 px-1 text-ink-subtle">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand animate-typing-dot" />
-          <span className="h-1.5 w-1.5 rounded-full bg-brand animate-typing-dot [animation-delay:120ms]" />
-          <span className="h-1.5 w-1.5 rounded-full bg-brand animate-typing-dot [animation-delay:240ms]" />
-          <span className="ml-1 text-[9px] font-medium">live guidance</span>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -1016,11 +964,11 @@ function FinalCTA() {
             Start free. No card. No friction.
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-2 sm:flex-row">
-            <Link href="/try" className="btn-primary">
+            <Link href="/try" prefetch={false} className="btn-primary">
               Start rewriting
               <ArrowRightIcon size={16} />
             </Link>
-            <Link href="/pricing" className="btn-secondary">
+            <Link href="/pricing" prefetch={false} className="btn-secondary">
               See pricing
             </Link>
           </div>

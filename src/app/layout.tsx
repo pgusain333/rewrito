@@ -16,29 +16,29 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: "rewrito",
   title: {
-    default: "rewrito - AI Humanizer, Detector, Plagiarism Checker, and Study Assistant",
+    default: "rewrito - AI Humanizer, Grammar Checker, Detector, Plagiarism Checker, and Study Assistant",
     template: "%s - rewrito",
   },
   description:
-    "Build human intelligence with AI intelligence. Humanize AI text, check AI detector confidence, review plagiarism risk, rewrite LinkedIn posts and emails, and study concepts clearly with rewrito.",
+    "Build human intelligence with AI intelligence. Humanize AI text, check AI detector confidence, fix grammar, review plagiarism risk, rewrite LinkedIn posts and emails, and study concepts clearly with rewrito.",
   keywords: CORE_KEYWORDS,
   authors: [{ name: "rewrito" }],
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: siteUrl,
-    title: "rewrito - AI Humanizer, Detector, Plagiarism Checker, and Study Assistant",
+    title: "rewrito - AI Humanizer, Grammar Checker, Detector, Plagiarism Checker, and Study Assistant",
     description:
-      "Human intelligence with AI intelligence. Humanize AI text, check originality risk, polish LinkedIn posts, rewrite emails, study clearly, and learn better patterns as you work.",
+      "Human intelligence with AI intelligence. Humanize AI text, check originality risk, fix grammar, polish LinkedIn posts, rewrite emails, study clearly, and learn better patterns as you work.",
     siteName: "rewrito",
     locale: "en_US",
     images: [{ url: "/rewrito-logo.png", width: 1200, height: 320, alt: "rewrito" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "rewrito - AI Humanizer, Detector, Plagiarism Checker, and Study Assistant",
+    title: "rewrito - AI Humanizer, Grammar Checker, Detector, Plagiarism Checker, and Study Assistant",
     description:
-      "Humanize AI text, check detector confidence, review plagiarism risk, rewrite professional communication, study clearly, and learn better patterns as you work.",
+      "Humanize AI text, check detector confidence, fix grammar, review plagiarism risk, rewrite professional communication, study clearly, and learn better patterns as you work.",
     images: ["/rewrito-logo.png"],
   },
   robots: {
@@ -79,7 +79,7 @@ const jsonLd = {
       name: "rewrito",
       url: siteUrl,
       description:
-        "AI writing and study toolkit for humanizing AI text, checking AI detector confidence, reviewing plagiarism risk, rewriting professional communication, and learning clearly.",
+        "AI writing and study toolkit for humanizing AI text, checking AI detector confidence, fixing grammar, reviewing plagiarism risk, rewriting professional communication, and learning clearly.",
       publisher: { "@id": `${siteUrl}/#organization` },
     },
     {
