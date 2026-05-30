@@ -5,7 +5,7 @@ import { ToolWorkspace } from "@/components/tools/ToolWorkspace";
 import { pageMetadata, TOOL_KEYWORDS, uniqueKeywords } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Try rewrito Free - AI Humanizer, Grammar, Detector, Plagiarism, Study",
+  title: "Try rewrito Free - AI Writing Tools",
   description:
     "Try rewrito free. Humanize AI text, fix grammar, check AI detector confidence, review plagiarism risk, rewrite LinkedIn posts and emails, and study concepts clearly in one workspace.",
   path: "/try",

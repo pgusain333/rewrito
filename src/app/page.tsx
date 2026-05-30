@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/icons";
 
 export const metadata: Metadata = {
-  title: "rewrito - AI Humanizer, Grammar Checker, Detector, Plagiarism Checker, and Study Assistant",
+  title: "rewrito - AI Humanizer, Grammar and Study Tools",
   description:
     "Build human intelligence with AI intelligence. Use rewrito to humanize AI text, check AI detector scores, review plagiarism risk, rewrite LinkedIn posts and emails, create quizzes, flashcards, and study plans.",
   keywords: uniqueKeywords(

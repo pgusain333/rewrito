@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rewrito.ai";
   const now = new Date();
   const routes: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
     { path: "", priority: 1, changeFrequency: "weekly" },
@@ -22,7 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/terms", priority: 0.4, changeFrequency: "yearly" },
   ];
   return routes.map((route) => ({
-    url: `${base}${route.path}`,
+    url: `${SITE_URL}${route.path}`,
     lastModified: now,
     changeFrequency: route.changeFrequency,
     priority: route.priority,

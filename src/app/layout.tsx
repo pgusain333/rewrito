@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: "rewrito",
   title: {
-    default: "rewrito - AI Humanizer, Grammar Checker, Detector, Plagiarism Checker, and Study Assistant",
+    default: "rewrito - AI Humanizer, Grammar and Study Tools",
     template: "%s - rewrito",
   },
   description:
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: siteUrl,
-    title: "rewrito - AI Humanizer, Grammar Checker, Detector, Plagiarism Checker, and Study Assistant",
+    title: "rewrito - AI Humanizer, Grammar and Study Tools",
     description:
       "Human intelligence with AI intelligence. Humanize AI text, check originality risk, fix grammar, polish LinkedIn posts, rewrite emails, study clearly, and learn better patterns as you work.",
     siteName: "rewrito",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "rewrito - AI Humanizer, Grammar Checker, Detector, Plagiarism Checker, and Study Assistant",
+    title: "rewrito - AI Humanizer, Grammar and Study Tools",
     description:
       "Humanize AI text, check detector confidence, fix grammar, review plagiarism risk, rewrite professional communication, study clearly, and learn better patterns as you work.",
     images: ["/rewrito-logo.png"],

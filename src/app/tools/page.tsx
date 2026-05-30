@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/icons";
 
 export const metadata: Metadata = pageMetadata({
-  title: "AI Writing Tools - Humanizer, Detector, Grammar, Plagiarism, Study",
+  title: "AI Writing Tools - Humanizer, Grammar, Study",
   description:
     "Explore rewrito's AI Humanizer, AI Detector Score, Grammar Checker, Plagiarism Checker, LinkedIn Post Rewriter, Professional Email Rewriter, and AI Study Assistant in one toolkit.",
   path: "/tools",

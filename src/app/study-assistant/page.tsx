@@ -9,7 +9,7 @@ import { ArrowRightIcon, CheckIcon, StudyIcon } from "@/components/ui/icons";
 import { absoluteUrl, breadcrumbJsonLd, pageMetadata, softwareAppJsonLd, TOOL_KEYWORDS } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "AI Study Assistant - Explain Concepts, Notes, Quizzes, Flashcards",
+  title: "AI Study Assistant - Study Smarter",
   description:
     "Rewrito Study is an AI study assistant that explains concepts clearly, organizes notes, creates quiz testlets and flashcards, and builds practical study plans.",
   path: "/study-assistant",

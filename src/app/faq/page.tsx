@@ -6,7 +6,7 @@ import { ArrowRightIcon } from "@/components/ui/icons";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
-  title: "rewrito FAQ - AI Humanizer, Grammar, Detector, Plagiarism, and Study Questions",
+  title: "rewrito FAQ - AI Writing and Study Tools",
   description:
     "Answers to common questions about rewrito, free access, saved history, AI humanizing, grammar checking, detector scores, plagiarism checking, Rewrito Study, privacy, and mobile support.",
   path: "/faq",

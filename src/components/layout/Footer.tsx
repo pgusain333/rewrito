@@ -26,7 +26,6 @@ export function Footer() {
           <FooterCol title="Product">
             <FooterLink href="/pricing">Pricing</FooterLink>
             <FooterLink href="/faq">FAQ</FooterLink>
-            <FooterLink href="/dashboard">Dashboard</FooterLink>
           </FooterCol>
           <FooterCol title="Company">
             <FooterLink href="mailto:hello@rewrito.ai">Contact</FooterLink>

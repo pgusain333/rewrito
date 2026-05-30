@@ -7,7 +7,9 @@ const LOGO_URL = "https://www.rewrito.ai/rewrito-logo.png";
 const subject = "Welcome to rewrito - your writing and study workspace";
 
 function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL ?? "https://rewrito.ai").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.rewrito.ai")
+    .replace(/\/$/, "")
+    .replace(/^https:\/\/rewrito\.ai$/i, "https://www.rewrito.ai");
 }
 
 function reviewUrl() {
