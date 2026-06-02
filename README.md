@@ -25,12 +25,12 @@ Run `supabase/schema.sql` in your Supabase SQL editor before testing auth, usage
 
 ## Production Setup
 
-1. Set `NEXT_PUBLIC_SITE_URL=https://www.rewrito.ai` in Vercel.
+1. Set `NEXT_PUBLIC_SITE_URL=https://rewrito.ai` in Vercel.
 2. Add the rest of `.env.example` values in Vercel Project Settings.
    - For stronger generation quality with Anthropic, use `AI_PROVIDER=anthropic` and `ANTHROPIC_MODEL=claude-sonnet-4-6`.
 3. In Supabase Auth URL Configuration, set:
-   - Site URL: `https://www.rewrito.ai`
-   - Redirect URL: `https://www.rewrito.ai/auth/callback`
+   - Site URL: `https://rewrito.ai`
+   - Redirect URL: `https://rewrito.ai/auth/callback`
    - Optional local redirect: `http://localhost:3000/auth/callback`
 4. In Supabase Auth Providers, enable Google and add the Google OAuth client ID and secret.
 5. In Google Cloud Console, add Supabase's Google callback URL as an authorized redirect URI. Supabase shows the exact URL in Auth Providers > Google.

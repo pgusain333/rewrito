@@ -5,12 +5,6 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: "/:path*",
-        has: [{ type: "host", value: "rewrito.ai" }],
-        destination: "https://www.rewrito.ai/:path*",
-        permanent: true,
-      },
-      {
         source: "/rewrito-study",
         destination: "/study-assistant",
         permanent: true,

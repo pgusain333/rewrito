@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
-const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.rewrito.ai";
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rewrito.ai";
 
 export const SITE_URL = rawSiteUrl
   .replace(/\/+$/, "")
-  .replace(/^https:\/\/rewrito\.ai$/i, "https://www.rewrito.ai");
+  .replace(/^https:\/\/www\.rewrito\.ai$/i, "https://rewrito.ai");
 export const SITE_NAME = "rewrito";
 export const SITE_TAGLINE = "Build human intelligence with AI intelligence";
 
